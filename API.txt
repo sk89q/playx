@@ -1,0 +1,55 @@
+PlayX contains an API that you can call from your own Lua scripts. 
+Do not directly change any variables in PlayX -- only call the methods.
+For descriptions of the methods, and information on the arguments,
+read through the respective lua/playx/playx.lua and 
+lua/playx/client/playx.lua files for server and client.
+
+Server
+------
+
+table PlayX.CurrentMedia = nil
+bool PlayX.AdminTimeoutTimerRunning = false
+
+bool PlayX.PlayerExists()
+bool PlayX.IsUsingJW()
+string PlayX.GetJWURL()
+bool PlayX.JWPlayerSupportsYouTube()
+bool PlayX.IsPermitted(entity ply)
+void PlayX.SpawnForPlayer(entity ply, string model)
+void PlayX.OpenMedia(string provider, string uri, number start,
+    bool forceLowFramerate, bool useJW, number ignoreLength)
+void PlayX.CloseMedia()
+void PlayX.SetCurrentMediaLength(length)
+void PlayX.BeginMedia(string handler, string uri, number start,
+    number resumeSupported, bool lowFramerate, number length,
+    table handlerArgs)
+void PlayX.EndMedia()
+void PlayX.SendBeginDStream(entity ply)
+void PlayX.SendEndUMsg()
+void PlayX.SendSpawnDialogUMsg(entity ply)
+
+Client
+------
+
+bool PlayX.Enabled = true
+bool PlayX.Playing = false
+table PlayX.CurrentMedia = nil
+bool PlayX.SeenNotice = false
+string PlayX.JWPlayerURL = ""
+
+bool PlayX.PlayerExists()
+entity PlayX.GetInstance()
+string PlayX.GetHTML()
+void PlayX.Enable()
+void PlayX.Disable()
+number PlayX.GetPlayerFPS()
+PlayX.SetPlayerFPS(number fps)
+number PlayX.GetPlayerVolume()
+PlayX.SetPlayerVolume(number volume)
+void PlayX.ResumePlay()
+void PlayX.HidePlayer()
+void PlayX.ResetRenderBounds()
+void PlayX.RequestOpenMedia(string provider, string uri, number start,
+    bool lowFPS, bool useJW)
+void PlayX.RequestCloseMedia()
+void PlayX.OpenSpawnDialog()

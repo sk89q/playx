@@ -1,0 +1,8 @@
+"AddonInfo"
+{
+    "name" "PlayX"
+    "version" "Nightly"
+    "author_name" "sk89q"
+    "author_url" "http://www.sk89q.com"
+    "info" "Internet media player"
+}
