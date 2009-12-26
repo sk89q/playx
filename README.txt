@@ -52,7 +52,7 @@ have set the value of the playx_jw_url cvar to the URL of the player.
 Server Cvars
 ------------
 
-string playx_jw_url (def. "")
+string playx_jw_url (def. "http://playx.googlecode.com/svn/jwplayer/player.swf")
     The JW Player URL. Required for a lot of functionality.
 
 bool playx_jw_youtube (def. "1")

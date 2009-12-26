@@ -22,7 +22,7 @@ PlayX = {}
 
 include("playx/providers.lua")
 
-CreateConVar("playx_jw_url", "", {FCVAR_ARCHIVE})
+CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "10", {FCVAR_ARCHIVE})
