@@ -293,10 +293,12 @@ function ENT:OnRemove()
                 browser:SetPaintedManually(true)
                 browser:StopAnimate()
             end
-        else -- Gmod lied
+        elseif ValidEntity(ent) then -- Gmod lied
             Msg("PlayX DEBUG: Entity was NOT really removed\n")
             
             ent:ResetRenderBounds()
+        else
+            Msg("PlayX DEBUG: Multiple entities detected?\n")
         end
     end)
 end
