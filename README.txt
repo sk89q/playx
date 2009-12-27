@@ -106,7 +106,7 @@ Support
 
 - YouTube: auto-detect, resume / seek, volume control, length detection
 - Flash: auto-detect
-- MP3*: auto-detect, resume / seek, volume control (not really)
+- MP3*: auto-detect, resume / seek (not really), volume control
 - FLV*: auto-detect, volume control
 - MP4*: auto-detect, volume control
 - AAC*: auto-detect, volume control
