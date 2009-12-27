@@ -37,3 +37,26 @@ end
 function ENT:OnRemove()
     PlayX.CloseMedia()
 end
+
+local function PlayXEntityDuplicator(ply, model, pos, ang)
+    if PlayX.PlayerExists() then
+        return nil
+    end
+    
+    if not PlayX.IsPermitted(ply) then
+        return nil
+    end
+    
+	local ent = ents.Create("gmod_playx")
+    ent:SetModel(model)
+	ent:SetPos(pos)
+	ent:SetAngles(ang)
+    ent:Spawn()
+    ent:Activate()
+    
+    ply:AddCleanup("gmod_playx", ent)
+
+    return ent
+end
+
+duplicator.RegisterEntityClass("gmod_playx", PlayXEntityDuplicator, "Model", "Pos", "Ang")
