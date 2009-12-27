@@ -1,6 +1,6 @@
 PlayX
 Copyright (c) 2009 sk89q <http://www.sk89q.com>
-Licensed under the GNU Lesser General Public License v2
+Licensed under the GNU General Public License v2
 
 Introduction
 ------------
@@ -9,41 +9,69 @@ PlayX is a versatile media player for Gmod that is capable of playing
 several different types of media, ranging from YouTube videos to images.
 
 Features:
-- Play YouTube videos, Livestream channels, Flash movies, MP3, FLV, MP4,
-  and AAC files, images, and Vimeo videos
-- Auto-detection of type of media
-- Video resuming support (support varies; see list below)
-- Video resuming for players who joined after the video started
-  (support varies; see list below)
-- Automatic video length detection for YouTube videos will stop rendering
-  of videos when finished
-- Automatic end of the video after a delay when all administrators have
-  left the server.
-- Ability to begin the media at a point other than the beginning
-  (support varies; see list below)
-- Client-side video restarting support with resume (support varies; see
-  list below)
-- Server-side video stop support
-- Client side enabling and disabling of the player
-- Adjustable FPS of player
-- Adjustable volume of player (support varies; see list below)
-- Ad-less player for YouTube (requires JW player; discussed below)
-- For non-animated media (static images, music files), a low frame rate
-  mode is automatically activated to significantly reduce frame rate drop
-- Low frame rate mode can be forced for any media
-- Contains a projector mode, with a model that does not require CS:S
-- Projector screen is the same size as the screen of IamMcLovin's YouTube 
-  player
-- Notice printed on screen on how to re-enable the player, should the
-  user disable the player
-- Message printed to chat whenever a video is played, should the user
-  disable the player
-- Protection against Gmod freezes (you hear a click and water sound upon
-  returning to Gmod), so that the video continues playing
-- Can be easily extended with more video providers
-- By default, administrator only, but can be extended to allow access on
-  different criteria
-- Client-side and server-side APIs
+- YouTube videos, Livestream channels, Flash movies, MP3, FLV, MP4,
+  and AAC files, images, and Vimeo videos can be played
+  - Select a particular provider, or let PlayX automatically detect that
+    information from the URL
+  - PlayX can be extended to play videos from other providers
+  - YouTube videos can be played in a custom player that contains no
+    pesky advertisements, and also likewise, no annotations and captions
+    - The custom media player can be disabled on a case-by-case basis
+  - Certain types of media (music files and images) are automatically put
+    into a low frame rate mode that tells clients to render the video
+    at 1 FPS, to prevent unnecessary reduce frame rate drop
+    - Any piece of media can be forced into low frame rate mode
+  - Flash movies will be "forced play" so that they can be played in the
+    player even if you would normally have to press a "Play" button
+- The screen can be drawn on a prop or projected from a projector model
+  - Available non-projector props are Counter-Strike: Source screens, and
+    one projector is from CS:S
+  - Another projector is the Gmod camera model, so anyone can watch the
+    video with no needed addons or games
+  - Any model can be used for the player even if the screen coordinates
+    are not explicitly defined, although support varies, and it best works
+    on (some) PHX plate models
+  - The projector screen is the same size as the projector screens in
+    IamMcLovin's YouTube player, allowing for easy replacement of the
+    projector in an adv. dupe file
+- Videos can be resumed (support varies between providers)
+  - Users can hide the player (where resume is supported), and restart the
+    player, resuming the video from where it 'would be' for everyone else
+  - Users who join after the video start can see the video from the point
+    where it would be for everyone else
+  - Videos can be started at a certain point in the video other than the
+    beginning
+  - Should the server clear of administrators, the player will
+    automatically stop the video after a delay to prevent the video from
+    continuing to load for everyone that joins
+- The currently playing media can be ended prematurely
+  - The video can be automatically stopped when it ends if it is a
+    YouTube video
+    - Configurable grace period after the video ends so that users who may
+      have had short buffering issues can still enjoy the video until the
+      end
+    - This feature can be disabled completely, or disabled on a
+      video-by-video basis
+- Clients can adjust the frame rate of the screen as well as the
+  volume of the video (support varies between providers)
+  - The player can be disabled altogether by a client, and the setting will
+    persist between sessions
+    - If the player is disabled, the user will see a message on the screen
+      reminding the user on how to re-enable the player
+    - When a video is started, and the user has the player disabled, a
+      notice will be printed to their chat reminding them that they have
+      the player disabled
+- Protection against Gmod freezes (where you hear a click and water sound
+  upon returning to Gmod) that will keep the video continuing to play
+  - If the projector screen starts to appear only if the projector prop
+    is in view, a button on the PlayX settings tool menu panel will correct
+    that issue
+- PlayX is extensible
+  - More providers can be added to PlayX
+  - PlayX contains both client-side and server-side APIs
+  - By default, PlayX checks whether you are an administrator on the
+    server before giving access, but this can be overrided with a custom
+    authorization routine
 
 A lot of the functionality available requires that you have an installation
 of the JW Player (http://www.longtailvideo.com/) somewhere, and that you
