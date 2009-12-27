@@ -24,21 +24,20 @@ local faves = {
 }
 
 hook.Add("PlayerSay", "PlayXFavesPlayerSay", function(ply, text, all, death)
+    if not PlayX then return end
+    if not all then return end
+    
     local q = text:lower():match("^!fav (.+)$")
     
-    if all and q and faves[q] then
-        if ply:IsAdmin() then
-            if PlayX and PlayX.PlayerExists() then
-                PlayX.OpenMedia("YouTube", faves[q])
-            elseif PlayX then
-                ply:ChatPrint("No PlayX player is spawned")
-            else
-                ply:ChatPrint("PlayX is not installed")
-            end
+    if q and faves[q] then
+        if not PlayX.IsPermitted(ply) then
+            ply:ChatPrint("You don't have permission to start videos")
+        elseif not PlayX.PlayerExists() then
+            ply:ChatPrint("No PlayX player is spawned")
         else
-            ply:ChatPrint("Only administrators can play videos")
+            PlayX.OpenMedia("YouTube", faves[q])
         end
-    elseif text:lower():match("^!fav ") then
+    elseif q then
         ply:ChatPrint("Unrecognized video name!")
     end
     
