@@ -106,13 +106,16 @@ Support
 
 - YouTube: auto-detect, resume / seek, volume control, length detection
 - Flash: auto-detect
-- MP3: auto-detect, resume / seek (not really)
-- FLV: auto-detect
-- MP4: auto-detect
-- AAC: auto-detect
-- image: auto-detect, resume, volume N/A, length N/A
+- MP3*: auto-detect, resume / seek, volume control (not really)
+- FLV*: auto-detect, volume control
+- MP4*: auto-detect, volume control
+- AAC*: auto-detect, volume control
+- Image: auto-detect, resume, volume N/A, length N/A
 - Livestream: auto-detect, resume, volume control, length N/A
 - Vimeo: auto-detect, volume control
+
+* Requires that the playx_jw_url cvar be pointed to a valid URL of a
+  hosted copy of the JW Player.
 
 Providers
 ---------
