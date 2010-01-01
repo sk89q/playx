@@ -297,6 +297,11 @@ function ENT:OnRemove()
             Msg("PlayX DEBUG: Entity was NOT really removed\n")
             
             ent:ResetRenderBounds()
+        elseif PlayX:PlayerExists() and ValidEntity(PlayX.GetInstance()) and
+            PlayX.GetInstance() ~= ent then
+            Msg("PlayX DEBUG: New PlayX entity created to replace old one\n")
+            
+            PlayX.GetInstance():ResetRenderBounds()
         else
             Msg("PlayX DEBUG: Multiple entities detected?\n")
         end
