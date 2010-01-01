@@ -122,17 +122,17 @@ local function SettingsPanel(panel)
             panel:AddControl("Label", {
                 Text = "The current media cannot be resumed once stopped."
             })
-            
-            if PlayX:GetInstance() and PlayX:GetInstance().IsProjector then
-                panel:AddControl("Button", {
-                    Label = "Fix Screen Not Always Appearing",
-                    Command = "playx_reset_render_bounds",
-                })
-            end
         end
     else
         panel:AddControl("Label", {
             Text = "No media is playing at the moment."
+        })
+    end
+    
+    if PlayX:GetInstance() and PlayX:GetInstance().IsProjector then
+        panel:AddControl("Button", {
+            Label = "Fix Screen Not Always Appearing",
+            Command = "playx_reset_render_bounds",
         })
     end
 end
