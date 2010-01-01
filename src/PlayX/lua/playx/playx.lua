@@ -53,7 +53,7 @@ end
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
-CreateConVar("playx_expire", "10", {FCVAR_ARCHIVE})
+CreateConVar("playx_expire", "15", {FCVAR_ARCHIVE})
 
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
@@ -210,7 +210,7 @@ end
 -- has begun playing.
 -- @param length Time in seconds
 function PlayX.SetCurrentMediaLength(length)
-    if GetConVar("playx_expire"):GetFloat() > -1 then
+    if GetConVar("playx_expire"):GetFloat() <= -1 then
         timer.Stop("PlayXMediaExpire")
         return
     end
@@ -223,7 +223,7 @@ function PlayX.SetCurrentMediaLength(length)
         local timeLeft = PlayX.CurrentMedia.StopTime - PlayX.CurrentMedia.StartTime
         
         print("PlayX: Length of current media set to " .. tostring(length) ..
-              "(grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
+              " (grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
         
         if timeLeft > 0 then
             timer.Adjust("PlayXMediaExpire", timeLeft, 1)
