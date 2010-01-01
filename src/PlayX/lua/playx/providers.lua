@@ -71,6 +71,8 @@ end
 local function GetYouTubeLength(id, callback)
     local vars = URLEncodeTable({
         ["alt"] = "atom",
+        ["key"] = "AI39si79-V-ltHhNyYvyTeaiJeexopkZoiUA56Sk-W8Z5alYUkgntdwvkmu1avAWGNixM_DuLx8-Jai6qy1am7HhbhYvWERzWA",
+        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
     local url = "http://gdata.youtube.com/feeds/api/videos/" .. id .."?" .. vars
 
