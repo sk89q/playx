@@ -25,7 +25,7 @@ ENT.Contact = "http://www.sk89q.com"
 ENT.Purpose = "Internet media player"
 ENT.Instructions = "Spawn one, and then use the spawn menu."
 
-ENT.Spawnable = false
+ENT.Spawnable = true
 ENT.AdminSpawnable = true
 
 ENT.RenderGroup = RENDERGROUP_TRANSLUCENT

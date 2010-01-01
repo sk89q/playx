@@ -321,8 +321,14 @@ end
 -- open the spawn dialog.
 -- @param ply Player to send to
 function PlayX.SendSpawnDialogUMsg(ply)
-    umsg.Start("PlayXSpawnDialog", ply)
-    umsg.End()
+	if not ply or not ply:IsValid() then
+        return
+    elseif not PlayX.IsPermitted(ply) then
+        ply:ChatPrint("PlayX: You do not have permission to use the player")
+    else
+        umsg.Start("PlayXSpawnDialog", ply)
+        umsg.End()
+    end
 end
 
 local function JWURLCallback(cvar, old, new)
