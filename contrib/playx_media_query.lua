@@ -128,12 +128,14 @@ local function Play(ply, provider, uri, lowFramerate)
             ply:ChatPrint("PlayX ERROR: " .. err)
         end
     else
-        ply:ChatPrint("NOTE: Only administrators can play videos")
+        ply:ChatPrint("NOTE: You are not permitted to control the player")
     end
 end
 
 hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, all, death)
     if not all then return end
+    
+    text = text:TrimRight()
     
     local m = FindMatch(text, {
         "^[!%.](yt) (.+)",
