@@ -1,8 +1,8 @@
 "AddonInfo"
 {
     "name" "PlayX"
-    "version" "1.0beta"
+    "version" "1.0-beta3"
     "author_name" "sk89q"
-    "author_url" "http://www.sk89q.com"
+    "author_url" "http://github.com/sk89q/playx"
     "info" "Internet media player"
 }
