@@ -22,6 +22,34 @@ PlayX = {}
 
 include("playx/providers.lua")
 
+--- Casts a console command arg to a string.
+-- @param v
+-- @param default
+local function ConCmdToString(v, default)
+    if v == nil then return default end
+    return tostring(v)
+end
+
+--- Casts a console command arg to a number.
+-- @param v
+-- @param default
+local function ConCmdToNumber(v, default)
+    v = tonumber(v)
+    if v == nil then return default end
+    return v
+end
+
+--- Casts a console command arg to a bool.
+-- @param v
+-- @param default
+local function ConCmdToBool(v, default)
+    if v == nil then return default end
+    if v == "false" then return false end
+    v = tonumber(v)
+    if v == nil then return true end
+    return v != 0
+end
+
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
@@ -100,6 +128,7 @@ end
 -- certain video.
 -- @param provider Name of provider, leave blank to auto-detect
 -- @param uri URI to play
+-- @param start Time to start the video at, in seconds
 -- @param forceLowFramerate Force the client side players to play at 1 FPS
 -- @param useJW True to allow the use of the JW player, false for otherwise, nil to default true
 -- @param ignoreLength True to not check the length of the video (for auto-close)
@@ -313,13 +342,15 @@ local function ConCmdOpen(ply, cmd, args)
         ply:ChatPrint("PlayX: You do not have permission to use the player")
     elseif not PlayX.PlayerExists() then
         ply:ChatPrint("PlayX: There is no player spawned to play the media")
+    elseif not args[1] then
+        ply:PrintMessage(HUD_PRINTCONSOLE, "playx_open requires a URI")
     else
         local uri = args[1]:Trim()
-        local provider = args[2]:Trim()
-        local start = math.max(tonumber(args[3]), 0)
-        local forceLowFramerate = tonumber(args[4]) != 0
-        local useJW = tonumber(args[5]) != 0
-        local ignoreLength = tonumber(args[6]) != 0
+        local provider = ConCmdToString(args[2], ""):Trim()
+        local start = math.max(ConCmdToNumber(args[3], 0), 0)
+        local forceLowFramerate = ConCmdToBool(args[4], false)
+        local useJW = ConCmdToBool(args[5], true)
+        local ignoreLength = ConCmdToBool(args[6], false)
         
         local result, err = PlayX.OpenMedia(provider, uri, start,
                                             forceLowFramerate, useJW,
