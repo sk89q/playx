@@ -1,26 +1,28 @@
 -- PlayX Faves
 -- Copyright (c) 2009 sk89q <http://www.sk89q.com>
--- 
--- This program is free software: you can redistribute it and/or modify
--- it under the terms of the GNU General Public License as published by
--- the Free Software Foundation, either version 2 of the License, or
--- (at your option) any later version.
--- 
--- This program is distributed in the hope that it will be useful,
--- but WITHOUT ANY WARRANTY; without even the implied warranty of
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--- GNU General Public License for more details.
--- 
--- You should have received a copy of the GNU General Public License
--- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-- Licensed under the GNU General Public License v2
+--
+-- playx_faves.lua allows you to provide a "favorites" list that can be
+-- accessed via chat. For example, you could do !fav brightside to play
+-- a certain video.
+--
+-- To install, drop this file into your lua/autorun/server folder.
 -- 
 -- $Id$
 
 local faves = {
-    ["brightside"] = "http://www.youtube.com/watch?v=_RM6qsq-JPY",
-    ["failedme"] = "http://www.youtube.com/watch?v=VuK-aLSZtNo",
-    ["theinternet"] = "http://www.youtube.com/watch?v=iDbyYGrswtg",
-    ["verymelon"] = "http://www.youtube.com/watch?v=T5Q8Gs-w-z8",
+
+-- Change this list to change the favorites
+--
+
+["brightside"] = "http://www.youtube.com/watch?v=_RM6qsq-JPY",
+["failedme"] = "http://www.youtube.com/watch?v=VuK-aLSZtNo",
+["theinternet"] = "http://www.youtube.com/watch?v=iDbyYGrswtg",
+["verymelon"] = "http://www.youtube.com/watch?v=T5Q8Gs-w-z8",
+
+--
+-- END
+
 }
 
 hook.Add("PlayerSay", "PlayXFavesPlayerSay", function(ply, text, all, death)

@@ -1,19 +1,31 @@
 -- PlayX Media Query Extension
 -- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Licensed under the GNU General Public License v2
 -- 
--- This program is free software: you can redistribute it and/or modify
--- it under the terms of the GNU General Public License as published by
--- the Free Software Foundation, either version 2 of the License, or
--- (at your option) any later version.
+-- This extension allows you to control PlayX, as well as search YouTube
+-- from chat. Anyone can invoke the YouTube functions, but only those
+-- permitted to do so can control PlayX.
+--
+-- Chat commands:
+--   !yt <query> -  Search YouTube in-game for embeddable videos, and get
+--      the first result (it will not play, though)
+--   !ytplay [query] - Search YouTube, and play it as well, but if you do
+--      not provide an argument/search query, then the last found video
+--      (via !yt or so) will be played
+--   !ytlisten [query] - Works just like !ytplay, except it will put videos
+--      into low frame rate mode (for music-only videos)
+--   !ytlast - Plays the last found video
+--   !play <URI> - Plays a piece of media (provider is auto-detected)
+--   !link <URI> - Alias of !play
+--   !playx <URI> - Alias of !play
 -- 
--- This program is distributed in the hope that it will be useful,
--- but WITHOUT ANY WARRANTY; without even the implied warranty of
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--- GNU General Public License for more details.
--- 
--- You should have received a copy of the GNU General Public License
--- along with this program.  If not, see <http://www.gnu.org/licenses/>.
--- 
+-- In addition to that, a user can also just paste a YouTube URL anywhere
+-- in his or her message and the title of the video will be looked up and
+-- printed to chat. It will also set the "last result" as the URL, so you
+-- can then just do !ytplay, !ytliste, or !ytlast.
+--
+-- To install, drop this file into your lua/autorun/server folder.
+--
 -- $Id$
 
 local lastResult = nil
