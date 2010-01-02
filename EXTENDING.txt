@@ -1,0 +1,40 @@
+Providers
+---------
+
+Providers are the video services/types themselves, such as YouTube or
+Vimeo, or MP3 and FLV files. Registered providers must provide an
+auto-detect function, as well as a function to translate a piece of media
+into the correct handler (explained later) to play it.
+
+Providers are registered in the PlayX.Providers table. See
+playx/providers.lua to see the format of providers.
+
+While providers are defined mostly server-side, there is also a client-side
+list of providers. This list, however, does not have any logic. It merely
+is a list of available providers. The client-side list of providers can
+also be changed, although you would have to either modify PlayX directly,
+or download another Lua file. The client-side list of providers is found 
+n playx/client/providers.lua.
+
+Handlers
+--------
+
+Handlers are a client-side construct. They are the actual players of the
+media. They generate HTML for the web browser control in order to play a
+piece of media.
+
+There is not a 1:1 relationship between providers and handlers. Many 
+different providers can be played using an already-implemented handler.
+Handlers are defined in playx/client/providers.lua.
+
+Authorization
+-------------
+
+To override authorization, define a global function named
+PlayXIsPermittedHook that takes in one argument, a Player. Have it return
+true to permit access, and false to deny access.
+
+API
+---
+
+See API.txt for API information.

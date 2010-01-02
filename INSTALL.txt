@@ -1,0 +1,14 @@
+Installation
+------------
+
+Copy the "PlayX" folder into your Gmod "addons" folder to install PlayX.
+That's all!
+
+PlayX can be used from the tool menu, under the "Options" tab.
+
+Extras
+------
+
+Inside the contrib/ folder are some extra extensions for PlayX. Open each
+file up in Notepad or your favorite text editor for an explanation of
+each file.

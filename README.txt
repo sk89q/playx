@@ -1,6 +1,7 @@
 PlayX
 Copyright (c) 2009 sk89q <http://www.sk89q.com>
 Licensed under the GNU General Public License v2
+http://github.com/sk89q/playx
 
 Introduction
 ------------
@@ -77,6 +78,27 @@ A lot of the functionality available requires that you have an installation
 of the JW Player (http://www.longtailvideo.com/) somewhere, and that you
 have set the value of the playx_jw_url cvar to the URL of the player.
 
+Support
+-------
+
+- YouTube: auto-detect, resume / seek, volume control, length detection
+- Flash: auto-detect
+- MP3*: auto-detect, resume / seek (not really), volume control
+- FLV*: auto-detect, volume control
+- MP4*: auto-detect, volume control
+- AAC*: auto-detect, volume control
+- Image: auto-detect, resume, volume N/A, length N/A
+- Livestream: auto-detect, resume, volume control, length N/A
+- Vimeo: auto-detect, volume control
+
+* Requires that the playx_jw_url cvar be pointed to a valid URL of a
+  hosted copy of the JW Player.
+
+Usage
+-----
+
+PlayX can be used from the tool menu, under the "Options" tab.
+
 Server Cvars
 ------------
 
@@ -101,52 +123,9 @@ number playx_expire (def. "10")
     The grace period after a video ends before stopping the video. Set to
     "-1" to disable this feature. Defined in seconds.
 
-Support
--------
-
-- YouTube: auto-detect, resume / seek, volume control, length detection
-- Flash: auto-detect
-- MP3*: auto-detect, resume / seek (not really), volume control
-- FLV*: auto-detect, volume control
-- MP4*: auto-detect, volume control
-- AAC*: auto-detect, volume control
-- Image: auto-detect, resume, volume N/A, length N/A
-- Livestream: auto-detect, resume, volume control, length N/A
-- Vimeo: auto-detect, volume control
-
-* Requires that the playx_jw_url cvar be pointed to a valid URL of a
-  hosted copy of the JW Player.
-
-Providers
+Extending
 ---------
 
-Providers are registered in the PlayX.Providers table. See
-playx/providers.lua to see the format of providers. The client-side
-list of providers can also be changed, although you would have to either
-modify PlayX directly, or download another Lua file. The client-side list
-of providers is found in playx/client/providers.lua.
+PlayX can be extended in several ways.
 
-Handlers
---------
-
-Handlers are a client-side construct. They are the actual players. They
-generate HTML for the web browser control in order to play a piece of
-media.
-
-There is not a 1:1 relationship between providers and handlers. Many 
-different providers can be played using an already-implemented handler.
-Handlers are defined in playx/client/providers.lua.
-
-Hooks
------
-
-To override authorization, define a global function named
-PlayXIsPermittedHook that takes in one argument, a Player. Have it return
-true to permit access, and false to deny access.
-
-API
----
-
-See API.txt for more information.
-
-There is an example usage of the API in the contrib/ folder.
+Please see EXTENDING.txt and API.txt.
