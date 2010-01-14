@@ -53,7 +53,7 @@ end
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
-CreateConVar("playx_expire", "15", {FCVAR_ARCHIVE})
+CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
 
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
