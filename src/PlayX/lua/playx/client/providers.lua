@@ -16,6 +16,41 @@
 -- 
 -- $Id$
 
+local HTMLPage = {}
+
+function HTMLPage:new(css, js, body, jsURL)
+    local instance = {
+        ["CSS"] = css,
+        ["Body"] = body,
+        ["JS"] = js,
+        ["JSInclude"] = jsURL,
+    }
+    
+    setmetatable(instance, self)
+    self.__index = self
+    return instance
+end
+
+function HTMLPage:GetHTML()
+    return [[
+<!DOCTYPE html>
+<html>
+<head>
+<title>PlayX</title>
+<style type="text/css">
+]] .. self.CSS .. [[
+</style>
+<script type="text/javascript">
+]] .. self.JS .. [[
+</script>
+</head>
+<body>
+]] .. self.Body .. [[
+</body>
+</html>
+]]
+end
+
 --- Percent encodes a value.
 -- @param s String
 -- @return Encoded
@@ -59,12 +94,7 @@ end
 local function GenerateImageViewer(width, height, url)
     url = url:gsub("&", "&amp;"):gsub("\"", "&quot;")
     
-    return [[
-<!DOCTYPE html>
-<html>
-<head>
-<title>PlayX</title>
-<style type="text/css">
+    return HTMLPage:new([[
 body {
   margin: 0;
   padding: 0;
@@ -76,9 +106,10 @@ td {
   text-align: center;
   vertical-align: middle;
 }
-</style>
-<script type="text/javascript">
-var keepResizing = true
+]],
+
+[[
+var keepResizing = true;
 function resize(obj) {
   var ratio = obj.width / obj.height;
   if (]] .. width .. [[ / ]] .. height .. [[ > ratio) {
@@ -92,21 +123,19 @@ setInterval(function() {
     resize(document.images[0]);
   }
 }, 1000);
-</script>
-</head>
-<body>
+]],
+
+[[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
 <table border="0" cellpadding="0" cellmargin="0" style="width: ]] .. width .. [[px; height: ]] .. height .. [[px">
 <tr>
-<td>
-<img src="]] .. url .. [[" alt="" onload="resize(this); keepResizing = false" />
+<td style="text-align: center">
+<img src="]] .. url .. [[" alt="" onload="resize(this); keepResizing = false" style="margin: auto" />
 </td>
 </tr>
 </table>
 </div>
-</body>
-</html>
-]]
+]])
 end
 
 --- Generates the HTML for a Flash player viewer.
@@ -134,38 +163,29 @@ local function GenerateFlashPlayer(width, height, url, flashVars, js, forcePlay)
 setInterval(function() {
   try {
     var player = document.getElementById('player');
-    if (!player.IsPlaying()) { player.play(); }
+    if (player && !player.IsPlaying()) {
+      player.play();
+    }
   } catch (e) {}
-}, 1000)
+}, 1000);
 ]]
         extraParams = [[
 <param name="loop" value="false">
 ]]
     end
     
-    if js then
-        js = "<script type=\"text/javascript\">" .. js .. "</script>"
-    else
-        js = ""
-    end
-    
-    return [[
-<!DOCTYPE html>
-<html>
-<head>
-<title>PlayX</title>
-<style type="text/css">
+    return HTMLPage:new([[
 body {
   margin: 0;
   padding: 0;
   border: 0;
   background: #000000;
   overflow: hidden;
-}
-</style>
-]] .. js .. [[
-</head>
-<body>
+}]],
+
+js,
+
+[[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
 <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" 
   type="application/x-shockwave-flash"
@@ -179,9 +199,7 @@ body {
 ]] .. extraParams .. [[
 </object> 
 </div>
-</body>
-</html>
-]]
+]])
 end
 
 --- Generate the HTML page for the JW player.
@@ -218,18 +236,7 @@ end
 local function GenerateJSEmbed(width, height, url, js)
     url = url:gsub("&", "&amp;"):gsub("\"", "&quot;")
     
-    if js then
-        js = "<script type=\"text/javascript\">" .. js .. "</script>"
-    else
-        js = ""
-    end
-    
-    return [[
-<!DOCTYPE html>
-<html>
-<head>
-<title>PlayX</title>
-<style type="text/css">
+    return HTMLPage:new([[
 body {
   margin: 0;
   padding: 0;
@@ -237,16 +244,17 @@ body {
   background: #000000;
   overflow: hidden;
 }
-</style>
-]] .. js .. [[
-</head>
-<body>
+]],
+
+js,
+
+[[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
   <script src="]] .. url .. [[" type="text/javascript"></script>
 </div>
-</body>
-</html>
-]]
+]],
+
+url)
 end
 
 PlayX.Providers = {

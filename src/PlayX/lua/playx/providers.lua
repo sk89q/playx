@@ -352,7 +352,7 @@ PlayX.Providers = {
                     ["wmode"] = "window",
                 }
                 
-                local url = "http://static.livestream.com/scripts/playerv2.js?" .. URLEncodeTable(vars)
+                local url = "http://cdn.livestream.com/grid/PlayerV2.swf?" .. URLEncodeTable(vars)
                 
                 return {
                     ["Handler"] = "FlashAPI",
@@ -360,7 +360,6 @@ PlayX.Providers = {
                     ["ResumeSupported"] = false,
                     ["LowFramerate"] = false,
                     ["HandlerArgs"] = {
-                        ["URLIsJavaScript"] = true,
                         ["VolumeMul"] = 0.1,
                     },
                 }

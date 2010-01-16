@@ -117,7 +117,7 @@ end
 --- Used to get the HTML, namely for debugging purposes.
 function PlayX.GetHTML()
     if PlayX.PlayerExists() then
-        return PlayX.GetInstance().CurrentHTML
+        return PlayX.GetInstance().CurrentPage:GetHTML()
     end
 end
 

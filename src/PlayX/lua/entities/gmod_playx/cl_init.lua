@@ -19,6 +19,10 @@
 require("chrome")
 include("shared.lua")
 
+language.Add("Undone_gmod_playx", "Undone PlayX Player")
+language.Add("Cleanup_gmod_playx", "PlayX Player")
+language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
+
 local usingChrome = chrome != nil and chrome.NewBrowser != nil
 
 local browserMat = nil
@@ -40,9 +44,10 @@ if usingChrome then
     end
 end
 
-language.Add("Undone_gmod_playx", "Undone PlayX Player")
-language.Add("Cleanup_gmod_playx", "PlayX Player")
-language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
+local function JSEncodeString(str)
+    return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
+        :gsub("\r", "\\r"):gsub("\n", "\\n")
+end
 
 function ENT:Initialize()
 	self.Entity:DrawShadow(false)
@@ -74,7 +79,8 @@ function ENT:Initialize()
         end
     end
     
-    self.CurrentHTML = ""
+    self.UsingChrome = usingChrome
+    self.CurrentPage = nil
     self.Playing = false
     self.FPS = 1
     self.LowFramerateMode = false
@@ -139,17 +145,18 @@ function ENT:SetProjectorBounds(forward, right, up)
     self.DrawScale = 1 -- Not used
 end
 
-function ENT:CreateBrowser(html)    
+function ENT:CreateBrowser(page)    
     if not self.DrawScale then
         Error("SetScreenBounds() not yet called")
     end
     
-    self.CurrentHTML = html
+    self.CurrentPage = page
     
     if usingChrome then
         self.Browser = chrome.NewBrowser(textureWidth, textureHeight,
                                          browserTexture, self:GetTable())
-        self.Browser:LoadHTML(html)
+        self.Browser:LoadURL("http://playx.googlecode.com/svn/host/host.html")
+        -- TODO: Remove hard-coded URL
     else
         if PlayXBrowser and PlayXBrowser:IsValid() then
             Msg("Found existing PlayXBrowser; reusing\n")
@@ -161,7 +168,7 @@ function ENT:CreateBrowser(html)
         self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
         self.Browser:SetPaintedManually(true)
         self.Browser:SetVerticalScrollbarEnabled(false)
-        self.Browser:SetHTML(html)
+        self.Browser:SetHTML(page:GetHTML())
         
         if self.LowFramerateMode then
             self.Browser:StartAnimate(1000)
@@ -174,20 +181,21 @@ function ENT:CreateBrowser(html)
 end
 
 function ENT:Play(handler, uri, start, volume, handlerArgs)
-    local html, center = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
+    local page, center = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
                                                  start, volume, uri, handlerArgs)
     
     self.DrawCenter = center
     
-    self.CurrentHTML = html
+    self.CurrentPage = page
     
     if not self.Browser then
-        self:CreateBrowser(html)
+        self:CreateBrowser(page)
     else
         if usingChrome then
-            self.Browser:LoadHTML(html)
+            self.Browser:LoadURL("http://playx.googlecode.com/svn/host/host.html")
+            -- TODO: Remove hard-coded URL
         else
-            self.Browser:SetHTML(html)
+            self.Browser:SetHTML(page:GetHTML())
         
             if self.LowFramerateMode then
                 self.Browser:StartAnimate(1000)
@@ -206,9 +214,8 @@ function ENT:Stop()
             self.Browser:Free()
             self.Browser = nil
         else
-            local html = [[STOPPED]]
-            self.CurrentHTML = html
-            self.Browser:SetHTML(html)
+            self.CurrentPage = nil
+            self.Browser:SetHTML([[STOPPED]])
             self.Browser:SetPaintedManually(true)
             self.Browser:StopAnimate()
         end
@@ -378,18 +385,34 @@ function ENT:OnRemove()
     end
 end
 
-function ENT:onBeginNavigation(url)
-    print("onBeginNavigation")
-end
-
-function ENT:onBeginLoading(url, status)
-    print("onBeginLoading")
-end
-
+-- For gm_chrome
 function ENT:onFinishLoading()
-    print("onFinishLoading")
+    if self.CurrentPage.JS then
+        self.Browser:Exec(self.CurrentPage.JS)
+    end
+    
+    if self.CurrentPage.JSInclude then
+        self.Browser:Exec([[
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = ']] .. JSEncodeString(self.CurrentPage.JSInclude) .. [[';
+document.body.appendChild(script);
+]])
+    else
+        self.Browser:Exec([[
+document.body.innerHTML = ']] .. JSEncodeString(self.CurrentPage.Body) .. [[';
+]])
+    end
+
+    self.Browser:Exec([[
+var style = document.createElement('style');
+style.type = 'text/css';
+style.styleSheet.cssText = ']] .. JSEncodeString(self.CurrentPage.CSS) .. [[';
+document.getElementsByTagName('head')[0].appendChild(style);
+]])
 end
 
-function ENT:onChangeFocus(focus)
-    print("onChangeFocus")
-end
+-- For gm_chrome
+function ENT:onBeginNavigation(url) end
+function ENT:onBeginLoading(url, status) end
+function ENT:onChangeFocus(focus) end
