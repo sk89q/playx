@@ -16,7 +16,29 @@
 -- 
 -- $Id$
 
+require("chrome")
 include("shared.lua")
+
+local usingChrome = chrome != nil and chrome.NewBrowser != nil
+
+local browserMat = nil
+local browserTexture = nil
+local textureID = nil
+local textureWidth = nil
+local textureHeight = nil
+
+if usingChrome then
+    browserMat = Material("chrome/tele")
+
+    if browserMat then
+        browserTexture = browserMat:GetMaterialTexture("$basetexture")
+        textureID = surface.GetTextureID("chrome/tele")
+        textureWidth = browserTexture:GetActualWidth()
+        textureHeight = browserTexture:GetActualHeight()
+    else
+        usingChrome = false
+    end
+end
 
 language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
@@ -67,12 +89,18 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight, rotateAround
     self.ScreenHeight = height
     self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
     
-    if self.IsSquare then
-        self.HTMLWidth = 1024
-        self.HTMLHeight = 1024
+    if usingChrome then
+        self.HTMLWidth = textureWidth
+        self.HTMLHeight = textureHeight
+        self.IsSquare = false
     else
-        self.HTMLWidth = 1024
-        self.HTMLHeight = 512
+        if self.IsSquare then
+            self.HTMLWidth = 1024
+            self.HTMLHeight = 1024
+        else
+            self.HTMLWidth = 1024
+            self.HTMLHeight = 512
+        end
     end
     
     if width / height < self.HTMLWidth / self.HTMLHeight then
@@ -100,8 +128,13 @@ function ENT:SetProjectorBounds(forward, right, up)
     self.Right = right
     self.Up = up
     
-    self.HTMLWidth = 1024
-    self.HTMLHeight = 512
+    if usingChrome then
+        self.HTMLWidth = textureWidth
+        self.HTMLHeight = textureHeight
+    else
+        self.HTMLWidth = 1024
+        self.HTMLHeight = 512
+    end
     
     self.DrawScale = 1 -- Not used
 end
@@ -111,25 +144,33 @@ function ENT:CreateBrowser(html)
         Error("SetScreenBounds() not yet called")
     end
     
-    if PlayXBrowser and PlayXBrowser:IsValid() then
-        Msg("Found existing PlayXBrowser; reusing\n")
-        self.Browser = PlayXBrowser
-    else
-        self.Browser = vgui.Create("HTML")
-    end
-    
-    self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
-    self.Browser:SetPaintedManually(true)
-    self.Browser:SetVerticalScrollbarEnabled(false)
-    self.Browser:SetHTML(html)
     self.CurrentHTML = html
-    if self.LowFramerateMode then
-        self.Browser:StartAnimate(1000)
-    else
-        self.Browser:StartAnimate(1000 / self.FPS)
-    end
     
-    PlayXBrowser = self.Browser
+    if usingChrome then
+        self.Browser = chrome.NewBrowser(textureWidth, textureHeight,
+                                         browserTexture, self:GetTable())
+        self.Browser:LoadHTML(html)
+    else
+        if PlayXBrowser and PlayXBrowser:IsValid() then
+            Msg("Found existing PlayXBrowser; reusing\n")
+            self.Browser = PlayXBrowser
+        else
+            self.Browser = vgui.Create("HTML")
+        end
+        
+        self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
+        self.Browser:SetPaintedManually(true)
+        self.Browser:SetVerticalScrollbarEnabled(false)
+        self.Browser:SetHTML(html)
+        
+        if self.LowFramerateMode then
+            self.Browser:StartAnimate(1000)
+        else
+            self.Browser:StartAnimate(1000 / self.FPS)
+        end
+        
+        PlayXBrowser = self.Browser
+    end
 end
 
 function ENT:Play(handler, uri, start, volume, handlerArgs)
@@ -143,11 +184,16 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     if not self.Browser then
         self:CreateBrowser(html)
     else
-        self.Browser:SetHTML(html)
-        if self.LowFramerateMode then
-            self.Browser:StartAnimate(1000)
+        if usingChrome then
+            self.Browser:LoadHTML(html)
         else
-            self.Browser:StartAnimate(1000 / self.FPS)
+            self.Browser:SetHTML(html)
+        
+            if self.LowFramerateMode then
+                self.Browser:StartAnimate(1000)
+            else
+                self.Browser:StartAnimate(1000 / self.FPS)
+            end
         end
     end
     
@@ -155,12 +201,17 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 end
 
 function ENT:Stop()
-    if self.Browser and self.Browser:IsValid() then
-        local html = [[STOPPED]]
-        self.CurrentHTML = html
-        self.Browser:SetHTML(html)
-        self.Browser:SetPaintedManually(true)
-        self.Browser:StopAnimate()
+    if self.Browser and (usingChrome or self.Browser:IsValid()) then
+        if usingChrome then
+            self.Browser:Free()
+            self.Browser = nil
+        else
+            local html = [[STOPPED]]
+            self.CurrentHTML = html
+            self.Browser:SetHTML(html)
+            self.Browser:SetPaintedManually(true)
+            self.Browser:StopAnimate()
+        end
     end
     
     self.Playing = false
@@ -175,7 +226,7 @@ end
 function ENT:SetFPS(fps)
     self.FPS = fps
     
-    if self.Browser and self.Browser:IsValid() and not self.LowFramerateMode then
+    if not usingChrome and self.Browser and self.Browser:IsValid() and not self.LowFramerateMode then
         self.Browser:StartAnimate(1000 / self.FPS)
     end
 end
@@ -184,7 +235,7 @@ function ENT:Draw()
 	self.Entity:DrawModel()
 	
 	if self.DrawScale then
-        if self.Browser and self.Browser:IsValid() and self.Playing then
+        if not usingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
             self.Browser:SetPaintedManually(false)
         end
 		render.SuppressEngineLighting(true)
@@ -211,8 +262,8 @@ function ENT:Draw()
                             + ang:Up() * 2
                 
                 cam.Start3D2D(pos, ang, width)
-                if self.Browser and self.Browser:IsValid() and self.Playing then
-                    self.Browser:PaintManual()
+                if self.Browser and (usingChrome or self.Browser:IsValid()) and self.Playing then
+                    self:PaintBrowser()
                 else
                     surface.SetDrawColor(0, 0, 0, 255)
                     surface.DrawRect(0, 0, 1024, 512)
@@ -242,8 +293,8 @@ function ENT:Draw()
             cam.Start3D2D(pos, ang, self.DrawScale)
             surface.SetDrawColor(0, 0, 0, 255)
             surface.DrawRect(-self.DrawShiftX, -self.DrawShiftY * shiftMultiplier, self.DrawWidth, self.DrawHeight)
-            if self.Browser and self.Browser:IsValid() and self.Playing then
-                self.Browser:PaintManual()
+            if self.Browser and (usingChrome or self.Browser:IsValid()) and self.Playing then
+                self:PaintBrowser()
             else
                 if not PlayX.Enabled then
                     draw.SimpleText("Re-enable the player in the tool menu -> Options",
@@ -258,10 +309,22 @@ function ENT:Draw()
         end
 
 		render.SuppressEngineLighting(false)
-        if self.Browser and self.Browser:IsValid() and self.Playing then
+        if not usingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
             self.Browser:SetPaintedManually(true)
         end
 	end
+end
+
+function ENT:PaintBrowser()
+    if usingChrome then
+        self.Browser:Update()
+        surface.SetDrawColor(0, 0, 0, 255)
+        surface.DrawRect(0, 0, textureWidth, textureHeight)
+        surface.SetTexture(textureID)
+        surface.DrawTexturedRect(0, 0, textureWidth, textureHeight)
+    else
+        self.Browser:PaintManual()
+    end
 end
 
 function ENT:OnRemove()
@@ -276,34 +339,57 @@ function ENT:OnRemove()
     local ent = this
     local browser = self.Browser
     
-    -- Give Gmod 200ms to really delete the entity
-    timer.Simple(0.2, function()
-        if not ValidEntity(ent) and 
-            (not PlayX:PlayerExists() or PlayX.GetInstance() == ent) then -- Entity is really gone
-            Msg("PlayX DEBUG: Entity was really removed\n")
-            
-            -- Creating a new HTML panel tends to crash clients occasionally, so
-            -- we're going try to keep a copy around
-            -- Don't know whether the crash is caused by the browser being created
-            -- or by the page browsing
-            if browser and browser:IsValid() then
-                --browser:Clear()
-                local html = [[Gmod called ENT:OnRemove() even though no entity was removed. You should not be seeing this message.]]
-                browser:SetHTML(html)
-                browser:SetPaintedManually(true)
-                browser:StopAnimate()
-            end
-        elseif ValidEntity(ent) then -- Gmod lied
-            Msg("PlayX DEBUG: Entity was NOT really removed\n")
-            
-            ent:ResetRenderBounds()
-        elseif PlayX:PlayerExists() and ValidEntity(PlayX.GetInstance()) and
-            PlayX.GetInstance() ~= ent then
-            Msg("PlayX DEBUG: New PlayX entity created to replace old one\n")
-            
-            PlayX.GetInstance():ResetRenderBounds()
-        else
-            Msg("PlayX DEBUG: Multiple entities detected?\n")
+    if usingChrome then
+        if self.Browser then
+            self.Browser:Free()
+            self.Browser = nil
         end
-    end)
+    else
+        -- Give Gmod 200ms to really delete the entity
+        timer.Simple(0.2, function()
+            if not ValidEntity(ent) and 
+                (not PlayX:PlayerExists() or PlayX.GetInstance() == ent) then -- Entity is really gone
+                Msg("PlayX DEBUG: Entity was really removed\n")
+                
+                -- Creating a new HTML panel tends to crash clients occasionally, so
+                -- we're going try to keep a copy around
+                -- Don't know whether the crash is caused by the browser being created
+                -- or by the page browsing
+                if browser and browser:IsValid() then
+                    --browser:Clear()
+                    local html = [[Gmod called ENT:OnRemove() even though no entity was removed. You should not be seeing this message.]]
+                    browser:SetHTML(html)
+                    browser:SetPaintedManually(true)
+                    browser:StopAnimate()
+                end
+            elseif ValidEntity(ent) then -- Gmod lied
+                Msg("PlayX DEBUG: Entity was NOT really removed\n")
+                
+                ent:ResetRenderBounds()
+            elseif PlayX:PlayerExists() and ValidEntity(PlayX.GetInstance()) and
+                PlayX.GetInstance() ~= ent then
+                Msg("PlayX DEBUG: New PlayX entity created to replace old one\n")
+                
+                PlayX.GetInstance():ResetRenderBounds()
+            else
+                Msg("PlayX DEBUG: Multiple entities detected?\n")
+            end
+        end)
+    end
+end
+
+function ENT:onBeginNavigation(url)
+    print("onBeginNavigation")
+end
+
+function ENT:onBeginLoading(url, status)
+    print("onBeginLoading")
+end
+
+function ENT:onFinishLoading()
+    print("onFinishLoading")
+end
+
+function ENT:onChangeFocus(focus)
+    print("onChangeFocus")
 end
