@@ -64,6 +64,13 @@ function PlayX.PlayerExists()
     return table.Count(ents.FindByClass("gmod_playx")) > 0
 end
 
+--- Gets the player instance entity
+-- @return Entity or nil
+function PlayX.GetInstance()
+    local props = ents.FindByClass("gmod_playx")
+    return props[1]
+end
+
 --- Checks whether the JW player is enabled.
 -- @return Whether the JW player is enabled
 function PlayX.IsUsingJW()
@@ -165,10 +172,11 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
             return false, "The provider did not recognize the media URI"
         end
     else -- Time to detect the provider
-        for _, p in pairs(PlayX.Providers) do
+        for id, p in pairs(PlayX.Providers) do
             local newURI = p.Detect(uri)
             
             if newURI then
+                provider = id
                 result = p.GetPlayer(newURI, useJW)
                 break
             end
@@ -186,7 +194,7 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
     
     PlayX.BeginMedia(result.Handler, result.URI, start,
                      result.ResumeSupported, useLowFramerate, nil,
-                     result.HandlerArgs)
+                     result.HandlerArgs, provider)
     
     if not ignoreLength and result.LengthFunc then
         result.LengthFunc(function(length)
@@ -207,31 +215,37 @@ function PlayX.CloseMedia()
 end
 
 --- Sets the current media length. This can be called even after the media
--- has begun playing.
+-- has begun playing. Calling this when there is no player spawned has
+-- no effect or there is no media playing has no effect.
 -- @param length Time in seconds
 function PlayX.SetCurrentMediaLength(length)
+    if not PlayX.PlayerExists() or not PlayX.CurrentMedia then
+        return
+    end
+    
+    PlayX.CurrentMedia.Length = length
+    PlayX:GetInstance():UpdateWireLength(length)
+    
     if GetConVar("playx_expire"):GetFloat() <= -1 then
         timer.Stop("PlayXMediaExpire")
         return
     end
     
     length = length + GetConVar("playx_expire"):GetFloat() -- Pad length
+     
+    PlayX.CurrentMedia.StopTime = PlayX.CurrentMedia.StartTime + length
     
-    if PlayX.CurrentMedia then        
-        PlayX.CurrentMedia.StopTime = PlayX.CurrentMedia.StartTime + length
-        
-        local timeLeft = PlayX.CurrentMedia.StopTime - PlayX.CurrentMedia.StartTime
-        
-        print("PlayX: Length of current media set to " .. tostring(length) ..
-              " (grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
-        
-        if timeLeft > 0 then
-            timer.Adjust("PlayXMediaExpire", timeLeft, 1)
-            timer.Start("PlayXMediaExpire")
-        else -- Looks like it ended already!
-            print("PlayX: Media has already expired")
-            PlayX.EndMedia()
-        end
+    local timeLeft = PlayX.CurrentMedia.StopTime - PlayX.CurrentMedia.StartTime
+    
+    print("PlayX: Length of current media set to " .. tostring(length) ..
+          " (grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
+    
+    if timeLeft > 0 then
+        timer.Adjust("PlayXMediaExpire", timeLeft, 1)
+        timer.Start("PlayXMediaExpire")
+    else -- Looks like it ended already!
+        print("PlayX: Media has already expired")
+        PlayX.EndMedia()
     end
 end
 
@@ -242,7 +256,13 @@ end
 -- @param start
 -- @param resumeSupported
 -- @param lowFramerate
-function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, length, handlerArgs)
+-- @param length Length of the media in seconds, can be nil
+-- @param handlerArgs Arguments for the handler, can be nil
+-- @Param provider Used for wire outputs & metadata, optional
+-- @Param identifier Identifies video URL/etc, used for wire outputs & metadata, optional
+-- @Param title Used for wire outputs & metadata, optional
+function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate,
+                          length, handlerArgs, provider, identifier, title)
     timer.Stop("PlayXMediaExpire")
     timer.Stop("PlayXAdminTimeout")
     
@@ -253,6 +273,11 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, le
         handlerArgs = {}
     end
     
+    PlayX.GetInstance():UpdateWireOutputs(handler, uri, start, length and length or 0,
+                                          provider and provider or "",
+                                          identifier and identifier or "",
+                                          title and title or "")
+    
     PlayX.CurrentMedia = {
         ["Handler"] = handler,
         ["URI"] = uri,
@@ -260,7 +285,11 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, le
         ["ResumeSupported"] = resumeSupported,
         ["LowFramerate"] = lowFramerate,
         ["StopTime"] = nil,
-        ["HandlerArgs"] = handlerArgs
+        ["HandlerArgs"] = handlerArgs,
+        ["Length"] = length,
+        ["Provider"] = provider,
+        ["Identifier"] = identifier,
+        ["Title"] = title,
     }
     
     if length then
@@ -276,6 +305,8 @@ end
 function PlayX.EndMedia()
     timer.Stop("PlayXMediaExpire")
     timer.Stop("PlayXAdminTimeout")
+    
+    PlayX.GetInstance():ClearWireOutputs()
     
     PlayX.CurrentMedia = nil
     PlayX.AdminTimeoutTimerRunning = false

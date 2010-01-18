@@ -28,6 +28,20 @@ function ENT:Initialize()
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	self.Entity:DrawShadow(false)
+    
+	if WireAddon then
+		self.Outputs = Wire_CreateOutputs(self.Entity, {
+            "Provider [STRING]",
+            "Handler [STRING]",
+            "URI [STRING]",
+            "Playing",
+            "Start",
+            "ActualStartTime",
+            "Length",
+            "Identifier [STRING]",
+            "Title [STRING]",
+        })
+	end
 end
 
 function ENT:SpawnFunction(ply, tr)
@@ -36,6 +50,48 @@ end
 
 function ENT:OnRemove()
     PlayX.CloseMedia()
+end
+
+function ENT:ClearWireOutputs()
+	if WireAddon then
+        Wire_TriggerOutput(self.Entity, "Provider", "")
+        Wire_TriggerOutput(self.Entity, "Handler", "")
+        Wire_TriggerOutput(self.Entity, "URI", "")
+        Wire_TriggerOutput(self.Entity, "Playing", 0)
+        Wire_TriggerOutput(self.Entity, "Start", 0)
+        Wire_TriggerOutput(self.Entity, "ActualStartTime", 0)
+        Wire_TriggerOutput(self.Entity, "Length", 0)
+        Wire_TriggerOutput(self.Entity, "Identifier", "")
+        Wire_TriggerOutput(self.Entity, "Title", "")
+    end
+end
+
+function ENT:UpdateWireOutputs(handler, uri, start, length, provider,
+                               identifier, title)
+	if WireAddon then
+        Wire_TriggerOutput(self.Entity, "Provider", provider)
+        Wire_TriggerOutput(self.Entity, "Handler", handler)
+        Wire_TriggerOutput(self.Entity, "URI", uri)
+        Wire_TriggerOutput(self.Entity, "Playing", 1)
+        Wire_TriggerOutput(self.Entity, "Start", start)
+        Wire_TriggerOutput(self.Entity, "ActualStartTime", CurTime())
+        Wire_TriggerOutput(self.Entity, "Length", length)
+        Wire_TriggerOutput(self.Entity, "Identifier", identifier)
+        Wire_TriggerOutput(self.Entity, "Title", title)
+    end
+end
+
+function ENT:UpdateWireLength(length)
+	if WireAddon then
+        Wire_TriggerOutput(self.Entity, "Length", length)
+    end
+end
+
+function ENT:UpdateWireMetadata(length, provider, title)
+	if WireAddon then
+        Wire_TriggerOutput(self.Entity, "Length", length)
+        Wire_TriggerOutput(self.Entity, "Title", title)
+    end
 end
 
 local function PlayXEntityDuplicator(ply, model, pos, ang)
