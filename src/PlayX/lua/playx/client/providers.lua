@@ -162,6 +162,15 @@ body {
   background: #000000;
   overflow: hidden;
 }
+.no-flash {
+  font-family: Arial, sans-serif;
+  font-size: 400%;
+  color: #FFFFFF;
+}
+.no-flash strong {
+  background: #FF0000;
+  color: #FFFFFF;
+}
 </style>
 ]] .. js .. [[
 </head>
@@ -177,6 +186,13 @@ body {
   <param name="allowfullscreen" value="false">
   <param name="FlashVars" value="]] .. flashVars .. [[">
 ]] .. extraParams .. [[
+<p class="no-flash">
+  <strong>IMPORTANT:</strong>
+  Adobe Flash Player must be installed for Internet Explorer. Please
+  visit
+  <span style="text-decoration: underline; color: #fffbb6">http://get.adobe.com/flashplayer/</span> in Internet Explorer.
+  <noscript>Please also enable JavaScript for IE.</noscript>
+</p>
 </object> 
 </div>
 </body>
