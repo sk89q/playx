@@ -50,6 +50,69 @@ local function ConCmdToBool(v, default)
     return v != 0
 end
 
+--- Parses a human-readable time string. Returns the number in seconds, or
+-- nil if it cannot detect a format. Blank strings will return 0.
+-- @Param str
+function ParseTimeString(str)
+    if str == "" or str == nil then return 0 end
+    
+    str = str:Trim()
+    
+    if tonumber(str) then
+        return tonumber(str)
+    end
+    
+    str = str:gsub("t=", "")
+    str = str:gsub("#", "")
+    
+    local m, s = str:match("^([0-9]+):([0-9]+)$")
+    if m then
+        return tonumber(m) * 60 + tonumber(s)
+    end
+    
+    local m, s, ms = str:match("^([0-9]+):([0-9]+)(%.[0-9]+)$")
+    if m then
+        return tonumber(m) * 60 + tonumber(s) + tonumber(ms)
+    end
+    
+    local h, m, s = str:match("^([0-9]+):([0-9]+):([0-9]+)$")
+    if h then
+        return tonumber(h) * 3600 + tonumber(m) * 60 + tonumber(s)
+    end
+    
+    local h, m, s, ms = str:match("^([0-9]+):([0-9]+):([0-9]+)(%.[0-9]+)$")
+    if h then
+        return tonumber(h) * 3600 + tonumber(m) * 60 + tonumber(s) + tonumber(ms)
+    end
+    
+    local s = str:match("^([0-9]+)s$")
+    if s then
+        return tonumber(s)
+    end
+    
+    local m, s = str:match("^([0-9]+)m *([0-9]+)s$")
+    if m then
+        return tonumber(m) * 60 + tonumber(s)
+    end
+    
+    local m, s = str:match("^([0-9]+)m$")
+    if m then
+        return tonumber(m) * 60
+    end
+    
+    local h, m, s = str:match("^([0-9]+)h *([0-9]+)m *([0-9]+)s$")
+    if h then
+        return tonumber(h) * 3600 + tonumber(m) * 60 + tonumber(s)
+    end
+    
+    local h, m = str:match("^([0-9]+)h *([0-9]+)m$")
+    if h then
+        return tonumber(h) * 3600 + tonumber(m) * 60
+    end
+    
+    return nil
+end
+
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
@@ -108,6 +171,10 @@ end
 function PlayX.SpawnForPlayer(ply, model)
     if PlayX.PlayerExists() then
         return false, "There is already a PlayX player somewhere on the map"
+    end
+    
+    if not util.IsValidModel(model) then
+        return false, "The server doesn't have the selected model"
     end
     
     local tr = ply:GetEyeTrace()
@@ -183,7 +250,7 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
         end
         
         if not result then
-            return false, "No provider was auto-detected for the provided media URI"
+            return false, "No provider was auto-detected"
         end
     end
     
@@ -348,6 +415,14 @@ function PlayX.SendEndUMsg()
     umsg.End()
 end
 
+--- Send the PlayXEnd umsg to clients. You should not have much of a
+-- a reason to call this method.
+function PlayX.SendError(ply, err)
+    umsg.Start("PlayXError", ply)
+	umsg.String(err)
+    umsg.End()
+end
+
 --- Send the PlayXSpawnDialog umsg to a client, telling the client to
 -- open the spawn dialog.
 -- @param ply Player to send to
@@ -376,25 +451,31 @@ local function ConCmdOpen(ply, cmd, args)
 	if not ply or not ply:IsValid() then
         return
     elseif not PlayX.IsPermitted(ply) then
-        ply:ChatPrint("PlayX: You do not have permission to use the player")
+        PlayX.SendError(ply, "You do not have permission to use the player")
     elseif not PlayX.PlayerExists() then
-        ply:ChatPrint("PlayX: There is no player spawned to play the media")
+        PlayX.SendError(ply, "There is no player spawned! Go to the spawn menu > Entities")
     elseif not args[1] then
         ply:PrintMessage(HUD_PRINTCONSOLE, "playx_open requires a URI")
     else
         local uri = args[1]:Trim()
         local provider = ConCmdToString(args[2], ""):Trim()
-        local start = math.max(ConCmdToNumber(args[3], 0), 0)
+        local start = ParseTimeString(args[3])
         local forceLowFramerate = ConCmdToBool(args[4], false)
         local useJW = ConCmdToBool(args[5], true)
         local ignoreLength = ConCmdToBool(args[6], false)
         
-        local result, err = PlayX.OpenMedia(provider, uri, start,
-                                            forceLowFramerate, useJW,
-                                            ignoreLength)
-        
-        if not result then
-            ply:ChatPrint("PlayX: " .. err)
+        if start == nil then
+            PlayX.SendError(ply, "The time format you entered for \"Start At\" isn't understood")
+        elseif start < 0 then
+            PlayX.SendError(ply, "A non-negative start time is required")
+        else
+            local result, err = PlayX.OpenMedia(provider, uri, start,
+                                                forceLowFramerate, useJW,
+                                                ignoreLength)
+            
+            if not result then
+                PlayX.SendError(ply, err)
+            end
         end
     end
 end
@@ -404,7 +485,7 @@ function ConCmdClose(ply, cmd, args)
 	if not ply or not ply:IsValid() then
         return
     elseif not PlayX.IsPermitted(ply) then
-        ply:ChatPrint("PlayX: You do not have permission to use the player")
+        PlayX.SendError(ply, "You do not have permission to use the player")
     else
         PlayX.EndMedia()
     end
@@ -415,16 +496,16 @@ function ConCmdSpawn(ply, cmd, args)
 	if not ply or not ply:IsValid() then
         return
     elseif not PlayX.IsPermitted(ply) then
-        ply:ChatPrint("PlayX: You do not have permission to use the player")
+        PlayX.SendError(ply, "You do not have permission to use the player")
     else
         if not args[1] or args[1]:Trim() == "" then
-            ply:ChatPrint("PlayX: No model specified")
+            PlayX.SendError(ply, "No model specified")
         else
             local model = args[1]:Trim()
             local result, err = PlayX.SpawnForPlayer(ply, model)
         
             if not result then
-                ply:ChatPrint("PlayX: " .. err)
+                PlayX.SendError(ply, err)
             end
         end
     end
