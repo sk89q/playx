@@ -23,7 +23,7 @@ CreateClientConVar("playx_fps", 14, true, false)
 CreateClientConVar("playx_volume", 80, true, false)
 CreateClientConVar("playx_provider", "", false, false)
 CreateClientConVar("playx_uri", "", false, false)
-CreateClientConVar("playx_start_time", 0, false, false)
+CreateClientConVar("playx_start_time", "0:00", false, false)
 CreateClientConVar("playx_force_low_framerate", 0, false, false)
 CreateClientConVar("playx_use_jw", 1, false, false)
 CreateClientConVar("playx_ignore_length", 0, false, false)
@@ -56,9 +56,7 @@ local function BeginPlay()
                              PlayX.GetPlayerVolume(), PlayX.CurrentMedia.HandlerArgs)
     
     if not PlayX.SeenNotice then
-        LocalPlayer():ChatPrint("Something is now playing on the PlayX media player.")
-        LocalPlayer():ChatPrint("If you start getting severe game slowness, check your "
-            .. "PlayX settings under the Options tab of the tool (Q) menu.")
+        PlayX.ShowHint("Want to stop what's playing? Go to the Q menu > Options > PlayX")
         PlayX.SeenNotice = true
     end
     
@@ -248,6 +246,20 @@ function PlayX.OpenSpawnDialog()
 	end
 end
 
+--- Shows a hint.
+-- @param msg
+function PlayX.ShowHint(msg)
+    GAMEMODE:AddNotify(msg, NOTIFY_GENERIC, 10);
+	surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+end
+
+--- Shows an error message.
+-- @param err
+function PlayX.ShowError(err)
+    GAMEMODE:AddNotify("PlayX error: " .. tostring(err), NOTIFY_ERROR, 7);
+	surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+end
+
 --- Called on playx_enabled change.
 local function EnabledCallback(cvar, old, new)
 	if GetConVar("playx_enabled"):GetBool() then
@@ -349,10 +361,18 @@ local function UMsgJWURL(um)
 	PlayX.UpdatePanels()
 end
 
+--- Called on PlayXError user message.
+local function UMsgError(um)
+    local err = um:ReadString()
+    
+	PlayX.ShowError(err)
+end
+
 datastream.Hook("PlayXBegin", DSBegin)
 usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
 usermessage.Hook("PlayXJWURL", UMsgJWURL)
+usermessage.Hook("PlayXError", UMsgError)
 
 --- Called for concmd playx_resume.
 local function ConCmdResume()
@@ -373,7 +393,7 @@ end
 local function ConCmdGUIOpen()
     PlayX.RequestOpenMedia(GetConVar("playx_provider"):GetString(),
                            GetConVar("playx_uri"):GetString(),
-                           GetConVar("playx_start_time"):GetFloat(),
+                           GetConVar("playx_start_time"):GetString(),
                            GetConVar("playx_force_low_framerate"):GetBool(),
                            GetConVar("playx_use_jw"):GetBool(),
                            GetConVar("playx_ignore_length"):GetBool())
