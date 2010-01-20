@@ -103,6 +103,10 @@ function PlayX.SpawnForPlayer(ply, model)
         return false, "There is already a PlayX player somewhere on the map"
     end
     
+    if not util.IsValidModel(model) then
+        return false, "The server doesn't have the selected model"
+    end
+    
     local tr = ply:GetEyeTrace()
 
 	local ent = ents.Create("gmod_playx")

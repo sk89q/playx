@@ -231,17 +231,20 @@ function PlayX.OpenSpawnDialog()
     modelList:SetSize(298, 174)
 	
 	for model, _ in pairs(PlayXScreens) do
-		local spawnIcon = vgui.Create("SpawnIcon", modelList)
-        spawnIcon:SetModel(model)
-        spawnIcon.Model = model
-        
-        function spawnIcon.DoClick()
-            surface.PlaySound("ui/buttonclickrelease.wav")
-            RunConsoleCommand("playx_spawn", spawnIcon.Model)
-            frame:Close()
+        if util.IsValidModel(model) then
+            local spawnIcon = vgui.Create("SpawnIcon", modelList)
+            
+            spawnIcon:SetModel(model)
+            spawnIcon.Model = model
+            
+            function spawnIcon.DoClick()
+                surface.PlaySound("ui/buttonclickrelease.wav")
+                RunConsoleCommand("playx_spawn", spawnIcon.Model)
+                frame:Close()
+            end
+            
+            modelList:AddItem(spawnIcon)
         end
-        
-		modelList:AddItem(spawnIcon)
 	end
 end
 
