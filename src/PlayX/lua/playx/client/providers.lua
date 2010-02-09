@@ -303,15 +303,15 @@ PlayX.Handlers = {
             url = url:gsub("__height__", height)
         end
         
-        if handlerArgs.VolumeMul != nil then
+        if handlerArgs.VolumeMul ~= nil then
             url = url:gsub("__volume__", handlerArgs.VolumeMul * volume)
         end
         
-        if handlerArgs.StartMul != nil then
+        if handlerArgs.StartMul ~= nil then
             url = url:gsub("__start__", handlerArgs.StartMul * start)
         end
         
-        if handlerArgs.JSInitFunc != nil then
+        if handlerArgs.JSInitFunc ~= nil then
             local code = ""
             local jsVolMul = handlerArgs.JSVolumeMul and handlerArgs.JSVolumeMul or 1
             local jsStartMul = handlerArgs.JSStartMul and handlerArgs.JSStartMul or 1
@@ -330,7 +330,7 @@ PlayX.Handlers = {
                 code = code .. "player." .. handlerArgs.JSPlayFunc .. "();"
             end
         
-        if handlerArgs.RawInitJS != nil then
+        if handlerArgs.RawInitJS ~= nil then
             code = code .. handlerArgs.RawInitJS
         end
             
@@ -344,7 +344,7 @@ function ]] .. handlerArgs.JSInitFunc .. [[() {
 ]]
         end
         
-        if handlerArgs.RawJS != nil then
+        if handlerArgs.RawJS ~= nil then
             js = js .. handlerArgs.RawJS
         end
         
