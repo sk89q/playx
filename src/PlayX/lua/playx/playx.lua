@@ -47,7 +47,7 @@ local function ConCmdToBool(v, default)
     if v == "false" then return false end
     v = tonumber(v)
     if v == nil then return true end
-    return v != 0
+    return v ~= 0
 end
 
 --- Parses a human-readable time string. Returns the number in seconds, or
@@ -137,7 +137,7 @@ end
 --- Checks whether the JW player is enabled.
 -- @return Whether the JW player is enabled
 function PlayX.IsUsingJW()
-    return GetConVar("playx_jw_url"):GetString():Trim() != ""
+    return GetConVar("playx_jw_url"):GetString():Trim() ~= ""
 end
 
 --- Gets the URL of the JW player.
@@ -227,7 +227,7 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
     
     local result = nil
     
-    if provider != "" then -- Provider detected
+    if provider ~= "" then -- Provider detected
         if not PlayX.Providers[provider] then
             return false, "Unknown provider specified"
         end
@@ -552,7 +552,7 @@ function PlayerDisconnected(ply)
     if PlayX.AdminTimeoutTimerRunning then return end
     
     for _, v in pairs(player.GetAll()) do
-       if v != ply and PlayX.IsPermitted(v) then return end
+        if v ~= ply and PlayX.IsPermitted(v) then return end
     end
     
     -- No timer, no admin, no soup for you

@@ -163,7 +163,7 @@ hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, all, death
             local function successF(videoID, title)
                 lastResult = videoID
                 
-                if m[1] != "yt" then -- Play
+                if m[1] ~= "yt" then -- Play
                     Play(ply, "YouTube", videoID, m[1] == "ytlisten")
                 end
                 
