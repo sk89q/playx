@@ -16,14 +16,16 @@
 -- 
 -- $Id$
 
-local HTMLPage = {}
+local HandlerResult = {}
 
-function HTMLPage:new(css, js, body, jsURL)
+function HandlerResult:new(css, js, body, jsURL, center)
     local instance = {
         ["CSS"] = css,
         ["Body"] = body,
         ["JS"] = js,
         ["JSInclude"] = jsURL,
+        ["Center"] = center,
+        ["ForceIE"] = false,
     }
     
     setmetatable(instance, self)
@@ -31,7 +33,7 @@ function HTMLPage:new(css, js, body, jsURL)
     return instance
 end
 
-function HTMLPage:GetHTML()
+function HandlerResult:GetHTML()
     return [[
 <!DOCTYPE html>
 <html>
@@ -86,15 +88,24 @@ local function URLEncodeTable(vars)
     return str:sub(1, -2)
 end
 
---- Generates the HTML for an image viewer.
+--- HTML encodes a string.
+-- @param str
+-- @return Encoded string
+local function HTMLEncode(str)
+    return str:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;"):gsub("\"", "&quot;")
+end
+
+--- Generates the HTML for an image viewer. The image viewer will automatiaclly
+-- center the image (once size information becomes exposed in JavaScript).
 -- @param width
 -- @param height
 -- @param url
 -- @return HTML
 local function GenerateImageViewer(width, height, url)
-    url = url:gsub("&", "&amp;"):gsub("\"", "&quot;")
+    local url = HTMLEncode(url)
     
-    return HTMLPage:new([[
+    -- CSS to center the image
+    local css = [[
 body {
   margin: 0;
   padding: 0;
@@ -106,9 +117,10 @@ td {
   text-align: center;
   vertical-align: middle;
 }
-]],
-
-[[
+]]
+    
+    -- Resizing code
+    local js = [[
 var keepResizing = true;
 function resize(obj) {
   var ratio = obj.width / obj.height;
@@ -123,9 +135,9 @@ setInterval(function() {
     resize(document.images[0]);
   }
 }, 1000);
-]],
-
-[[
+]]
+    
+    local body = [[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
 <table border="0" cellpadding="0" cellmargin="0" style="width: ]] .. width .. [[px; height: ]] .. height .. [[px">
 <tr>
@@ -135,7 +147,9 @@ setInterval(function() {
 </tr>
 </table>
 </div>
-]])
+]]
+    
+    return HandlerResult:new(css, js, body)
 end
 
 --- Generates the HTML for a Flash player viewer.
@@ -148,18 +162,20 @@ end
 -- @return HTML
 local function GenerateFlashPlayer(width, height, url, flashVars, js, forcePlay)
     local extraParams = ""
-    url = url:gsub("&", "&amp;"):gsub("\"", "&quot;")
+    local url = HTMLEncode(url)
+    local flashVars = flashVars and URLEncodeTable(flashVars) or ""
     
-    if not flashVars then
-        flashVars = ""
-    else
-        flashVars = URLEncodeTable(flashVars)
-    end
+    local css = [[
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #000000;
+  overflow: hidden;
+}]]
     
-    if forcePlay then
-        if not js then js = "" end
-        
-        js = js .. [[
+    if forcePlay then        
+        js = (js and js or "") .. [[
 setInterval(function() {
   try {
     var player = document.getElementById('player');
@@ -174,18 +190,7 @@ setInterval(function() {
 ]]
     end
     
-    return HTMLPage:new([[
-body {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: #000000;
-  overflow: hidden;
-}]],
-
-js,
-
-[[
+    local body = [[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
 <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" 
   type="application/x-shockwave-flash"
@@ -199,7 +204,11 @@ js,
 ]] .. extraParams .. [[
 </object> 
 </div>
-]])
+]]
+    
+    local result = HandlerResult:new(css, js, body)
+    if forcePlay then result.ForceIE = true end
+    return result
 end
 
 --- Generate the HTML page for the JW player.
@@ -234,9 +243,9 @@ end
 -- @param url
 -- @return HTML
 local function GenerateJSEmbed(width, height, url, js)
-    url = url:gsub("&", "&amp;"):gsub("\"", "&quot;")
+    local url = HTMLEncode(url)
     
-    return HTMLPage:new([[
+    local css = [[
 body {
   margin: 0;
   padding: 0;
@@ -244,17 +253,15 @@ body {
   background: #000000;
   overflow: hidden;
 }
-]],
+]]
 
-js,
-
-[[
+    local body = [[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
   <script src="]] .. url .. [[" type="text/javascript"></script>
 </div>
-]],
-
-url)
+]]
+    
+    return HandlerResult:new(css, js, body, url)
 end
 
 PlayX.Providers = {
@@ -271,28 +278,29 @@ PlayX.Providers = {
 
 PlayX.Handlers = {
     ["JW"] = function(width, height, start, volume, uri)
-        return GenerateJWPlayer(width, height, start, volume, uri, handlerArgs), false
+        return GenerateJWPlayer(width, height, start, volume, uri, handlerArgs)
     end,
     ["JWVideo"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateJWPlayer(width, height, start, volume, uri, "video"), false
+        return GenerateJWPlayer(width, height, start, volume, uri, "video")
     end,
     ["JWAudio"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateJWPlayer(width, height, start, volume, uri, "sound"), false
+        return GenerateJWPlayer(width, height, start, volume, uri, "sound")
     end,
     ["JWRTMP"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateJWPlayer(width, height, start, volume, uri, "rtmp"), false
+        return GenerateJWPlayer(width, height, start, volume, uri, "rtmp")
     end,
     ["Flash"] = function(width, height, start, volume, uri, handlerArgs)
-        local flashVars = {}
-        if handlerArgs.FlashVars then
-            flashVars = handlerArgs.FlashVars
-        end
+        local flashVars = handlerArgs.FlashVars and handlerArgs.FlashVars or {}
         local forcePlay = handlerArgs.ForcePlay
         local center = handlerArgs.Center
-        return GenerateFlashPlayer(width, height, uri, flashVars, nil, forcePlay), center
+        local result = GenerateFlashPlayer(width, height, uri, flashVars, nil, forcePlay)
+        result.center = center
+        return result
     end,
     ["Image"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateImageViewer(width, height, uri), true -- Center
+        local result = GenerateImageViewer(width, height, uri)
+        result.center = true
+        return result
     end,
     ["FlashAPI"] = function(width, height, start, volume, uri, handlerArgs)
         local url = uri
@@ -330,9 +338,9 @@ PlayX.Handlers = {
                 code = code .. "player." .. handlerArgs.JSPlayFunc .. "();"
             end
         
-        if handlerArgs.RawInitJS ~= nil then
-            code = code .. handlerArgs.RawInitJS
-        end
+	        if handlerArgs.RawInitJS ~= nil then
+	            code = code .. handlerArgs.RawInitJS
+	        end
             
             js = js .. [[
 function ]] .. handlerArgs.JSInitFunc .. [[() {
@@ -349,9 +357,9 @@ function ]] .. handlerArgs.JSInitFunc .. [[() {
         end
         
         if handlerArgs.URLIsJavaScript then -- Include a JS file instead
-            return GenerateJSEmbed(width, height, url, js), false
+            return GenerateJSEmbed(width, height, url, js)
         else
-            return GenerateFlashPlayer(width, height, url, nil, js), false
+            return GenerateFlashPlayer(width, height, url, nil, js)
         end
     end,
 }

@@ -210,11 +210,11 @@ function ENT:DestructBrowser()
     end
 end
 
-function ENT:Play(handler, uri, start, volume, handlerArgs, forceIE)
-    local page, center = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
-                                                 start, volume, uri, handlerArgs)
+function ENT:Play(handler, uri, start, volume, handlerArgs)
+    local result = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
+                                           start, volume, uri, handlerArgs)
     
-    local usingChrome = supportsChrome and not forceIE
+    local usingChrome = supportsChrome and not result.ForceIE
     
     -- Switching browser engines!
     if self.Browser and usingChrome ~= self.UsingChrome then
@@ -224,8 +224,8 @@ function ENT:Play(handler, uri, start, volume, handlerArgs, forceIE)
     
     self.UsingChrome = usingChrome
     
-    self.DrawCenter = center
-    self.CurrentPage = page
+    self.DrawCenter = result.center
+    self.CurrentPage = result
     
     if not self.Browser then
         self:CreateBrowser()
@@ -235,7 +235,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs, forceIE)
         self.Browser:LoadURL("http://localhost/playx/host.html?")
         -- TODO: Remove hard-coded URL
     else
-        self.Browser:SetHTML(page:GetHTML())
+        self.Browser:SetHTML(result:GetHTML())
     
         if self.LowFramerateMode then
             self.Browser:StartAnimate(1000)
