@@ -41,7 +41,7 @@ function HTMLPage:GetHTML()
 ]] .. self.CSS .. [[
 </style>
 <script type="text/javascript">
-]] .. self.JS .. [[
+]] .. (self.JS and self.JS or "") .. [[
 </script>
 </head>
 <body>

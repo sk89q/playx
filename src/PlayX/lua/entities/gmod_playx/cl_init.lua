@@ -32,15 +32,21 @@ local procTexWidth = nil
 local procTexHeight = nil
 
 if supportsChrome then
+    Msg("PlayX DEBUG: gm_chrome detected\n")
+    
     procMat = Material("chrome/tele")
 
     if procMat then
         procTexture = procMat:GetMaterialTexture("$basetexture")
-        procTexID = surface.GetprocTexID("chrome/tele")
+        procTexID = surface.GetTextureID("chrome/tele")
         procTexWidth = procTexture:GetActualWidth()
         procTexHeight = procTexture:GetActualHeight()
+        
+        Msg("PlayX DEBUG: chrome/tele material detected\n")
     else
         supportsChrome = false
+        
+        Msg("PlayX DEBUG: chrome/tele material not detected; gm_chrome is unavailable\n")
     end
 end
 
@@ -59,6 +65,8 @@ function ENT:Initialize()
     self.FPS = 1
     self.LowFramerateMode = false
     self.DrawCenter = false
+    
+    self:UpdateScreenBounds()
 end
 
 function ENT:UpdateScreenBounds()
@@ -151,9 +159,13 @@ function ENT:CreateBrowser()
     self:UpdateScreenBounds()
     
     if self.UsingChrome then
+        Msg("PlayX DEBUG: Using gm_chrome\n")
+        
         self.Browser = chrome.NewBrowser(procTexWidth, procTexHeight,
                                          procTexture, self:GetTable())
     else
+        Msg("PlayX DEBUG: Using IE\n")
+        
         if PlayXBrowser and PlayXBrowser:IsValid() then
             Msg("Found existing PlayX browser; reusing\n")
             self.Browser = PlayXBrowser
@@ -205,10 +217,12 @@ function ENT:Play(handler, uri, start, volume, handlerArgs, forceIE)
     local usingChrome = supportsChrome and not forceIE
     
     -- Switching browser engines!
-    if usingChrome ~= self.UsingChrome then
+    if self.Browser and usingChrome ~= self.UsingChrome then
         self.Browser:DestructBrowser()
-        self.UsingChrome = usingChrome
+        self.Browser = nil
     end
+    
+    self.UsingChrome = usingChrome
     
     self.DrawCenter = center
     self.CurrentPage = page
@@ -218,7 +232,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs, forceIE)
     end
     
     if self.UsingChrome then
-        self.Browser:LoadURL("http://playx.googlecode.com/svn/host/host.html")
+        self.Browser:LoadURL("http://localhost/playx/host.html?")
         -- TODO: Remove hard-coded URL
     else
         self.Browser:SetHTML(page:GetHTML())
@@ -359,6 +373,7 @@ function ENT:OnRemove()
     
     local ent = self
     local browser = self.Browser
+    local usingChrome = self.UsingChrome
     
     -- Give Gmod 200ms to really delete the entity
     timer.Simple(0.2, function()
@@ -366,7 +381,25 @@ function ENT:OnRemove()
             (not PlayX:PlayerExists() or PlayX.GetInstance() == ent) then -- Entity is really gone
             Msg("PlayX DEBUG: Entity was really removed\n")
             
-            self:DestructBrowser()
+            -- From ENT:DestructBrowser()
+		    if usingChrome then
+		        if browser then
+		            browser:Free()
+		        end
+		    else
+		        if browser and browser.IsValid and browser:IsValid() then
+		            --browser:Clear()
+		            local html = [[ENT:OnRemove() called.]]
+		            browser:SetHTML(html)
+		            browser:SetPaintedManually(true)
+		            browser:StopAnimate()
+		            
+		            -- Creating a new HTML panel tends to crash clients occasionally, so
+		            -- we're going try to keep a copy around
+		            -- Don't know whether the crash is caused by the browser being created
+		            -- or by the page browsing
+		        end
+		    end
         elseif ValidEntity(ent) then -- Gmod lied
             Msg("PlayX DEBUG: Entity was NOT really removed\n")
             
