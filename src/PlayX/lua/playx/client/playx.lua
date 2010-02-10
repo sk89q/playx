@@ -16,6 +16,7 @@
 -- 
 -- $Id$
 
+require("chrome")
 require("datastream")
 
 CreateClientConVar("playx_enabled", 1, true, false)
@@ -27,6 +28,7 @@ CreateClientConVar("playx_start_time", "0:00", false, false)
 CreateClientConVar("playx_force_low_framerate", 0, false, false)
 CreateClientConVar("playx_use_jw", 1, false, false)
 CreateClientConVar("playx_ignore_length", 0, false, false)
+CreateClientConVar("playx_use_chrome", 1, true, false)
 
 PlayX = {}
 
@@ -38,6 +40,32 @@ PlayX.Playing = false
 PlayX.CurrentMedia = nil
 PlayX.SeenNotice = false
 PlayX.JWPlayerURL = ""
+PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
+
+PlayX.ProcMat = nil
+PlayX.ProcTexture = nil
+PlayX.ProcTexID = nil
+PlayX.ProcTexWidth = nil
+PlayX.ProcTexHeight = nil
+
+if PlayX.SupportsChrome then
+    Msg("PlayX DEBUG: gm_chrome detected\n")
+    
+    PlayX.ProcMat = Material("playx/screen")
+
+    if PlayX.ProcMat then
+        PlayX.ProcTexture = PlayX.ProcMat:GetMaterialTexture("$basetexture")
+        PlayX.ProcTexID = surface.GetTextureID("playx/screen")
+        PlayX.ProcTexWidth = PlayX.ProcTexture:GetActualWidth()
+        PlayX.ProcTexHeight = PlayX.ProcTexture:GetActualHeight()
+        
+        Msg("PlayX DEBUG: playx/screen material detected\n")
+    else
+        PlayX.SupportsChrome = false
+        
+        Msg("PlayX DEBUG: playx/screen material not detected; gm_chrome is unavailable\n")
+    end
+end
 
 --- Internal function to update the FPS of the current player instance.
 local function DoFPSChange()
@@ -151,6 +179,13 @@ end
 -- @return
 function PlayX.SetPlayerVolume(vol)
     RunConsoleCommand("playx_volume", vol)
+end
+
+--- Checks to see if the user enabled gm_chrome. It does not check to see
+-- whether it is supported, however. Use PlayX.SupportsChrome for that.
+-- @return
+function PlayX.ChromeEnabled()
+    return GetConVar("playx_use_chrome"):GetBool()
 end
 
 --- Resume playing if it is not already playing. Error messages will 

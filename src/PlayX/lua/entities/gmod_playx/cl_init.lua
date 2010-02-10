@@ -16,39 +16,11 @@
 -- 
 -- $Id$
 
-require("chrome")
 include("shared.lua")
 
 language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
-
-local supportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
-
-local procMat = nil
-local procTexture = nil
-local procTexID = nil
-local procTexWidth = nil
-local procTexHeight = nil
-
-if supportsChrome then
-    Msg("PlayX DEBUG: gm_chrome detected\n")
-    
-    procMat = Material("playx/screen")
-
-    if procMat then
-        procTexture = procMat:GetMaterialTexture("$basetexture")
-        procTexID = surface.GetTextureID("playx/screen")
-        procTexWidth = procTexture:GetActualWidth()
-        procTexHeight = procTexture:GetActualHeight()
-        
-        Msg("PlayX DEBUG: playx/screen material detected\n")
-    else
-        supportsChrome = false
-        
-        Msg("PlayX DEBUG: playx/screen material not detected; gm_chrome is unavailable\n")
-    end
-end
 
 local function JSEncodeString(str)
     return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
@@ -106,8 +78,8 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight, rotateAround
     self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
     
     if self.UsingChrome then
-        self.HTMLWidth = procTexWidth
-        self.HTMLHeight = procTexHeight
+        self.HTMLWidth = PlayX.ProcTexWidth
+        self.HTMLHeight = PlayX.ProcTexHeight
         self.IsSquare = false
     else
         if self.IsSquare then
@@ -145,8 +117,8 @@ function ENT:SetProjectorBounds(forward, right, up)
     self.Up = up
     
     if self.UsingChrome then
-        self.HTMLWidth = procTexWidth
-        self.HTMLHeight = procTexHeight
+        self.HTMLWidth = PlayX.ProcTexWidth
+        self.HTMLHeight = PlayX.ProcTexHeight
     else
         self.HTMLWidth = 1024
         self.HTMLHeight = 512
@@ -161,8 +133,8 @@ function ENT:CreateBrowser()
     if self.UsingChrome then
         Msg("PlayX DEBUG: Using gm_chrome\n")
         
-        self.Browser = chrome.NewBrowser(procTexWidth, procTexHeight,
-                                         procTexture, self:GetTable())
+        self.Browser = chrome.NewBrowser(PlayX.ProcTexWidth, PlayX.ProcTexHeight,
+                                         PlayX.ProcTexture, self:GetTable())
     else
         Msg("PlayX DEBUG: Using IE\n")
         
@@ -214,11 +186,11 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     local result = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
                                            start, volume, uri, handlerArgs)
     
-    local usingChrome = supportsChrome and not result.ForceIE
+    local usingChrome = PlayX.SupportsChrome and PlayX.ChromeEnabled() and not result.ForceIE
     
     -- Switching browser engines!
     if self.Browser and usingChrome ~= self.UsingChrome then
-        self.Browser:DestructBrowser()
+        self:DestructBrowser()
         self.Browser = nil
     end
     
@@ -354,9 +326,9 @@ function ENT:PaintBrowser()
     if self.UsingChrome then
         self.Browser:Update()
         surface.SetDrawColor(0, 0, 0, 255)
-        surface.DrawRect(0, 0, procTexWidth, procTexHeight)
-        surface.SetTexture(procTexID)
-        surface.DrawTexturedRect(0, 0, procTexWidth, procTexHeight)
+        surface.DrawRect(0, 0, PlayX.ProcTexWidth, PlayX.ProcTexHeight)
+        surface.SetTexture(PlayX.ProcTexID)
+        surface.DrawTexturedRect(0, 0, PlayX.ProcTexWidth, PlayX.ProcTexHeight)
     else
         self.Browser:PaintManual()
     end

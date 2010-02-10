@@ -30,6 +30,20 @@ local function SettingsPanel(panel)
         return
     end
 
+    local chromeCheck = panel:AddControl("CheckBox", {
+        Label = "Use gm_chrome",
+        Command = "playx_use_chrome",
+    })
+    
+    if not PlayX.SupportsChrome then
+        chromeCheck:SetDisabled(true)
+	    
+	    panel:AddControl("Label", {
+	        Text = "Installing gm_chrome provides vast improvements in performance. " ..
+            "Visit http://wiki.github.com/sk89q/playx/installation for more information."
+	    })
+    end
+
 	panel:AddControl("Slider", {
 		Label = "Frame rate:",
 		Command = "playx_fps",
