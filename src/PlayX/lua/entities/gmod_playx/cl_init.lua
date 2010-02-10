@@ -34,19 +34,19 @@ local procTexHeight = nil
 if supportsChrome then
     Msg("PlayX DEBUG: gm_chrome detected\n")
     
-    procMat = Material("chrome/tele")
+    procMat = Material("playx/screen")
 
     if procMat then
         procTexture = procMat:GetMaterialTexture("$basetexture")
-        procTexID = surface.GetTextureID("chrome/tele")
+        procTexID = surface.GetTextureID("playx/screen")
         procTexWidth = procTexture:GetActualWidth()
         procTexHeight = procTexture:GetActualHeight()
         
-        Msg("PlayX DEBUG: chrome/tele material detected\n")
+        Msg("PlayX DEBUG: playx/screen material detected\n")
     else
         supportsChrome = false
         
-        Msg("PlayX DEBUG: chrome/tele material not detected; gm_chrome is unavailable\n")
+        Msg("PlayX DEBUG: playx/screen material not detected; gm_chrome is unavailable\n")
     end
 end
 
