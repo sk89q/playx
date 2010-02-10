@@ -29,6 +29,7 @@ CreateClientConVar("playx_force_low_framerate", 0, false, false)
 CreateClientConVar("playx_use_jw", 1, false, false)
 CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
+CreateConVar("playx_host_url", "http://localhost/playx/host.html", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
 
 PlayX = {}
 
@@ -186,6 +187,12 @@ end
 -- @return
 function PlayX.ChromeEnabled()
     return GetConVar("playx_use_chrome"):GetBool()
+end
+
+--- Gets the host page URL.
+-- @return
+function PlayX.GetHostURL()
+    return GetConVar("playx_host_url"):GetString()
 end
 
 --- Resume playing if it is not already playing. Error messages will 

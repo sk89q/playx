@@ -204,7 +204,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     end
     
     if self.UsingChrome then
-        self.Browser:LoadURL("http://localhost/playx/host.html?")
+        self.Browser:LoadURL(PlayX.GetHostURL())
         -- TODO: Remove hard-coded URL
     else
         self.Browser:SetHTML(result:GetHTML())
