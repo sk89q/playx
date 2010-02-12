@@ -475,7 +475,7 @@ function PlayX.SendSpawnDialogUMsg(ply)
 	if not ply or not ply:IsValid() then
         return
     elseif not PlayX.IsPermitted(ply) then
-        ply:ChatPrint("PlayX: You do not have permission to use the player")
+        PlayX.SendError(ply, "You do not have permission to use the player")
     else
         umsg.Start("PlayXSpawnDialog", ply)
         umsg.End()
