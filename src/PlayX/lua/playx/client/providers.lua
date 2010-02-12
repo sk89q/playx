@@ -33,6 +33,14 @@ function HandlerResult:new(css, js, body, jsURL, center)
     return instance
 end
 
+function HandlerResult:GetVolumeChangeJS(volume)
+    return nil
+end
+
+function HandlerResult:AppendJavaScript(js)
+    self.JS = (self.JS and self.JS or "") .. js
+end
+
 function HandlerResult:GetHTML()
     return [[
 <!DOCTYPE html>
@@ -228,13 +236,24 @@ local function GenerateJWPlayer(width, height, start, volume, uri, provider)
         ["start"] = start,
         ["volume"] = volume,
         ["file"] = uri,
+        ["playerready"] = "jwInit",
     }
     
     if provider then
         flashVars["provider"] = provider
     end
     
-    return GenerateFlashPlayer(width, height, flashURL, flashVars)
+    local result = GenerateFlashPlayer(width, height, flashURL, flashVars)
+    
+    result.GetVolumeChangeJS = function(volume)
+        return [[
+try {
+  document.getElementById('player').sendEvent("VOLUME", "]] .. tostring(volume) .. [[");
+} catch(e) {}
+]]
+    end
+    
+    return result
 end
 
 --- Generates the HTML code for an included JavaScript file.
@@ -305,6 +324,8 @@ PlayX.Handlers = {
     ["FlashAPI"] = function(width, height, start, volume, uri, handlerArgs)
         local url = uri
         local js = ""
+        local result = nil
+        local volChangeJSF = nil
         
         if not handlerArgs.NoDimRepl then
             url = url:gsub("__width__", width)
@@ -327,6 +348,12 @@ PlayX.Handlers = {
             if handlerArgs.JSVolumeFunc then
                 code = code .. "player." .. handlerArgs.JSVolumeFunc .. "(" .. 
                     tostring(jsVolMul * volume) .. ");"
+                
+                volChangeJSF = function(volume)
+                    return "try { player." .. 
+                        handlerArgs.JSVolumeFunc .. "(" .. 
+                        tostring(jsVolMul * volume) .. "); } catch (e) {}"
+                end
             end
             
             if handlerArgs.JSStartFunc then
@@ -343,9 +370,10 @@ PlayX.Handlers = {
 	        end
             
             js = js .. [[
+var player;
 function ]] .. handlerArgs.JSInitFunc .. [[() {
   try {
-    var player = document.getElementById('player');
+    player = document.getElementById('player');
 ]] .. code .. [[
   } catch (e) {}
 }
@@ -357,9 +385,15 @@ function ]] .. handlerArgs.JSInitFunc .. [[() {
         end
         
         if handlerArgs.URLIsJavaScript then -- Include a JS file instead
-            return GenerateJSEmbed(width, height, url, js)
+            result = GenerateJSEmbed(width, height, url, js)
         else
-            return GenerateFlashPlayer(width, height, url, nil, js)
+            result = GenerateFlashPlayer(width, height, url, nil, js)
         end
+        
+        if volChangeJSF then
+            result.GetVolumeChangeJS = volChangeJSF
+        end
+        
+        return result
     end,
 }

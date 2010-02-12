@@ -315,11 +315,19 @@ end
 
 --- Called on playx_fps change.
 local function FPSChangeCallback(cvar, old, new)
-	DoFPSChange()
+    DoFPSChange()
+end
+
+--- Called on playx_volume change.
+local function VolumeChangeCallback(cvar, old, new)
+    if PlayX.PlayerExists() and PlayX.CurrentMedia then
+        PlayX.GetInstance():ChangeVolume(PlayX.GetPlayerVolume())
+    end
 end
 
 cvars.AddChangeCallback("playx_enabled", EnabledCallback)
 cvars.AddChangeCallback("playx_fps", FPSChangeCallback)
+cvars.AddChangeCallback("playx_volume", VolumeChangeCallback)
 
 PlayX.Enabled = GetConVar("playx_enabled"):GetBool()
 

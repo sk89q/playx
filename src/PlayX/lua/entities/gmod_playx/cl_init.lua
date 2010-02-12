@@ -224,6 +224,21 @@ function ENT:Stop()
     self.Playing = false
 end
 
+function ENT:ChangeVolume(volume)
+    if not self.Browser or not self.UsingChrome then
+        return false
+    end
+    
+    local js = self.CurrentPage.GetVolumeChangeJS(volume)
+    
+    if js then
+        self.Browser:Exec(js)
+        return true
+    end
+    
+    return false
+end
+
 function ENT:ResetRenderBounds()
     -- Not sure if this works
 	self:SetRenderBoundsWS(Vector(-100, -100, -100), Vector(100, 100, 100))
