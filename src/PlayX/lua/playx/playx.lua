@@ -178,15 +178,59 @@ function PlayX.SpawnForPlayer(ply, model)
         return false, "The server doesn't have the selected model"
     end
     
-    local tr = ply:GetEyeTrace()
+    local tr = ply.GetEyeTraceNoCursor and ply:GetEyeTraceNoCursor() or
+        ply:GetEyeTrace()
 
 	local ent = ents.Create("gmod_playx")
     ent:SetModel(model)
-	ent:SetPos(tr.HitPos + tr.HitNormal * 100)
-    ent:DropToFloor()
-    ent:PhysWake()
+    
+	local info = PlayXScreens[model:lower()]
+    
+	if not info or not info.IsProjector or 
+	   not ((info.Up == 0 and info.Forward == 0) or
+	        (info.Forward == 0 and info.Right == 0) or
+	        (info.Right == 0 and info.Up == 0)) then
+        ent:SetAngles(Angle(0, (ply:GetPos() - tr.HitPos):Angle().y, 0))
+	    ent:SetPos(tr.HitPos - ent:OBBCenter() + 
+	       ((ent:OBBMaxs() - ent:OBBMins()):Length() + 10) * tr.HitNormal)
+        ent:DropToFloor()
+    else
+        local ang = Angle(0, 0, 0)
+        
+        if info.Forward > 0 then
+            ang = ang + Angle(180, 0, 180)
+        elseif info.Forward < 0 then
+            ang = ang + Angle(0, 0, 0)
+        elseif info.Right > 0 then
+            ang = ang + Angle(90, 0, 90)
+        elseif info.Right < 0 then
+            ang = ang + Angle(-90, 0, 90)
+        elseif info.Up > 0 then
+            ang = ang + Angle(-90, 0, 0)
+        elseif info.Up < 0 then
+            ang = ang + Angle(90, 0, 0)
+        end
+        
+        local tryDist = math.min(ply:GetPos():Distance(tr.HitPos), 4000)
+        local data = {}
+        data.start = tr.HitPos + tr.HitNormal * (ent:OBBMaxs() - ent:OBBMins()):Length()
+        data.endpos = tr.HitPos + tr.HitNormal * tryDist
+        data.filter = player.GetAll()
+        local dist = util.TraceLine(data).Fraction * tryDist - 
+            (ent:OBBMaxs() - ent:OBBMins()):Length() / 2
+        
+        ent:SetAngles(ang + tr.HitNormal:Angle())
+        ent:SetPos(tr.HitPos - ent:OBBCenter() + dist * tr.HitNormal)
+    end
+    
     ent:Spawn()
     ent:Activate()
+    
+    local phys = ent:GetPhysicsObject()
+    if phys:IsValid() then
+        phys:EnableMotion(false)
+        phys:Sleep()
+    end
     
     ply:AddCleanup("gmod_playx", ent)
     
