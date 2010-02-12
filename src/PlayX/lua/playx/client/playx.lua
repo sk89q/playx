@@ -41,6 +41,7 @@ PlayX.Playing = false
 PlayX.CurrentMedia = nil
 PlayX.SeenNotice = false
 PlayX.JWPlayerURL = ""
+PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 
 PlayX.ProcMat = nil

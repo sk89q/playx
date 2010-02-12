@@ -35,11 +35,18 @@ local function SettingsPanel(panel)
         Command = "playx_use_chrome",
     })
     
-    if not PlayX.SupportsChrome then
+    if not PlayX.HasChrome then
         chromeCheck:SetDisabled(true)
         
         panel:AddControl("Label", {
             Text = "Installing gm_chrome provides vast improvements in performance. " ..
+            "Visit http://wiki.github.com/sk89q/playx/installation for more information."
+        })
+    elseif not PlayX.SupportsChrome then
+        chromeCheck:SetDisabled(true)
+        
+        panel:AddControl("Label", {
+            Text = "Some gm_chrome support materials are required. " ..
             "Visit http://wiki.github.com/sk89q/playx/installation for more information."
         })
     end
