@@ -47,7 +47,7 @@ PlayXScreens = {
         ["RotateAroundRight"] = true,
         ["RotateAroundUp"] = true,
     },
-    ["models/props_bts/projector.mdl"] = {
+    ["models/props/cs_office/projector.mdl"] = {
         ["IsProjector"] = true,
         ["Forward"] = 0,
         ["Right"] = 1,    
