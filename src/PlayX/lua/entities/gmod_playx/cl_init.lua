@@ -22,10 +22,26 @@ language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
 
+local function JSEncodeString(str)
+    return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
+        :gsub("\r", "\\r"):gsub("\n", "\\n")
+end
+
 function ENT:Initialize()
 	self.Entity:DrawShadow(false)
 	self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
+    
+    self.UsingChrome = false
+    self.CurrentPage = nil
+    self.Playing = false
+    self.FPS = 1
+    self.LowFramerateMode = false
+    self.DrawCenter = false
+    
+    self:UpdateScreenBounds()
+end
 
+function ENT:UpdateScreenBounds()
     local model = self.Entity:GetModel()
     local info = PlayXScreens[model]
     
@@ -51,12 +67,6 @@ function ENT:Initialize()
                                  math.abs(mins.y - maxs.y), math.abs(mins.z - maxs.z), true, true)
         end
     end
-    
-    self.CurrentHTML = ""
-    self.Playing = false
-    self.FPS = 1
-    self.LowFramerateMode = false
-    self.DrawCenter = false
 end
 
 function ENT:SetScreenBounds(pos, width, height, rotateAroundRight, rotateAroundUp)
@@ -67,12 +77,18 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight, rotateAround
     self.ScreenHeight = height
     self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
     
-    if self.IsSquare then
-        self.HTMLWidth = 1024
-        self.HTMLHeight = 1024
+    if self.UsingChrome then
+        self.HTMLWidth = PlayX.ProcTexWidth
+        self.HTMLHeight = PlayX.ProcTexHeight
+        self.IsSquare = false
     else
-        self.HTMLWidth = 1024
-        self.HTMLHeight = 512
+        if self.IsSquare then
+            self.HTMLWidth = 1024
+            self.HTMLHeight = 1024
+        else
+            self.HTMLWidth = 1024
+            self.HTMLHeight = 512
+        end
     end
     
     if width / height < self.HTMLWidth / self.HTMLHeight then
@@ -100,50 +116,99 @@ function ENT:SetProjectorBounds(forward, right, up)
     self.Right = right
     self.Up = up
     
-    self.HTMLWidth = 1024
-    self.HTMLHeight = 512
+    if self.UsingChrome then
+        self.HTMLWidth = PlayX.ProcTexWidth
+        self.HTMLHeight = PlayX.ProcTexHeight
+    else
+        self.HTMLWidth = 1024
+        self.HTMLHeight = 512
+    end
     
     self.DrawScale = 1 -- Not used
 end
 
-function ENT:CreateBrowser(html)    
-    if not self.DrawScale then
-        Error("SetScreenBounds() not yet called")
-    end
+function ENT:CreateBrowser()
+    self:UpdateScreenBounds()
     
-    if PlayXBrowser and PlayXBrowser:IsValid() then
-        Msg("Found existing PlayXBrowser; reusing\n")
-        self.Browser = PlayXBrowser
+    if self.UsingChrome then
+        Msg("PlayX DEBUG: Using gm_chrome\n")
+        
+        self.Browser = chrome.NewBrowser(PlayX.ProcTexWidth, PlayX.ProcTexHeight,
+                                         PlayX.ProcTexture, self:GetTable())
     else
-        self.Browser = vgui.Create("HTML")
+        Msg("PlayX DEBUG: Using IE\n")
+        
+        if PlayXBrowser and PlayXBrowser:IsValid() then
+            Msg("Found existing PlayX browser; reusing\n")
+            self.Browser = PlayXBrowser
+        else
+            self.Browser = vgui.Create("HTML")
+            PlayXBrowser = self.Browser
+        end
+        
+        self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
+        self.Browser:SetPaintedManually(true)
+        self.Browser:SetVerticalScrollbarEnabled(false)
+        
+        if self.LowFramerateMode then
+            self.Browser:StartAnimate(1000)
+        else
+            self.Browser:StartAnimate(1000 / self.FPS)
+        end
     end
-    
-    self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
-    self.Browser:SetPaintedManually(true)
-    self.Browser:SetVerticalScrollbarEnabled(false)
-    self.Browser:SetHTML(html)
-    self.CurrentHTML = html
-    if self.LowFramerateMode then
-        self.Browser:StartAnimate(1000)
+end
+
+function ENT:DestructBrowser()
+    if self.UsingChrome then
+        if self.Browser then
+            self.Browser:Free()
+            self.Browser = nil
+        end
     else
-        self.Browser:StartAnimate(1000 / self.FPS)
+        if self.Browser and self.Browser:IsValid() then
+            --browser:Clear()
+            local html = [[ENT:DestructBrowser() called.]]
+            self.Browser:SetHTML(html)
+            self.Browser:SetPaintedManually(true)
+            self.Browser:StopAnimate()
+            
+            -- Creating a new HTML panel tends to crash clients occasionally, so
+            -- we're going try to keep a copy around
+            -- Don't know whether the crash is caused by the browser being created
+            -- or by the page browsing
+        end
+        
+        self.Browser = nil
     end
-    
-    PlayXBrowser = self.Browser
 end
 
 function ENT:Play(handler, uri, start, volume, handlerArgs)
-    local html, center = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
-                                                 start, volume, uri, handlerArgs)
+    local result = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
+                                           start, volume, uri, handlerArgs)
     
-    self.DrawCenter = center
+    local usingChrome = PlayX.SupportsChrome and PlayX.ChromeEnabled() and not result.ForceIE
     
-    self.CurrentHTML = html
+    -- Switching browser engines!
+    if self.Browser and usingChrome ~= self.UsingChrome then
+        self:DestructBrowser()
+        self.Browser = nil
+    end
+    
+    self.UsingChrome = usingChrome
+    
+    self.DrawCenter = result.center
+    self.CurrentPage = result
     
     if not self.Browser then
-        self:CreateBrowser(html)
+        self:CreateBrowser()
+    end
+    
+    if self.UsingChrome then
+        self.Browser:LoadURL(PlayX.GetHostURL())
+        -- TODO: Remove hard-coded URL
     else
-        self.Browser:SetHTML(html)
+        self.Browser:SetHTML(result:GetHTML())
+    
         if self.LowFramerateMode then
             self.Browser:StartAnimate(1000)
         else
@@ -155,15 +220,23 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 end
 
 function ENT:Stop()
-    if self.Browser and self.Browser:IsValid() then
-        local html = [[STOPPED]]
-        self.CurrentHTML = html
-        self.Browser:SetHTML(html)
-        self.Browser:SetPaintedManually(true)
-        self.Browser:StopAnimate()
+    self:DestructBrowser()
+    self.Playing = false
+end
+
+function ENT:ChangeVolume(volume)
+    if not self.Browser or not self.UsingChrome then
+        return false
     end
     
-    self.Playing = false
+    local js = self.CurrentPage.GetVolumeChangeJS(volume)
+    
+    if js then
+        self.Browser:Exec(js)
+        return true
+    end
+    
+    return false
 end
 
 function ENT:ResetRenderBounds()
@@ -175,7 +248,7 @@ end
 function ENT:SetFPS(fps)
     self.FPS = fps
     
-    if self.Browser and self.Browser:IsValid() and not self.LowFramerateMode then
+    if not self.UsingChrome and self.Browser and self.Browser:IsValid() and not self.LowFramerateMode then
         self.Browser:StartAnimate(1000 / self.FPS)
     end
 end
@@ -184,7 +257,7 @@ function ENT:Draw()
 	self.Entity:DrawModel()
 	
 	if self.DrawScale then
-        if self.Browser and self.Browser:IsValid() and self.Playing then
+        if not self.UsingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
             self.Browser:SetPaintedManually(false)
         end
 		render.SuppressEngineLighting(true)
@@ -211,8 +284,8 @@ function ENT:Draw()
                             + ang:Up() * 2
                 
                 cam.Start3D2D(pos, ang, width)
-                if self.Browser and self.Browser:IsValid() and self.Playing then
-                    self.Browser:PaintManual()
+                if self.Browser and (self.UsingChrome or self.Browser:IsValid()) and self.Playing then
+                    self:PaintBrowser()
                 else
                     surface.SetDrawColor(0, 0, 0, 255)
                     surface.DrawRect(0, 0, 1024, 512)
@@ -242,8 +315,8 @@ function ENT:Draw()
             cam.Start3D2D(pos, ang, self.DrawScale)
             surface.SetDrawColor(0, 0, 0, 255)
             surface.DrawRect(-self.DrawShiftX, -self.DrawShiftY * shiftMultiplier, self.DrawWidth, self.DrawHeight)
-            if self.Browser and self.Browser:IsValid() and self.Playing then
-                self.Browser:PaintManual()
+            if self.Browser and (self.UsingChrome or self.Browser:IsValid()) and self.Playing then
+                self:PaintBrowser()
             else
                 if not PlayX.Enabled then
                     draw.SimpleText("Re-enable the player in the tool menu -> Options",
@@ -258,10 +331,22 @@ function ENT:Draw()
         end
 
 		render.SuppressEngineLighting(false)
-        if self.Browser and self.Browser:IsValid() and self.Playing then
+        if not self.UsingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
             self.Browser:SetPaintedManually(true)
         end
 	end
+end
+
+function ENT:PaintBrowser()
+    if self.UsingChrome then
+        self.Browser:Update()
+        surface.SetDrawColor(0, 0, 0, 255)
+        surface.DrawRect(0, 0, PlayX.ProcTexWidth, PlayX.ProcTexHeight)
+        surface.SetTexture(PlayX.ProcTexID)
+        surface.DrawTexturedRect(0, 0, PlayX.ProcTexWidth, PlayX.ProcTexHeight)
+    else
+        self.Browser:PaintManual()
+    end
 end
 
 function ENT:OnRemove()
@@ -273,8 +358,9 @@ function ENT:OnRemove()
     
     Msg("PlayX DEBUG: ENT:OnRemove() called\n")
     
-    local ent = this
+    local ent = self
     local browser = self.Browser
+    local usingChrome = self.UsingChrome
     
     -- Give Gmod 200ms to really delete the entity
     timer.Simple(0.2, function()
@@ -282,17 +368,25 @@ function ENT:OnRemove()
             (not PlayX:PlayerExists() or PlayX.GetInstance() == ent) then -- Entity is really gone
             Msg("PlayX DEBUG: Entity was really removed\n")
             
-            -- Creating a new HTML panel tends to crash clients occasionally, so
-            -- we're going try to keep a copy around
-            -- Don't know whether the crash is caused by the browser being created
-            -- or by the page browsing
-            if browser and browser:IsValid() then
-                --browser:Clear()
-                local html = [[Gmod called ENT:OnRemove() even though no entity was removed. You should not be seeing this message.]]
-                browser:SetHTML(html)
-                browser:SetPaintedManually(true)
-                browser:StopAnimate()
-            end
+            -- From ENT:DestructBrowser()
+		    if usingChrome then
+		        if browser then
+		            browser:Free()
+		        end
+		    else
+		        if browser and browser.IsValid and browser:IsValid() then
+		            --browser:Clear()
+		            local html = [[ENT:OnRemove() called.]]
+		            browser:SetHTML(html)
+		            browser:SetPaintedManually(true)
+		            browser:StopAnimate()
+		            
+		            -- Creating a new HTML panel tends to crash clients occasionally, so
+		            -- we're going try to keep a copy around
+		            -- Don't know whether the crash is caused by the browser being created
+		            -- or by the page browsing
+		        end
+		    end
         elseif ValidEntity(ent) then -- Gmod lied
             Msg("PlayX DEBUG: Entity was NOT really removed\n")
             
@@ -307,3 +401,35 @@ function ENT:OnRemove()
         end
     end)
 end
+
+-- For gm_chrome
+function ENT:onFinishLoading()
+    if self.CurrentPage.JS then
+        self.Browser:Exec(self.CurrentPage.JS)
+    end
+    
+    if self.CurrentPage.JSInclude then
+        self.Browser:Exec([[
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = ']] .. JSEncodeString(self.CurrentPage.JSInclude) .. [[';
+document.body.appendChild(script);
+]])
+    else
+        self.Browser:Exec([[
+document.body.innerHTML = ']] .. JSEncodeString(self.CurrentPage.Body) .. [[';
+]])
+    end
+
+    self.Browser:Exec([[
+var style = document.createElement('style');
+style.type = 'text/css';
+style.styleSheet.cssText = ']] .. JSEncodeString(self.CurrentPage.CSS) .. [[';
+document.getElementsByTagName('head')[0].appendChild(style);
+]])
+end
+
+-- For gm_chrome
+function ENT:onBeginNavigation(url) end
+function ENT:onBeginLoading(url, status) end
+function ENT:onChangeFocus(focus) end

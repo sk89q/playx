@@ -114,6 +114,7 @@ function ParseTimeString(str)
 end
 
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
+CreateConVar("playx_host_url", "http://localhost/playx/host.html", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
