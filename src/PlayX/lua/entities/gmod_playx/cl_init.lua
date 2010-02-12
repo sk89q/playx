@@ -49,27 +49,62 @@ function ENT:UpdateScreenBounds()
         if info.IsProjector then
             self:SetProjectorBounds(info.Forward, info.Right, info.Up)
         else
-            self:SetScreenBounds(info.Offset, info.Width, info.Height, info.RotateAroundRight, info.RotateAroundUp)
+            local rotateAroundRight = info.RotateAroundRight
+            local rotateAroundUp = info.RotateAroundUp
+            local rotateAroundForward = info.RotateAroundForward
+            
+            -- For backwards compatibility, adapt to the new rotation system
+            if type(rotateAroundRight) == 'boolean' then
+                rotateAroundRight = rotateAroundRight and -90 or 0
+            end
+            if type(rotateAroundUp) == 'boolean' then
+                rotateAroundUp = rotateAroundUp and 90 or 0
+            end
+            if type(rotateAroundForward) == 'boolean' then
+                rotateAroundForward = rotateAroundForward and 90 or 0
+            end
+            
+            self:SetScreenBounds(info.Offset, info.Width, info.Height,
+                                 rotateAroundRight,
+                                 rotateAroundUp,
+                                 rotateAroundForward)
         end
     else
-        -- PHX plates are oriented flat
-        if model:find("hunter/plates") or model:find("props_phx") or true then
-            local mins = self.Entity:OBBMins()
-            local maxs = self.Entity:OBBMaxs()
-            
-            self:SetScreenBounds(Vector(-mins.x, -mins.y, maxs.z + 0.2), 
-                                 mins.y - maxs.y, mins.x - maxs.x, false, true)
+        local center = self.Entity:OBBCenter()
+        local mins = self.Entity:OBBMins()
+        local maxs = self.Entity:OBBMaxs()
+        local rightArea = (maxs.z * mins.z) * (maxs.y * mins.y)
+        local forwardArea = (maxs.z * mins.z) * (maxs.x * mins.x)
+        local topArea = (maxs.y * mins.y) * (maxs.x * mins.x)
+        local maxArea = math.max(rightArea, forwardArea, topArea)
+        
+        if maxArea == rightArea then
+	        local width = maxs.y - mins.y
+	        local height = maxs.z - mins.z
+	        local pos = Vector(center.x + (maxs.x - mins.x) / 2 + 0.5,
+	                           center.y - width / 2,
+	                           center.z + height / 2)
+            self:SetScreenBounds(pos, width, height, -90, 90, 0)
+        elseif maxArea == forwardArea then
+            local width = maxs.x - mins.x
+            local height = maxs.z - mins.z
+            local pos = Vector(center.x + width / 2,
+                               center.y + (maxs.y - mins.y) / 2 + 0.5,
+                               center.z + height / 2)
+            self:SetScreenBounds(pos, width, height, 180, 0, -90)
         else
-            local mins = self.Entity:OBBMins()
-            local maxs = self.Entity:OBBMaxs()
-            
-            self:SetScreenBounds(Vector(-mins.x - 0.2, mins.y, -mins.z),
-                                 math.abs(mins.y - maxs.y), math.abs(mins.z - maxs.z), true, true)
+            local width = maxs.y - mins.y
+            local height = maxs.x - mins.x
+            local pos = Vector(center.x + height / 2,
+                               center.y + width / 2,
+                               center.z + (maxs.z - mins.z) / 2 + 0.5)
+            self:SetScreenBounds(pos, width, height, 0, -90, 0)
         end
     end
 end
 
-function ENT:SetScreenBounds(pos, width, height, rotateAroundRight, rotateAroundUp)
+function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
+                             rotateAroundUp, rotateAroundForward)
     self.IsProjector = false
     
     self.ScreenOffset = pos
@@ -107,6 +142,7 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight, rotateAround
     
     self.RotateAroundRight = rotateAroundRight
     self.RotateAroundUp = rotateAroundUp
+    self.RotateAroundForward = rotateAroundForward
 end
 
 function ENT:SetProjectorBounds(forward, right, up)
@@ -309,8 +345,9 @@ function ENT:Draw()
                 Vector(0, self.DrawShiftX * self.DrawScale, self.DrawShiftY * shiftMultiplier * self.DrawScale))
             local ang = self.Entity:GetAngles()
             
-            if self.RotateAroundRight then ang:RotateAroundAxis(ang:Right(), -90) end
-            if self.RotateAroundUp then ang:RotateAroundAxis(ang:Up(), 90) end
+            ang:RotateAroundAxis(ang:Right(), self.RotateAroundRight)
+            ang:RotateAroundAxis(ang:Up(), self.RotateAroundUp)
+            ang:RotateAroundAxis(ang:Forward(), self.RotateAroundForward)
             
             cam.Start3D2D(pos, ang, self.DrawScale)
             surface.SetDrawColor(0, 0, 0, 255)
