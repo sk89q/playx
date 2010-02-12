@@ -24,13 +24,13 @@ include("shared.lua")
 resource.AddFile("materials/vgui/entities/gmod_playx.vmt")
 
 function ENT:Initialize()
-	self.Entity:PhysicsInit(SOLID_VPHYSICS)
-	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
-	self.Entity:SetSolid(SOLID_VPHYSICS)
-	self.Entity:DrawShadow(false)
+    self.Entity:PhysicsInit(SOLID_VPHYSICS)
+    self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+    self.Entity:SetSolid(SOLID_VPHYSICS)
+    self.Entity:DrawShadow(false)
     
-	if WireAddon then
-		self.Outputs = Wire_CreateOutputs(self.Entity, {
+    if WireAddon then
+        self.Outputs = Wire_CreateOutputs(self.Entity, {
             "Provider [STRING]",
             "Handler [STRING]",
             "URI [STRING]",
@@ -41,7 +41,7 @@ function ENT:Initialize()
             "Identifier [STRING]",
             "Title [STRING]",
         })
-	end
+    end
 end
 
 function ENT:SpawnFunction(ply, tr)
@@ -53,7 +53,7 @@ function ENT:OnRemove()
 end
 
 function ENT:ClearWireOutputs()
-	if WireAddon then
+    if WireAddon then
         Wire_TriggerOutput(self.Entity, "Provider", "")
         Wire_TriggerOutput(self.Entity, "Handler", "")
         Wire_TriggerOutput(self.Entity, "URI", "")
@@ -68,7 +68,7 @@ end
 
 function ENT:UpdateWireOutputs(handler, uri, start, length, provider,
                                identifier, title)
-	if WireAddon then
+    if WireAddon then
         Wire_TriggerOutput(self.Entity, "Provider", provider)
         Wire_TriggerOutput(self.Entity, "Handler", handler)
         Wire_TriggerOutput(self.Entity, "URI", uri)
@@ -82,13 +82,13 @@ function ENT:UpdateWireOutputs(handler, uri, start, length, provider,
 end
 
 function ENT:UpdateWireLength(length)
-	if WireAddon then
+    if WireAddon then
         Wire_TriggerOutput(self.Entity, "Length", length)
     end
 end
 
 function ENT:UpdateWireMetadata(length, provider, title)
-	if WireAddon then
+    if WireAddon then
         Wire_TriggerOutput(self.Entity, "Length", length)
         Wire_TriggerOutput(self.Entity, "Title", title)
     end
@@ -103,10 +103,10 @@ local function PlayXEntityDuplicator(ply, model, pos, ang)
         return nil
     end
     
-	local ent = ents.Create("gmod_playx")
+    local ent = ents.Create("gmod_playx")
     ent:SetModel(model)
-	ent:SetPos(pos)
-	ent:SetAngles(ang)
+    ent:SetPos(pos)
+    ent:SetAngles(ang)
     ent:Spawn()
     ent:Activate()
     

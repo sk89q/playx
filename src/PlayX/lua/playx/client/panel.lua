@@ -18,8 +18,8 @@
 
 --- Draw the settings panel.
 local function SettingsPanel(panel)
-	panel:ClearControls()
-	panel:AddHeader()
+    panel:ClearControls()
+    panel:AddHeader()
 
     panel:AddControl("CheckBox", {
         Label = "Enabled",
@@ -37,37 +37,37 @@ local function SettingsPanel(panel)
     
     if not PlayX.SupportsChrome then
         chromeCheck:SetDisabled(true)
-	    
-	    panel:AddControl("Label", {
-	        Text = "Installing gm_chrome provides vast improvements in performance. " ..
+        
+        panel:AddControl("Label", {
+            Text = "Installing gm_chrome provides vast improvements in performance. " ..
             "Visit http://wiki.github.com/sk89q/playx/installation for more information."
-	    })
+        })
     end
 
-	panel:AddControl("Slider", {
-		Label = "Frame rate:",
-		Command = "playx_fps",
-		Type = "Integer",
-		Min = "1",
-		Max = "30",
-	})
+    panel:AddControl("Slider", {
+        Label = "Frame rate:",
+        Command = "playx_fps",
+        Type = "Integer",
+        Min = "1",
+        Max = "30",
+    })
             
     panel:AddControl("Label", {
         Text = "Decreasing the frame rate will cause your game to run better, at the cost of video choppiness."
     })
 
-	panel:AddControl("Slider", {
-		Label = "Volume:",
-		Command = "playx_volume",
-		Type = "Float",
-		Min = "1",
-		Max = "100",
-	})
-	
-	panel:AddControl("Label", {
-		Text = "Not all media have adjustable volumes, and the player must be re-initialized " ..
+    panel:AddControl("Slider", {
+        Label = "Volume:",
+        Command = "playx_volume",
+        Type = "Float",
+        Min = "1",
+        Max = "100",
+    })
+    
+    panel:AddControl("Label", {
+        Text = "Not all media have adjustable volumes, and the player must be re-initialized " ..
             "for a change in volume to take effect."
-	})
+    })
     
     if PlayX.CurrentMedia then
         if PlayX.CurrentMedia.ResumeSupported then
@@ -146,8 +146,8 @@ end
 
 --- Draw the control panel.
 local function ControlPanel(panel)
-	panel:ClearControls()
-	panel:AddHeader()
+    panel:ClearControls()
+    panel:AddHeader()
     
     local options = {
         ["Auto-detect"] = {["playx_provider"] = ""}
@@ -162,22 +162,22 @@ local function ControlPanel(panel)
     local label = panel:AddControl("DLabel", {})
     label:SetText("Provider:")
 
-	panel:AddControl("ListBox", {
-		Label = "Provider:",
-		Options = options,
-	})
+    panel:AddControl("ListBox", {
+        Label = "Provider:",
+        Options = options,
+    })
 
-	panel:AddControl("TextBox", {
-		Label = "URI:",
+    panel:AddControl("TextBox", {
+        Label = "URI:",
         Command = "playx_uri",
-		WaitForEnter = false,
-	})
+        WaitForEnter = false,
+    })
 
-	panel:AddControl("TextBox", {
-		Label = "Start At:",
+    panel:AddControl("TextBox", {
+        Label = "Start At:",
         Command = "playx_start_time",
-		WaitForEnter = false,
-	})
+        WaitForEnter = false,
+    })
 
     if PlayX.JWPlayerURL then
         panel:AddControl("CheckBox", {
@@ -186,19 +186,19 @@ local function ControlPanel(panel)
         })
     end
 
-	panel:AddControl("CheckBox", {
-		Label = "Force low frame rate",
+    panel:AddControl("CheckBox", {
+        Label = "Force low frame rate",
         Command = "playx_force_low_framerate",
-	})
+    })
     
     panel:AddControl("CheckBox", {
         Label = "Don't auto stop on finish when applicable",
         Command = "playx_ignore_length",
     })
-	
-	panel:AddControl("Label", {
-		Text = "READ: Press ENTER in the textboxes above before clicking the buttons below."
-	})
+    
+    panel:AddControl("Label", {
+        Text = "READ: Press ENTER in the textboxes above before clicking the buttons below."
+    })
     
     panel:AddControl("Button", {
         Label = "Open Media",
@@ -217,8 +217,8 @@ end
 
 --- PopulateToolMenu hook.
 local function PopulateToolMenu()
-	spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
-	spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
+    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
+    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
 end
 
 hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)

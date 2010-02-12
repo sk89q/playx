@@ -70,7 +70,7 @@ end
 
 --- Internal function to update the FPS of the current player instance.
 local function DoFPSChange()
-	if PlayX.PlayerExists() then
+    if PlayX.PlayerExists() then
         PlayX.GetInstance():SetFPS(PlayX:GetPlayerFPS())
     end
 end
@@ -257,20 +257,20 @@ end
 
 --- Opens the dialog for choosing a model to spawn the player with.
 function PlayX.OpenSpawnDialog()
-	local frame = vgui.Create("DFrame")
-	frame:SetTitle("Select Model for PlayX Player")
+    local frame = vgui.Create("DFrame")
+    frame:SetTitle("Select Model for PlayX Player")
     frame:SetSize(300, 200)
     frame:SetSizable(false)
     frame:Center()
     frame:MakePopup()
-	
-	local modelList = vgui.Create("DPanelList", frame)
+    
+    local modelList = vgui.Create("DPanelList", frame)
     modelList:EnableHorizontal(true)
     modelList:SetPadding(5)
     modelList:SetPos(1, 25)
     modelList:SetSize(298, 174)
-	
-	for model, _ in pairs(PlayXScreens) do
+    
+    for model, _ in pairs(PlayXScreens) do
         if util.IsValidModel(model) then
             local spawnIcon = vgui.Create("SpawnIcon", modelList)
             
@@ -285,26 +285,26 @@ function PlayX.OpenSpawnDialog()
             
             modelList:AddItem(spawnIcon)
         end
-	end
+    end
 end
 
 --- Shows a hint.
 -- @param msg
 function PlayX.ShowHint(msg)
     GAMEMODE:AddNotify(msg, NOTIFY_GENERIC, 10);
-	surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
 end
 
 --- Shows an error message.
 -- @param err
 function PlayX.ShowError(err)
     GAMEMODE:AddNotify("PlayX error: " .. tostring(err), NOTIFY_ERROR, 7);
-	surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
 end
 
 --- Called on playx_enabled change.
 local function EnabledCallback(cvar, old, new)
-	if GetConVar("playx_enabled"):GetBool() then
+    if GetConVar("playx_enabled"):GetBool() then
         DoEnable()
     else
         DoDisable()
@@ -408,14 +408,14 @@ local function UMsgJWURL(um)
     
     PlayX.JWPlayerURL = um:ReadString()
     
-	PlayX.UpdatePanels()
+    PlayX.UpdatePanels()
 end
 
 --- Called on PlayXError user message.
 local function UMsgError(um)
     local err = um:ReadString()
     
-	PlayX.ShowError(err)
+    PlayX.ShowError(err)
 end
 
 datastream.Hook("PlayXBegin", DSBegin)

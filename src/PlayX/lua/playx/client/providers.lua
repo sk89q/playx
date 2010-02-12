@@ -365,9 +365,9 @@ PlayX.Handlers = {
                 code = code .. "player." .. handlerArgs.JSPlayFunc .. "();"
             end
         
-	        if handlerArgs.RawInitJS ~= nil then
-	            code = code .. handlerArgs.RawInitJS
-	        end
+            if handlerArgs.RawInitJS ~= nil then
+                code = code .. handlerArgs.RawInitJS
+            end
             
             js = js .. [[
 var player;

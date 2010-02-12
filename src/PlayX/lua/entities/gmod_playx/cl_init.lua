@@ -28,8 +28,8 @@ local function JSEncodeString(str)
 end
 
 function ENT:Initialize()
-	self.Entity:DrawShadow(false)
-	self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
+    self.Entity:DrawShadow(false)
+    self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
     
     self.UsingChrome = false
     self.CurrentPage = nil
@@ -241,8 +241,8 @@ end
 
 function ENT:ResetRenderBounds()
     -- Not sure if this works
-	self:SetRenderBoundsWS(Vector(-100, -100, -100), Vector(100, 100, 100))
-	self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
+    self:SetRenderBoundsWS(Vector(-100, -100, -100), Vector(100, 100, 100))
+    self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
 end
 
 function ENT:SetFPS(fps)
@@ -254,13 +254,13 @@ function ENT:SetFPS(fps)
 end
 
 function ENT:Draw()
-	self.Entity:DrawModel()
-	
-	if self.DrawScale then
+    self.Entity:DrawModel()
+    
+    if self.DrawScale then
         if not self.UsingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
             self.Browser:SetPaintedManually(false)
         end
-		render.SuppressEngineLighting(true)
+        render.SuppressEngineLighting(true)
         
         if self.IsProjector then
             local excludeEntities = player.GetAll()
@@ -330,11 +330,11 @@ function ENT:Draw()
             cam.End3D2D()
         end
 
-		render.SuppressEngineLighting(false)
+        render.SuppressEngineLighting(false)
         if not self.UsingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
             self.Browser:SetPaintedManually(true)
         end
-	end
+    end
 end
 
 function ENT:PaintBrowser()
@@ -369,24 +369,24 @@ function ENT:OnRemove()
             Msg("PlayX DEBUG: Entity was really removed\n")
             
             -- From ENT:DestructBrowser()
-		    if usingChrome then
-		        if browser then
-		            browser:Free()
-		        end
-		    else
-		        if browser and browser.IsValid and browser:IsValid() then
-		            --browser:Clear()
-		            local html = [[ENT:OnRemove() called.]]
-		            browser:SetHTML(html)
-		            browser:SetPaintedManually(true)
-		            browser:StopAnimate()
-		            
-		            -- Creating a new HTML panel tends to crash clients occasionally, so
-		            -- we're going try to keep a copy around
-		            -- Don't know whether the crash is caused by the browser being created
-		            -- or by the page browsing
-		        end
-		    end
+            if usingChrome then
+                if browser then
+                    browser:Free()
+                end
+            else
+                if browser and browser.IsValid and browser:IsValid() then
+                    --browser:Clear()
+                    local html = [[ENT:OnRemove() called.]]
+                    browser:SetHTML(html)
+                    browser:SetPaintedManually(true)
+                    browser:StopAnimate()
+                    
+                    -- Creating a new HTML panel tends to crash clients occasionally, so
+                    -- we're going try to keep a copy around
+                    -- Don't know whether the crash is caused by the browser being created
+                    -- or by the page browsing
+                end
+            end
         elseif ValidEntity(ent) then -- Gmod lied
             Msg("PlayX DEBUG: Entity was NOT really removed\n")
             
