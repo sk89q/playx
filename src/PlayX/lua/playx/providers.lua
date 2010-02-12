@@ -95,18 +95,69 @@ PlayX.Providers = {
     ["YouTube"] = {
         ["Detect"] = function(uri)
             -- Easter egg / test media
-            if uri == "ttgl" then
+            if uri == "evans" then -- Bill Evans
+                local videos = {
+                    "http://www.youtube.com/watch?v=57HnHX-BlRg",
+                    "http://www.youtube.com/watch?v=dH3GSrCmzC8",
+                    "http://www.youtube.com/watch?v=a2LFVWBmoiw",
+                    "http://www.youtube.com/watch?v=IA7d6P7yXSo",
+                }
+                uri = videos[math.random(1, #videos)]
+            elseif uri == "davis" then -- Miles Davis
+                local videos = {
+                    "http://www.youtube.com/watch?v=fBq87dbKyHQ",
+                    "http://www.youtube.com/watch?v=PoPL7BExSQU",
+                    "http://www.youtube.com/watch?v=N090STPx-2M",
+                    "http://www.youtube.com/watch?v=qzpSIJpq11c",
+                    "http://www.youtube.com/watch?v=4xQE47HYbeM",
+                }
+                uri = videos[math.random(1, #videos)]
+            elseif uri == "ttgl" then -- Tengen Toppa Gurren Lagann prologue
                 uri = "http://www.youtube.com/watch?v=RN63L89nJeA"
-            elseif uri == "pmk" then
-                uri = "http://www.youtube.com/watch?v=Z6B10uzcjPQ"
-            elseif uri == "stramic" then
-                uri = "http://www.youtube.com/watch?v=zSSqCLHc9ek"
-            elseif uri == "thekillers" then
-                uri = "http://www.youtube.com/watch?v=whsGHeB_LwI"
-            elseif uri == "dnangel" then
-                uri = "http://www.youtube.com/watch?v=KZhUaiT1II8"
-            elseif uri == "failedme" then
+            elseif uri == "liberame" then -- Tengen Toppa Gurren Lagann soundtrack
+                uri = "http://www.youtube.com/watch?v=oAlztMvvNkk"
+            elseif uri == "brightside" then -- The Killers (English)
+                uri = "http://www.youtube.com/watch?v=WwJZJ9GyqKQ"
+            elseif uri == "lazer" then
+                uri = "http://www.youtube.com/watch?v=whjqK9DdLPI"
+            elseif uri == "dietotenhosen" then -- Die Toten Hosen (German)
+                uri = "http://www.youtube.com/watch?v=Li2t_XbXaRY"
+            elseif uri == "failedme" then -- You have failed me for the last time
                 uri = "http://www.youtube.com/watch?v=VuK-aLSZtNo"
+            elseif uri == "beautifullove" then -- The Afters (English)
+                uri = "http://www.youtube.com/watch?v=nXANIyRaMnk"
+            elseif uri == "sayhi" then -- Kokia (Japanese)
+                uri = "http://www.youtube.com/watch?v=jgOTYYnLtEY"
+            elseif uri == "closingtime" then -- Closing Time (English)
+                uri = "http://www.youtube.com/watch?v=xGytDsqkQY8"
+            elseif uri == "mae" then -- Mae (English)
+                uri = "http://www.youtube.com/watch?v=ahj6XRONd3s"
+            elseif uri == "zoostersbreakout" then -- Hans Zimmer
+                uri = "http://www.youtube.com/watch?v=S7GC3Iwlns8"
+            elseif uri == "believe" then -- Antiloop
+                uri = "http://www.youtube.com/watch?v=7fyTugLAjtk"
+            elseif uri == "southampton" then -- James Horner
+                uri = "http://www.youtube.com/watch?v=Ra-zp1BwtJ8"
+            elseif uri == "whatislove" then -- Haddaway (remix) (English)
+                uri = "http://www.youtube.com/watch?v=JzzaIeVtQ0s"
+            elseif uri == "peterpan" then -- Peterpan (Indonesian)
+                uri = "http://www.youtube.com/watch?v=QyafyFWVW-s"
+            elseif uri == "canonind" then -- Pachelbel
+                uri = "http://www.youtube.com/watch?v=DZHw9uyj81g"
+            elseif uri == "wagner" then -- Wagner
+                uri = "http://www.youtube.com/watch?v=fktwPGCR7Yw"
+            elseif uri == "souleater" then -- Soul Eater opening
+                uri = "http://www.youtube.com/watch?v=aX26MLlRfws"
+            elseif uri == "verymelon" then -- Zatch Bell clip
+                uri = "http://www.youtube.com/watch?v=T5Q8Gs-w-z8"
+            elseif uri == "thong" then -- Shrek 2 clip
+                uri = "http://www.youtube.com/watch?v=L_wVbUvFK2A"
+            elseif uri == "yellowcard" then -- Yellowcard (English)
+                uri = "http://www.youtube.com/watch?v=slpjGBsfczk"
+            elseif uri == "rain" then -- Sound of rain
+                uri = "http://www.youtube.com/watch?v=1pSyYhRYeIM"
+            elseif uri == "pmk" then -- Peacemaker Kurogane opening
+                uri = "http://www.youtube.com/watch?v=Z6B10uzcjPQ"
             end
             
             local m = FindMatch(uri, {
