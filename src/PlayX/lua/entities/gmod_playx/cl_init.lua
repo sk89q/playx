@@ -164,8 +164,6 @@ function ENT:SetProjectorBounds(forward, right, up)
 end
 
 function ENT:CreateBrowser()
-    self:UpdateScreenBounds()
-    
     if self.UsingChrome then
         Msg("PlayX DEBUG: Using gm_chrome\n")
         
