@@ -42,14 +42,14 @@ local function SettingsPanel(panel)
         
         panel:AddControl("Label", {
             Text = "Installing gm_chrome provides vast improvements in performance. " ..
-            "Visit http://wiki.github.com/sk89q/playx/installation for more information."
+            "Visit http://wiki.github.com/sk89q/playx/gm_chrome for more information."
         })
     elseif not PlayX.SupportsChrome then
         chromeCheck:SetDisabled(true)
         
         panel:AddControl("Label", {
             Text = "Some gm_chrome support materials are required. " ..
-            "Visit http://wiki.github.com/sk89q/playx/installation for more information."
+            "Visit http://wiki.github.com/sk89q/playx/gm_chrome for more information."
         })
     end
 
@@ -180,7 +180,7 @@ local function ControlPanel(panel)
         Label = "URI:",
         Command = "playx_uri",
         WaitForEnter = false,
-    })
+    }):SetTooltip("Example: http://www.youtube.com/watch?v=NWdTcxv4V-g")
 
     panel:AddControl("TextBox", {
         Label = "Start At:",
@@ -198,7 +198,7 @@ local function ControlPanel(panel)
     panel:AddControl("CheckBox", {
         Label = "Force low frame rate",
         Command = "playx_force_low_framerate",
-    })
+    }):SetTooltip("Use this for music-only videos")
     
     panel:AddControl("CheckBox", {
         Label = "Don't auto stop on finish when applicable",
