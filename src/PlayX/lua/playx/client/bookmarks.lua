@@ -244,8 +244,9 @@ function PlayX.LoadBookmarks()
         data = [[
 The Device Has Been Modified,,http://youtube.com/watch?v=DQUaEF2bJZ0,modified,0:00,true
 Spaceman,,http://youtube.com/watch?v=Hc16Y9fiCvQ,spaceman,0:00,
-Time Warp,,http://youtube.com/watch?v=yarYjuN-m8I,timewarp,0:00,
+Cosmic Quandaries,,http://www.youtube.com/watch?v=CAD25s53wmE,,0:00,
 resonance,,http://youtube.com/watch?v=aX26MLlRfws,,0:00,
+Mae - Seasons,,http://www.youtube.com/watch?v=KGFIRcbvxds,seasons,0:00, 
 The White Mountain,,http://vimeo.com/8918647,,0:00,
 ]]
     end
