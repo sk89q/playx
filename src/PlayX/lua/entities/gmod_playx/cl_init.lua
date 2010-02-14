@@ -37,6 +37,7 @@ function ENT:Initialize()
     self.FPS = 1
     self.LowFramerateMode = false
     self.DrawCenter = false
+    self.ProcMat = nil
     
     self:UpdateScreenBounds()
 end
@@ -113,8 +114,9 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
     self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
     
     if self.UsingChrome then
-        self.HTMLWidth = PlayX.ProcTexWidth
-        self.HTMLHeight = PlayX.ProcTexHeight
+        self.ProcMat = not self.IsSquare and PlayX.ProcMat or PlayX.ProcMatSq
+        self.HTMLWidth = self.ProcMat.Width
+        self.HTMLHeight = self.ProcMat.Height
         self.IsSquare = false
     else
         if self.IsSquare then
@@ -153,8 +155,9 @@ function ENT:SetProjectorBounds(forward, right, up)
     self.Up = up
     
     if self.UsingChrome then
-        self.HTMLWidth = PlayX.ProcTexWidth
-        self.HTMLHeight = PlayX.ProcTexHeight
+        self.ProcMat = not self.IsSquare and PlayX.ProcMat or PlayX.ProcMatSq
+        self.HTMLWidth = self.ProcMat.Width
+        self.HTMLHeight = self.ProcMat.Height
     else
         self.HTMLWidth = 1024
         self.HTMLHeight = 512
@@ -164,11 +167,13 @@ function ENT:SetProjectorBounds(forward, right, up)
 end
 
 function ENT:CreateBrowser()
+    self:UpdateScreenBounds()
+    
     if self.UsingChrome then
         Msg("PlayX DEBUG: Using gm_chrome\n")
         
-        self.Browser = chrome.NewBrowser(PlayX.ProcTexWidth, PlayX.ProcTexHeight,
-                                         PlayX.ProcTexture, self:GetTable())
+        self.Browser = chrome.NewBrowser(self.ProcMat.Width, self.ProcMat.Height,
+                                         self.ProcMat.Texture, self:GetTable())
     else
         Msg("PlayX DEBUG: Using IE\n")
         
@@ -376,9 +381,9 @@ function ENT:PaintBrowser()
     if self.UsingChrome then
         self.Browser:Update()
         surface.SetDrawColor(0, 0, 0, 255)
-        surface.DrawRect(0, 0, PlayX.ProcTexWidth, PlayX.ProcTexHeight)
-        surface.SetTexture(PlayX.ProcTexID)
-        surface.DrawTexturedRect(0, 0, PlayX.ProcTexWidth, PlayX.ProcTexHeight)
+        surface.DrawRect(0, 0, self.ProcMat.Width, self.ProcMat.Height)
+        surface.SetTexture(self.ProcMat.TextureID)
+        surface.DrawTexturedRect(0, 0, self.ProcMat.Width, self.ProcMat.Height)
     else
         self.Browser:PaintManual()
     end

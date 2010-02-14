@@ -46,27 +46,35 @@ PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 
 PlayX.ProcMat = nil
-PlayX.ProcTexture = nil
-PlayX.ProcTexID = nil
-PlayX.ProcTexWidth = nil
-PlayX.ProcTexHeight = nil
+PlayX.ProcMatSq = nil
 
 if PlayX.SupportsChrome then
     Msg("PlayX DEBUG: gm_chrome detected\n")
     
-    PlayX.ProcMat = Material("playx/screen")
+    local mat = Material("playx/screen")
+    local matSq = Material("playx/screen_sq")
 
-    if PlayX.ProcMat then
-        PlayX.ProcTexture = PlayX.ProcMat:GetMaterialTexture("$basetexture")
-        PlayX.ProcTexID = surface.GetTextureID("playx/screen")
-        PlayX.ProcTexWidth = PlayX.ProcTexture:GetActualWidth()
-        PlayX.ProcTexHeight = PlayX.ProcTexture:GetActualHeight()
+    if mat and matSq then
+        PlayX.ProcMat = {
+            Material = mat,
+            Texture = mat:GetMaterialTexture("$basetexture"),
+            TextureID = surface.GetTextureID("playx/screen"),
+            Width = 1024,
+            Height = 512,
+        }
+        PlayX.ProcMatSq = {
+            Material = matSq,
+            Texture = matSq:GetMaterialTexture("$basetexture"),
+            TextureID = surface.GetTextureID("playx/screen_sq"),
+            Width = 1024,
+            Height = 1024,
+        }
         
-        Msg("PlayX DEBUG: playx/screen material detected\n")
+        Msg("PlayX DEBUG: playx/screen and playx/screen_sq materials detected\n")
     else
         PlayX.SupportsChrome = false
         
-        Msg("PlayX DEBUG: playx/screen material not detected; gm_chrome is unavailable\n")
+        Msg("PlayX DEBUG: playx/screen and playx/screen_sq materials not detected; gm_chrome is unavailable\n")
     end
 end
 
