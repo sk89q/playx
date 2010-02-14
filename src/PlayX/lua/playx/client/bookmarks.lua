@@ -588,7 +588,7 @@ function PlayX.OpenBookmarksWindow(selectTitle)
     local saveButton = vgui.Create("DButton", frame)
     saveButton:SetText("Save")
     saveButton:SetWide(80)
-    saveButton:SetTooltip("Save the bookmarks to disk")
+    saveButton:SetTooltip("Save the bookmarks to disk (automatically done after every operation)")
     saveButton.DoClick = function()
         PlayX.SaveBookmarks()
     end
