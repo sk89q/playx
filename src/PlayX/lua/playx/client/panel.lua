@@ -293,5 +293,3 @@ function PlayX.UpdatePanels()
     SettingsPanel(GetControlPanel("PlayXSettings"))
     ControlPanel(GetControlPanel("PlayXControl"))
 end
-
-PlayX.UpdatePanels()
