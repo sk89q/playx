@@ -33,6 +33,7 @@ CreateConVar("playx_host_url", "http://localhost/playx/host.html", {FCVAR_REPLIC
 
 PlayX = {}
 
+include("playx/client/bookmarks.lua")
 include("playx/client/providers.lua")
 include("playx/client/panel.lua")
 
@@ -440,6 +441,15 @@ end
 
 --- Called for concmd playx_gui_open.
 local function ConCmdGUIOpen()
+    -- Let's handle bookmark keywords
+    if GetConVar("playx_provider"):GetString() == "" then
+        local bookmark = PlayX.GetBookmarkByKeyword(GetConVar("playx_uri"):GetString())
+        if bookmark then
+            bookmark:Play()
+            return
+        end
+    end
+    
     PlayX.RequestOpenMedia(GetConVar("playx_provider"):GetString(),
                            GetConVar("playx_uri"):GetString(),
                            GetConVar("playx_start_time"):GetString(),

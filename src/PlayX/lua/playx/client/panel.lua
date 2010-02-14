@@ -16,6 +16,8 @@
 -- 
 -- $Id$
 
+PlayX._BookmarksPanelList = nil
+
 --- Draw the settings panel.
 local function SettingsPanel(panel)
     panel:ClearControls()
@@ -174,7 +176,7 @@ local function ControlPanel(panel)
         Options = options,
     })
 
-    panel:AddControl("TextBox", {
+    local textbox = panel:AddControl("TextBox", {
         Label = "URI:",
         Command = "playx_uri",
         WaitForEnter = false,
@@ -222,10 +224,66 @@ local function ControlPanel(panel)
     end
 end
 
+--- Draw the control panel.
+local function BookmarksPanel(panel)
+    panel:ClearControls()
+    panel:AddHeader()
+    
+    panel:SizeToContents(true)
+    
+    local bookmarks = panel:AddControl("DListView", {})
+    PlayX._BookmarksPanelList = bookmarks
+    bookmarks:SetMultiSelect(false)
+    bookmarks:AddColumn("Title")
+    bookmarks:AddColumn("URI")
+    bookmarks:SetTall(500)
+    
+    for k, bookmark in pairs(PlayX.Bookmarks) do
+        local line = bookmarks:AddLine(bookmark.Title, bookmark.URI)
+        if bookmark.Keyword ~= "" then
+            line:SetTooltip("Keyword: " .. bookmark.Keyword)
+        end
+    end
+    
+    bookmarks.OnRowRightClick = function(lst, index, line)
+        local menu = DermaMenu()
+        menu:AddOption("Open", function()
+            PlayX.GetBookmark(line:GetValue(1):Trim()):Play()
+        end)
+        menu:AddOption("Edit", function()
+            PlayX.OpenBookmarksWindow(line:GetValue(1))
+        end)
+        menu:Open()
+    end
+    
+    bookmarks.DoDoubleClick = function(lst, index, line)
+        if not line then return end
+        PlayX.GetBookmark(line:GetValue(1):Trim()):Play()
+    end
+    
+    local button = panel:AddControl("DButton", {})
+    button:SetText("Open Selected")
+    button.DoClick = function()
+        if bookmarks:GetSelectedLine() then
+            local line = bookmarks:GetLine(bookmarks:GetSelectedLine())
+            PlayX.GetBookmark(line:GetValue(1):Trim()):Play()
+	    else
+            Derma_Message("You didn't select an entry.", "Error", "OK")
+	    end
+    end
+    
+    local button = panel:AddControl("DButton", {})
+    button:SetText("Manage Bookmarks...")
+    button.DoClick = function()
+        PlayX.OpenBookmarksWindow()
+    end
+end
+
 --- PopulateToolMenu hook.
 local function PopulateToolMenu()
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
+    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel)
 end
 
 hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
@@ -234,4 +292,7 @@ hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 function PlayX.UpdatePanels()
     SettingsPanel(GetControlPanel("PlayXSettings"))
     ControlPanel(GetControlPanel("PlayXControl"))
+    BookmarksPanel(GetControlPanel("PlayXBookmarks"))
 end
+
+PlayX.UpdatePanels()
