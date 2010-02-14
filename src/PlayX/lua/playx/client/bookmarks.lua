@@ -697,4 +697,3 @@ function PlayX.OpenBookmarksWindow(selectTitle)
 end
 
 PlayX.LoadBookmarks()
-PlayX.UpdatePanels()
