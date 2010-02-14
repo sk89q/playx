@@ -4,7 +4,7 @@
 
 Name "PlayX Chrome Support Pack"
 
-!define VERSION 1.0
+!define VERSION 1.1.0.0
 !define URL "http://github.com/sk89q/playx"
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
@@ -26,7 +26,7 @@ InstallDir "$PROGRAMFILES\PlayX Chrome Support Pack"
 CRCCheck on
 XPStyle on
 ShowInstDetails show
-VIProductVersion 1.0.0.0
+VIProductVersion "${VERSION}"
 VIAddVersionKey ProductName "PlayX Chrome Support Pack"
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey FileVersion "${VERSION}"
@@ -38,6 +38,8 @@ Section "!PlayX files" playx_files
     SetOverwrite on
     File screen.vmt
     File screen.vtf
+    File screen_sq.vmt
+    File screen_sq.vtf
 SectionEnd
 
 Section "!gm_chrome" gm_chrome
