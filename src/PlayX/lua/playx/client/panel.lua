@@ -36,6 +36,11 @@ local function SettingsPanel(panel)
         Label = "Use gm_chrome",
         Command = "playx_use_chrome",
     })
+
+    panel:AddControl("CheckBox", {
+        Label = "Show errors in message boxes",
+        Command = "playx_error_windows",
+    }):SetTooltip("Uncheck to use hints instead")
     
     if not PlayX.HasChrome then
         chromeCheck:SetDisabled(true)

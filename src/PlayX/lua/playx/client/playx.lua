@@ -29,6 +29,7 @@ CreateClientConVar("playx_force_low_framerate", 0, false, false)
 CreateClientConVar("playx_use_jw", 1, false, false)
 CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
+CreateClientConVar("playx_error_windows", 1, true, false)
 CreateConVar("playx_host_url", "http://localhost/playx/host.html", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
 
 PlayX = {}
@@ -306,8 +307,12 @@ end
 --- Shows an error message.
 -- @param err
 function PlayX.ShowError(err)
-    GAMEMODE:AddNotify("PlayX error: " .. tostring(err), NOTIFY_ERROR, 7);
-    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+    if GetConVar("playx_error_windows"):GetBool() then
+        Derma_Message(err, "Error", "OK")
+    else
+	    GAMEMODE:AddNotify("PlayX error: " .. tostring(err), NOTIFY_ERROR, 7);
+	    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+	end
 end
 
 --- Called on playx_enabled change.
