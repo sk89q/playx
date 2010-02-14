@@ -192,7 +192,7 @@ function PlayX.SpawnForPlayer(ply, model)
 	        (info.Right == 0 and info.Up == 0)) then
         ent:SetAngles(Angle(0, (ply:GetPos() - tr.HitPos):Angle().y, 0))
 	    ent:SetPos(tr.HitPos - ent:OBBCenter() + 
-	       ((ent:OBBMaxs() - ent:OBBMins()):Length() + 10) * tr.HitNormal)
+	       ((ent:OBBMaxs().z - ent:OBBMins().z) + 10) * tr.HitNormal)
         ent:DropToFloor()
     else
         local ang = Angle(0, 0, 0)
