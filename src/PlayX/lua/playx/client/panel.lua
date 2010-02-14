@@ -292,7 +292,6 @@ hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 function PlayX.UpdatePanels()
     SettingsPanel(GetControlPanel("PlayXSettings"))
     ControlPanel(GetControlPanel("PlayXControl"))
-    BookmarksPanel(GetControlPanel("PlayXBookmarks"))
 end
 
 PlayX.UpdatePanels()
