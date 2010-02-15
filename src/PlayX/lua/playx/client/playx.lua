@@ -309,6 +309,8 @@ end
 function PlayX.ShowError(err)
     if GetConVar("playx_error_windows"):GetBool() then
         Derma_Message(err, "Error", "OK")
+        gui.EnableScreenClicker(true)
+        gui.EnableScreenClicker(false)
     else
 	    GAMEMODE:AddNotify("PlayX error: " .. tostring(err), NOTIFY_ERROR, 7);
 	    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
