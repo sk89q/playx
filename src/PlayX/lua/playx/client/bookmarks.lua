@@ -20,6 +20,7 @@ PlayX.BookmarksWindow = nil
 PlayX.Bookmarks = {}
 
 local bookmarksWindowList = nil
+local advancedView = false
 
 local function ParseCSV(data)
     local lines = string.Explode("\n", data:gsub("\r", ""))
@@ -380,7 +381,6 @@ function PlayX.OpenBookmarksWindow(selectTitle)
     end
     
     local bookmarks = nil
-    local advancedView = false
     
     local frame = vgui.Create("DFrame")
     PlayX.BookmarksWindow = frame
