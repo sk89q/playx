@@ -22,6 +22,8 @@ function Livestream.Detect(uri, useJW)
     local m = PlayX.FindMatch(uri:gsub("%?.*$", ""), {
         "^http://www%.livestream%.com/([a-zA-Z0-9_]+)$",
         "^http://livestream%.com/([a-zA-Z0-9_]+)$",
+        "^http://www%.mogulus%.com/([a-zA-Z0-9_]+)$",
+        "^http://mogulus%.com/([a-zA-Z0-9_]+)$",
     })
     
     if m then
