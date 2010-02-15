@@ -538,7 +538,7 @@ function PlayX.OpenBookmarksWindow(selectTitle)
     -- Clear button
     local clearButton = vgui.Create("DButton", frame)
     clearButton:SetText("Clear")
-    clearButton:SetWide(70)
+    clearButton:SetWide(80)
     clearButton:SetTooltip("Clear the form")
     clearButton.DoClick = function()
         titleInput:SetValue("")
@@ -568,7 +568,7 @@ function PlayX.OpenBookmarksWindow(selectTitle)
     -- Close button
     local closeButton = vgui.Create("DButton", frame)
     closeButton:SetText("Close")
-    closeButton:SetWide(100)
+    closeButton:SetWide(80)
     closeButton.DoClick = function()
         frame:Close()
     end
@@ -622,8 +622,11 @@ function PlayX.OpenBookmarksWindow(selectTitle)
 	        PlayX.GetBookmark(line:GetValue(1):Trim()):Play()
             frame:Close()
         end)
-        menu:AddOption("Delete", function()
+        menu:AddOption("Delete...", function()
             DoBookmarkDelete(bookmarks, line)
+        end)
+        menu:AddOption("Copy URI", function()
+            SetClipboardText(line:GetValue(2))
         end)
         menu:Open() 
     end
@@ -685,8 +688,8 @@ function PlayX.OpenBookmarksWindow(selectTitle)
         addButton:SetPos(3 + updateButton:GetWide() + 10,
                          frame:GetTall() - 32)
         clearButton:SetPos(3 + updateButton:GetWide() + addButton:GetWide() + 30,
-                         frame:GetTall() - 32)
-        deleteButton:SetPos(frame:GetWide() - deleteButton:GetWide() - 10,
+                           frame:GetTall() - 32)
+        deleteButton:SetPos(3 + updateButton:GetWide() + addButton:GetWide() + clearButton:GetWide() + 33,
                             frame:GetTall() - 32)
         closeButton:SetPos(frame:GetWide() - closeButton:GetWide() - 10,
                             frame:GetTall() - 32)
