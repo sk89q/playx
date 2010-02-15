@@ -49,6 +49,8 @@ PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.ProcMat = nil
 PlayX.ProcMatSq = nil
 
+local spawnWindow = nil
+
 if PlayX.SupportsChrome then
     Msg("PlayX DEBUG: gm_chrome detected\n")
     
@@ -268,26 +270,29 @@ end
 
 --- Opens the dialog for choosing a model to spawn the player with.
 function PlayX.OpenSpawnDialog()
+    if spawnWindow and spawnWindow:IsValid() then
+        return
+    end
+    
     local frame = vgui.Create("DFrame")
+    frame:SetDeleteOnClose(true)
     frame:SetTitle("Select Model for PlayX Player")
-    frame:SetSize(300, 200)
-    frame:SetSizable(false)
+    frame:SetSize(275, 400)
+    frame:SetSizable(true)
     frame:Center()
     frame:MakePopup()
+    spawnWindow = frame
     
     local modelList = vgui.Create("DPanelList", frame)
     modelList:EnableHorizontal(true)
     modelList:SetPadding(5)
-    modelList:SetPos(1, 25)
-    modelList:SetSize(298, 174)
     
     for model, _ in pairs(PlayXScreens) do
         local spawnIcon = vgui.Create("SpawnIcon", modelList)
         
         spawnIcon:SetModel(model)
         spawnIcon.Model = model
-        
-        function spawnIcon.DoClick()
+        spawnIcon.DoClick = function()
             surface.PlaySound("ui/buttonclickrelease.wav")
             RunConsoleCommand("playx_spawn", spawnIcon.Model)
             frame:Close()
@@ -295,6 +300,42 @@ function PlayX.OpenSpawnDialog()
         
         modelList:AddItem(spawnIcon)
     end
+    
+    local cancelButton = vgui.Create("DButton", frame)
+    cancelButton:SetText("Cancel")
+    cancelButton:SetWide(80)
+    cancelButton.DoClick = function()
+        frame:Close()
+    end
+    
+    local customModelButton = vgui.Create("DButton", frame)
+    customModelButton:SetText("Custom...")
+    customModelButton:SetWide(80)
+    customModelButton:SetTooltip("Try PlayX's \"best attempt\" at using an arbitrary model")
+    customModelButton.DoClick = function()
+        Derma_StringRequest("Custom Model", "Enter a model path (i.e. models/props_lab/blastdoor001c.mdl)", "",
+            function(text)
+                local text = text:Trim()
+                if text ~= "" then
+                    RunConsoleCommand("playx_spawn", text)
+                    frame:Close()
+                else
+                    Derma_Message("You didn't enter a model path.", "Error", "OK")
+                end
+            end)
+    end
+    
+    local oldPerform = frame.PerformLayout
+    frame.PerformLayout = function()
+        oldPerform(frame)
+        modelList:StretchToParent(5, 25, 5, 35)
+	    cancelButton:SetPos(frame:GetWide() - cancelButton:GetWide() - 5,
+	                        frame:GetTall() - cancelButton:GetTall() - 5)
+	    customModelButton:SetPos(frame:GetWide() - cancelButton:GetWide() - customModelButton:GetWide() - 8,
+	                        frame:GetTall() - customModelButton:GetTall() - 5)
+    end
+    
+    frame:InvalidateLayout(true, true)
 end
 
 --- Shows a hint.
