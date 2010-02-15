@@ -16,31 +16,8 @@
 -- 
 -- $Id$
 
---- Gets the length of a YouTube video, for the YouTube provider.
--- @param id Video ID
--- @param callback Callback to call with length
-local function GetLength(id, callback)
-    local vars = PlayX.URLEncodeTable({
-        ["alt"] = "atom",
-        ["key"] = "AI39si79-V-ltHhNyYvyTeaiJeexopkZoiUA56Sk-W8Z5alYUkgntdwvkmu1avAWGNixM_DuLx8-Jai6qy1am7HhbhYvWERzWA",
-        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
-    })
-    local url = "http://gdata.youtube.com/feeds/api/videos/" .. id .."?" .. vars
-
-    http.Get(url, "", function(result, size)
-        if size > 0 then
-            local length = string.match(result, "<yt:duration seconds='([0-9]+)'")
-            
-            if length then
-                callback(tonumber(length))
-            else
-                print("PlayX YouTube provider: Failed to detect length from API result")
-            end
-        else
-            print("PlayX YouTube provider: Failed to fetch API for video length")
-        end
-    end)
-end
+local apiKey = "AI39si79-V-ltHhNyYvyTeaiJeexopkZoiUA56Sk-W8Z5alYUkgntdwvkmu1" ..
+               "avAWGNixM_DuLx8-Jai6qy1am7HhbhYvWERzWA"
 
 local YouTube = {}
 
@@ -66,8 +43,8 @@ function YouTube.GetPlayer(uri, useJW)
                 ["URI"] = "http://www.youtube.com/watch?v=" .. uri,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
-                ["LengthFunc"] = function(callback)
-                    GetLength(uri, callback)
+                ["MetadataFunc"] = function(callback, failCallback)
+                    YouTube.QueryMetadata(uri, callback, failCallback)
                 end,
             }
         else
@@ -80,15 +57,16 @@ function YouTube.GetPlayer(uri, useJW)
                 ["showinfo"] = "0",
                 ["enablejsapi"] = "1",
             }
-            local url = "http://www.youtube.com/v/" .. uri .. "&" .. PlayX.URLEncodeTable(vars)
+            
+            local url = Format("http://www.youtube.com/v/%s&%s", uri, PlayX.URLEncodeTable(vars))
             
             return {
                 ["Handler"] = "FlashAPI",
                 ["URI"] = url,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
-                ["LengthFunc"] = function(callback)
-                    GetLength(uri, callback)
+                ["MetadataFunc"] = function(callback, failCallback)
+                    YouTube.QueryMetadata(uri, callback, failCallback)
                 end,
                 ["HandlerArgs"] = {
                     ["JSInitFunc"] = "onYouTubePlayerReady",
@@ -98,6 +76,51 @@ function YouTube.GetPlayer(uri, useJW)
             }
         end
     end
+end
+
+function YouTube.QueryMetadata(uri, callback, failCallback)
+    local vars = PlayX.URLEncodeTable({
+        ["alt"] = "atom",
+        ["key"] = apiKey,
+        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+    })
+    
+    local url = Format("http://gdata.youtube.com/feeds/api/videos/%s?%s", uri, vars)
+
+    http.Get(url, "", function(result, size)
+        if size == 0 then
+            failCallback("HTTP request failed (size = 0)")
+            return
+        end
+        
+        local title = PlayX.HTMLUnescape(string.match(result, "<title type='text'>([^<]+)</title>"))
+        local desc = PlayX.HTMLUnescape(string.match(result, "<content type='text'>([^<]+)</content>"))
+        local length = tonumber(string.match(result, "<yt:duration seconds='([0-9]+)'"))
+        local tags = PlayX.ParseTags(PlayX.HTMLUnescape(string.match(result, "<media:keywords>([^<]+)</media:keywords>")), ",")
+        local thumbnail = PlayX.HTMLUnescape(string.match(result, "<media:thumbnail url='([^']+)' height='240' width='320' time='[^']+'/>"))
+        local faves, views = string.match(result, "<yt:statistics favoriteCount='([0-9]+)' viewCount='([0-9]+)'/>")
+        faves, views = tonumber(faves), tonumber(views)
+        local rating, numRaters = string.match(result, "<gd:rating average='([0-9%.]+)'[^R]+numRaters='([0-9]+)'")
+        rating, numRaters = tonumber(rating), tonumber(numRaters)
+        if rating then rating = rating / 5.0 end
+        
+        if length then
+            callback({
+                ["URL"] = "http://www.youtube.com/watch?v=" .. uri,
+                ["Title"] = title,
+                ["Description"] = desc,
+                ["Length"] = length,
+                ["Tags"] = tags,
+                ["NumFaves"] = faves,
+                ["NumViews"] = views,
+                ["RatingNorm"] = rating,
+                ["NumRatings"] = numRaters,
+                ["Thumbnail"] = thumbnail,
+            })
+        else
+            failCallback("API result did not have length information")
+        end
+    end)
 end
 
 list.Set("PlayXProviders", "YouTube", YouTube)

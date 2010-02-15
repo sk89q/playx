@@ -34,13 +34,21 @@ function ENT:Initialize()
             "Provider [STRING]",
             "Handler [STRING]",
             "URI [STRING]",
-            "Playing",
             "Start",
             "ActualStartTime",
             "Length",
-            "Identifier [STRING]",
+            "URL [STRING]",
             "Title [STRING]",
+            "Description [STRING]",
+            "Tags [ARRAY]",
+            "Faved",
+            "Views",
+            "NormalizedRating",
+            "RatingCount",
+            "Thumbnail [STRING]",
         })
+        
+        self:ClearWireOutputs()
     end
 end
 
@@ -57,40 +65,38 @@ function ENT:ClearWireOutputs()
         Wire_TriggerOutput(self.Entity, "Provider", "")
         Wire_TriggerOutput(self.Entity, "Handler", "")
         Wire_TriggerOutput(self.Entity, "URI", "")
-        Wire_TriggerOutput(self.Entity, "Playing", 0)
-        Wire_TriggerOutput(self.Entity, "Start", 0)
-        Wire_TriggerOutput(self.Entity, "ActualStartTime", 0)
-        Wire_TriggerOutput(self.Entity, "Length", 0)
-        Wire_TriggerOutput(self.Entity, "Identifier", "")
+        Wire_TriggerOutput(self.Entity, "Start", -1)
+        Wire_TriggerOutput(self.Entity, "ActualStartTime", -1)
+        Wire_TriggerOutput(self.Entity, "Length", -1)
+        Wire_TriggerOutput(self.Entity, "URL", "")
         Wire_TriggerOutput(self.Entity, "Title", "")
+        Wire_TriggerOutput(self.Entity, "Description", "")
+        Wire_TriggerOutput(self.Entity, "Tags", "")
+        Wire_TriggerOutput(self.Entity, "Faved", -1)
+        Wire_TriggerOutput(self.Entity, "Views", -1)
+        Wire_TriggerOutput(self.Entity, "NormalizedRating", -1)
+        Wire_TriggerOutput(self.Entity, "RatingCount", -1)
+        Wire_TriggerOutput(self.Entity, "Thumbnail", "")
     end
 end
 
-function ENT:UpdateWireOutputs(handler, uri, start, length, provider,
-                               identifier, title)
+function ENT:SetWireMetadata(data)
     if WireAddon then
-        Wire_TriggerOutput(self.Entity, "Provider", provider)
-        Wire_TriggerOutput(self.Entity, "Handler", handler)
-        Wire_TriggerOutput(self.Entity, "URI", uri)
-        Wire_TriggerOutput(self.Entity, "Playing", 1)
-        Wire_TriggerOutput(self.Entity, "Start", start)
-        Wire_TriggerOutput(self.Entity, "ActualStartTime", CurTime())
-        Wire_TriggerOutput(self.Entity, "Length", length)
-        Wire_TriggerOutput(self.Entity, "Identifier", identifier)
-        Wire_TriggerOutput(self.Entity, "Title", title)
-    end
-end
-
-function ENT:UpdateWireLength(length)
-    if WireAddon then
-        Wire_TriggerOutput(self.Entity, "Length", length)
-    end
-end
-
-function ENT:UpdateWireMetadata(length, provider, title)
-    if WireAddon then
-        Wire_TriggerOutput(self.Entity, "Length", length)
-        Wire_TriggerOutput(self.Entity, "Title", title)
+        Wire_TriggerOutput(self.Entity, "Provider", data.Provider and data.Provider or "")
+        Wire_TriggerOutput(self.Entity, "Handler", data.Handler)
+        Wire_TriggerOutput(self.Entity, "URI", data.URI)
+        Wire_TriggerOutput(self.Entity, "Start", data.StartAt)
+        Wire_TriggerOutput(self.Entity, "ActualStartTime", data.StartTime + data.StartAt)
+        Wire_TriggerOutput(self.Entity, "Length", data.Length and data.Length or -1)
+        Wire_TriggerOutput(self.Entity, "URL", data.URL and data.URL or "")
+        Wire_TriggerOutput(self.Entity, "Title", data.Title and data.Title or "")
+        Wire_TriggerOutput(self.Entity, "Description", data.Description and data.Description or "")
+        Wire_TriggerOutput(self.Entity, "Tags", data.Tags and data.Tags or "")
+        Wire_TriggerOutput(self.Entity, "Faved", data.NumFaves and data.NumFaves or -1)
+        Wire_TriggerOutput(self.Entity, "Views", data.NumViews and data.NumViews or -1)
+        Wire_TriggerOutput(self.Entity, "NormalizedRating", data.RatingNorm and data.RatingNorm or -1)
+        Wire_TriggerOutput(self.Entity, "RatingCount", data.NumRatings and data.NumRatings or -1)
+        Wire_TriggerOutput(self.Entity, "Thumbnail", data.Thumbnail and data.Thumbnail or "")
     end
 end
 

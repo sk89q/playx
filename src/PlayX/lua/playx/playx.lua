@@ -195,7 +195,6 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
         end
     else -- Time to detect the provider
         for id, p in pairs(list.Get("PlayXProviders")) do
-            print(id, p)
             local newURI = p.Detect(uri)
             
             if newURI then
@@ -215,15 +214,20 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
         useLowFramerate = true
     end
     
-    PlayX.BeginMedia(result.Handler, result.URI, start,
-                     result.ResumeSupported, useLowFramerate, nil,
-                     result.HandlerArgs, provider)
+    PlayX.BeginMedia(result.Handler, result.URI, start, result.ResumeSupported,
+                     useLowFramerate, result.HandlerArgs)
     
-    if not ignoreLength and result.LengthFunc then
-        result.LengthFunc(function(length)
-            if length then
-                PlayX.SetCurrentMediaLength(length)
-            end
+    PlayX.UpdateMetadata({
+        ["Provider"] = provider,
+    })
+    
+    if result.MetadataFunc then
+        Msg(Format("PlayX: Metadata function available via provider %s\n", provider))
+        result.MetadataFunc(function(data)
+            Msg(Format("PlayX: Received metadata via provider %s\n", provider)) 
+            PlayX.UpdateMetadata(data)
+        end, function(err)
+            Msg(Format("PlayX: Metadata failed via provider %s: %s\n", provider, err))
         end)
     end
     
@@ -237,38 +241,41 @@ function PlayX.CloseMedia()
     end
 end
 
---- Sets the current media length. This can be called even after the media
+--- Updates the current media metadata. This can be called even after the media
 -- has begun playing. Calling this when there is no player spawned has
 -- no effect or there is no media playing has no effect.
--- @param length Time in seconds
-function PlayX.SetCurrentMediaLength(length)
+-- @param data Metadata structure
+function PlayX.UpdateMetadata(data)
     if not PlayX.PlayerExists() or not PlayX.CurrentMedia then
         return
     end
     
-    PlayX.CurrentMedia.Length = length
-    PlayX:GetInstance():UpdateWireLength(length)
+    table.Merge(PlayX.CurrentMedia, data)
+    PlayX:GetInstance():SetWireMetadata(PlayX.CurrentMedia)
     
-    if GetConVar("playx_expire"):GetFloat() <= -1 then
-        timer.Stop("PlayXMediaExpire")
-        return
-    end
-    
-    length = length + GetConVar("playx_expire"):GetFloat() -- Pad length
-     
-    PlayX.CurrentMedia.StopTime = PlayX.CurrentMedia.StartTime + length
-    
-    local timeLeft = PlayX.CurrentMedia.StopTime - PlayX.CurrentMedia.StartTime
-    
-    print("PlayX: Length of current media set to " .. tostring(length) ..
-          " (grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
-    
-    if timeLeft > 0 then
-        timer.Adjust("PlayXMediaExpire", timeLeft, 1)
-        timer.Start("PlayXMediaExpire")
-    else -- Looks like it ended already!
-        print("PlayX: Media has already expired")
-        PlayX.EndMedia()
+    -- Now handle the length
+    if data.Length then
+	    if GetConVar("playx_expire"):GetFloat() <= -1 then
+	        timer.Stop("PlayXMediaExpire")
+	        return
+	    end
+	    
+	    length = length + GetConVar("playx_expire"):GetFloat() -- Pad length
+	     
+	    PlayX.CurrentMedia.StopTime = PlayX.CurrentMedia.StartTime + length
+	    
+	    local timeLeft = PlayX.CurrentMedia.StopTime - PlayX.CurrentMedia.StartTime
+	    
+	    print("PlayX: Length of current media set to " .. tostring(length) ..
+	          " (grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
+	    
+	    if timeLeft > 0 then
+	        timer.Adjust("PlayXMediaExpire", timeLeft, 1)
+	        timer.Start("PlayXMediaExpire")
+	    else -- Looks like it ended already!
+	        print("PlayX: Media has already expired")
+	        PlayX.EndMedia()
+	    end
     end
 end
 
@@ -284,8 +291,7 @@ end
 -- @Param provider Used for wire outputs & metadata, optional
 -- @Param identifier Identifies video URL/etc, used for wire outputs & metadata, optional
 -- @Param title Used for wire outputs & metadata, optional
-function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate,
-                          length, handlerArgs, provider, identifier, title)
+function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
     timer.Stop("PlayXMediaExpire")
     timer.Stop("PlayXAdminTimeout")
     
@@ -296,23 +302,28 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate,
         handlerArgs = {}
     end
     
-    PlayX.GetInstance():UpdateWireOutputs(handler, uri, start, length and length or 0,
-                                          provider and provider or "",
-                                          identifier and identifier or "",
-                                          title and title or "")
-    
     PlayX.CurrentMedia = {
         ["Handler"] = handler,
         ["URI"] = uri,
+        ["StartAt"] = start,
         ["StartTime"] = CurTime() - start,
         ["ResumeSupported"] = resumeSupported,
         ["LowFramerate"] = lowFramerate,
         ["StopTime"] = nil,
         ["HandlerArgs"] = handlerArgs,
-        ["Length"] = length,
-        ["Provider"] = provider,
-        ["Identifier"] = identifier,
-        ["Title"] = title,
+        -- Filled by metadata functions
+        ["Provider"] = nil,
+        -- Filled by metadata functions from provider
+        ["URL"] = nil,
+        ["Title"] = nil,
+        ["Description"] = nil,
+        ["Length"] = nil,
+        ["Tags"] = nil,
+        ["NumFaves"] = nil,
+        ["NumViews"] = nil,
+        ["RatingNorm"] = nil,
+        ["NumRatings"] = nil,
+        ["Thumbnail"] = nil,
     }
     
     if length then

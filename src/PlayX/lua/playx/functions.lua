@@ -65,6 +65,44 @@ function PlayX.FindMatch(str, patterns)
     return nil
 end
 
+--- Unescape HTML. It does not handle all of HTML's named entities.
+-- @param s The string
+-- @return Unescaped string
+function PlayX.HTMLUnescape(s)
+    if not s then return nil end
+    
+    s = s:gsub("<br */?>", "\n")
+    s = s:gsub("&#([0-9]+);", function(m) return string.char(tonumber(m)) end)
+    s = s:gsub("&#x(%x+);", function(m) return string.char(tonumber(m, 16)) end)
+    s = s:gsub("&lt;", "<")
+    s = s:gsub("&gt;", ">")
+    s = s:gsub("&quot;", "\"")
+    s = s:gsub("&amp;", "&")
+    s = s:gsub("<[^<]+>", "")
+    
+    return s
+end
+
+--- Gets the tags out of a string.
+-- @param s
+-- @param delim Delimiter
+-- @return Table
+function PlayX.ParseTags(s, delim)
+    if not s then return nil end
+    
+    local final = {}
+    
+    local tags = string.Explode(delim, s)
+    for _, tag in pairs(tags) do
+        tag = tag:Trim()
+        if tag ~= "" and not table.HasValue(final, tag) then
+            table.insert(final, tag)
+        end
+    end
+    
+    return final
+end
+
 --- Casts a console command arg to a string.
 -- @param v
 -- @param default
