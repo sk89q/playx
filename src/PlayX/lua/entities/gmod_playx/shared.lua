@@ -32,6 +32,7 @@ ENT.AdminSpawnable = true
 
 ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
 
+-- Model names MUST be lowercase
 PlayXScreens = {
     ["models/props/cs_assault/billboard.mdl"] = {
         ["Offset"] = Vector(1, -110.5, 57.5),

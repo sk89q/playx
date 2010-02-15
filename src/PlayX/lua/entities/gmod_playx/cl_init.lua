@@ -44,7 +44,7 @@ end
 
 function ENT:UpdateScreenBounds()
     local model = self.Entity:GetModel()
-    local info = PlayXScreens[model]
+    local info = PlayXScreens[model:lower()]
     
     if info then
         if info.IsProjector then
