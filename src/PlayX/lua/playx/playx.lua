@@ -18,106 +18,16 @@
 
 require("datastream")
 
-PlayX = {}
-
-include("playx/providers.lua")
-
---- Casts a console command arg to a string.
--- @param v
--- @param default
-local function ConCmdToString(v, default)
-    if v == nil then return default end
-    return tostring(v)
-end
-
---- Casts a console command arg to a number.
--- @param v
--- @param default
-local function ConCmdToNumber(v, default)
-    v = tonumber(v)
-    if v == nil then return default end
-    return v
-end
-
---- Casts a console command arg to a bool.
--- @param v
--- @param default
-local function ConCmdToBool(v, default)
-    if v == nil then return default end
-    if v == "false" then return false end
-    v = tonumber(v)
-    if v == nil then return true end
-    return v ~= 0
-end
-
---- Parses a human-readable time string. Returns the number in seconds, or
--- nil if it cannot detect a format. Blank strings will return 0.
--- @Param str
-function ParseTimeString(str)
-    if str == "" or str == nil then return 0 end
-    
-    str = str:Trim()
-    
-    if tonumber(str) then
-        return tonumber(str)
-    end
-    
-    str = str:gsub("t=", "")
-    str = str:gsub("#", "")
-    
-    local m, s = str:match("^([0-9]+):([0-9]+)$")
-    if m then
-        return tonumber(m) * 60 + tonumber(s)
-    end
-    
-    local m, s, ms = str:match("^([0-9]+):([0-9]+)(%.[0-9]+)$")
-    if m then
-        return tonumber(m) * 60 + tonumber(s) + tonumber(ms)
-    end
-    
-    local h, m, s = str:match("^([0-9]+):([0-9]+):([0-9]+)$")
-    if h then
-        return tonumber(h) * 3600 + tonumber(m) * 60 + tonumber(s)
-    end
-    
-    local h, m, s, ms = str:match("^([0-9]+):([0-9]+):([0-9]+)(%.[0-9]+)$")
-    if h then
-        return tonumber(h) * 3600 + tonumber(m) * 60 + tonumber(s) + tonumber(ms)
-    end
-    
-    local s = str:match("^([0-9]+)s$")
-    if s then
-        return tonumber(s)
-    end
-    
-    local m, s = str:match("^([0-9]+)m *([0-9]+)s$")
-    if m then
-        return tonumber(m) * 60 + tonumber(s)
-    end
-    
-    local m, s = str:match("^([0-9]+)m$")
-    if m then
-        return tonumber(m) * 60
-    end
-    
-    local h, m, s = str:match("^([0-9]+)h *([0-9]+)m *([0-9]+)s$")
-    if h then
-        return tonumber(h) * 3600 + tonumber(m) * 60 + tonumber(s)
-    end
-    
-    local h, m = str:match("^([0-9]+)h *([0-9]+)m$")
-    if h then
-        return tonumber(h) * 3600 + tonumber(m) * 60
-    end
-    
-    return nil
-end
-
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
 CreateConVar("playx_host_url", "http://localhost/playx/host.html", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
+
+PlayX = {}
+
+include("playx/functions.lua")
+include("playx/providers.lua")
 
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
@@ -273,18 +183,19 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
     local result = nil
     
     if provider ~= "" then -- Provider detected
-        if not PlayX.Providers[provider] then
+        if not list.Get("PlayXProviders")[provider] then
             return false, "Unknown provider specified"
         end
         
-        local newURI = PlayX.Providers[provider].Detect(uri)
-        result = PlayX.Providers[provider].GetPlayer(newURI and newURI or uri, useJW)
+        local newURI = list.Get("PlayXProviders")[provider].Detect(uri)
+        result = list.Get("PlayXProviders")[provider].GetPlayer(newURI and newURI or uri, useJW)
         
         if not result then
             return false, "The provider did not recognize the media URI"
         end
     else -- Time to detect the provider
-        for id, p in pairs(PlayX.Providers) do
+        for id, p in pairs(list.Get("PlayXProviders")) do
+            print(id, p)
             local newURI = p.Detect(uri)
             
             if newURI then
@@ -503,11 +414,11 @@ local function ConCmdOpen(ply, cmd, args)
         ply:PrintMessage(HUD_PRINTCONSOLE, "playx_open requires a URI")
     else
         local uri = args[1]:Trim()
-        local provider = ConCmdToString(args[2], ""):Trim()
-        local start = ParseTimeString(args[3])
-        local forceLowFramerate = ConCmdToBool(args[4], false)
-        local useJW = ConCmdToBool(args[5], true)
-        local ignoreLength = ConCmdToBool(args[6], false)
+        local provider = PlayX.ConCmdToString(args[2], ""):Trim()
+        local start = PlayX.ParseTimeString(args[3])
+        local forceLowFramerate = PlayX.ConCmdToBool(args[4], false)
+        local useJW = PlayX.ConCmdToBool(args[5], true)
+        local ignoreLength = PlayX.ConCmdToBool(args[6], false)
         
         if start == nil then
             PlayX.SendError(ply, "The time format you entered for \"Start At\" isn't understood")
