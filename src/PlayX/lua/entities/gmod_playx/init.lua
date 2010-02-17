@@ -41,11 +41,21 @@ function ENT:Initialize()
             "Title [STRING]",
             "Description [STRING]",
             "Tags [ARRAY]",
+            "DatePublished",
+            "DateModified",
+            "Submitter [STRING]",
+            "SubmitterURL [STRING]",
+            "SubmitterAvatar [STRING]",
             "Faved",
             "Views",
+            "Comments",
             "NormalizedRating",
             "RatingCount",
             "Thumbnail [STRING]",
+            "Width",
+            "Height",
+            "IsLive",
+            "ViewerCount",
         })
         
         self:ClearWireOutputs()
@@ -72,11 +82,21 @@ function ENT:ClearWireOutputs()
         Wire_TriggerOutput(self.Entity, "Title", "")
         Wire_TriggerOutput(self.Entity, "Description", "")
         Wire_TriggerOutput(self.Entity, "Tags", {})
+        Wire_TriggerOutput(self.Entity, "DatePublished", -1)
+        Wire_TriggerOutput(self.Entity, "DateModified", -1)
+        Wire_TriggerOutput(self.Entity, "Submitter", "")
+        Wire_TriggerOutput(self.Entity, "SubmitterURL", "")
+        Wire_TriggerOutput(self.Entity, "SubmitterAvatar", "")
         Wire_TriggerOutput(self.Entity, "Faved", -1)
         Wire_TriggerOutput(self.Entity, "Views", -1)
+        Wire_TriggerOutput(self.Entity, "Comments", -1)
         Wire_TriggerOutput(self.Entity, "NormalizedRating", -1)
         Wire_TriggerOutput(self.Entity, "RatingCount", -1)
         Wire_TriggerOutput(self.Entity, "Thumbnail", "")
+        Wire_TriggerOutput(self.Entity, "Width", -1)
+        Wire_TriggerOutput(self.Entity, "Height", -1)
+        Wire_TriggerOutput(self.Entity, "IsLive", -1)
+        Wire_TriggerOutput(self.Entity, "ViewerCount", -1)
     end
 end
 
@@ -92,11 +112,21 @@ function ENT:SetWireMetadata(data)
         Wire_TriggerOutput(self.Entity, "Title", data.Title and data.Title or "")
         Wire_TriggerOutput(self.Entity, "Description", data.Description and data.Description or "")
         Wire_TriggerOutput(self.Entity, "Tags", data.Tags and data.Tags or {})
+        Wire_TriggerOutput(self.Entity, "DatePublished", data.DatePublished and data.DatePublished or -1)
+        Wire_TriggerOutput(self.Entity, "DateModified", data.DateModified and data.DateModified or -1)
+        Wire_TriggerOutput(self.Entity, "Submitter", data.Submitter and data.Submitter or "")
+        Wire_TriggerOutput(self.Entity, "SubmitterURL", data.SubmitterURL and data.SubmitterURL or "")
+        Wire_TriggerOutput(self.Entity, "SubmitterAvatar", data.SubmitterAvatar and data.SubmitterAvatar or "")
         Wire_TriggerOutput(self.Entity, "Faved", data.NumFaves and data.NumFaves or -1)
         Wire_TriggerOutput(self.Entity, "Views", data.NumViews and data.NumViews or -1)
+        Wire_TriggerOutput(self.Entity, "Comments", data.NumComments and data.NumComments or -1)
         Wire_TriggerOutput(self.Entity, "NormalizedRating", data.RatingNorm and data.RatingNorm or -1)
         Wire_TriggerOutput(self.Entity, "RatingCount", data.NumRatings and data.NumRatings or -1)
         Wire_TriggerOutput(self.Entity, "Thumbnail", data.Thumbnail and data.Thumbnail or "")
+        Wire_TriggerOutput(self.Entity, "Width", data.Width and data.Width or -1)
+        Wire_TriggerOutput(self.Entity, "Height", data.Height and data.Height or -1)
+        Wire_TriggerOutput(self.Entity, "IsLive", data.IsLive and data.IsLive or -1)
+        Wire_TriggerOutput(self.Entity, "ViewerCount", data.ViewerCount and data.ViewerCount or -1)
     end
 end
 

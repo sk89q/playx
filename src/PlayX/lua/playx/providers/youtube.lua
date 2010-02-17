@@ -95,11 +95,32 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
         
         local title = PlayX.HTMLUnescape(string.match(result, "<title type='text'>([^<]+)</title>"))
         local desc = PlayX.HTMLUnescape(string.match(result, "<content type='text'>([^<]+)</content>"))
+        local submitter = PlayX.HTMLUnescape(string.match(result, "<author><name>([^<]+)</name>"))
+        
+        local publishedDate = nil
+        local y, mo, d, h, m, s = string.match(result, "<published>([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z</published>")
+        if y then
+            publishedDate = PlayX.UTCTime({year=tonumber(y), month=tonumber(m),
+                                           day=tonumber(d), hour=tonumber(h),
+                                           min=tonumber(m), sec=tonumber(s)})
+        end
+        
+        local modifiedDate = nil
+        local y, mo, d, h, m, s = string.match(result, "<updated>([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z</updated>")
+        if y then
+            modifiedDate = PlayX.UTCTime({year=tonumber(y), month=tonumber(mo),
+                                          day=tonumber(d), hour=tonumber(h),
+                                          min=tonumber(m), sec=tonumber(s)})
+        end
+        
         local length = tonumber(string.match(result, "<yt:duration seconds='([0-9]+)'"))
         local tags = PlayX.ParseTags(PlayX.HTMLUnescape(string.match(result, "<media:keywords>([^<]+)</media:keywords>")), ",")
         local thumbnail = PlayX.HTMLUnescape(string.match(result, "<media:thumbnail url='([^']+)' height='240' width='320' time='[^']+'/>"))
+        local comments = tonumber(string.match(result, "<gd:comments><gd:feedLink href='[^']+' countHint='([0-9]+)'/>"))
+        
         local faves, views = string.match(result, "<yt:statistics favoriteCount='([0-9]+)' viewCount='([0-9]+)'/>")
         faves, views = tonumber(faves), tonumber(views)
+        
         local rating, numRaters = string.match(result, "<gd:rating average='([0-9%.]+)'[^R]+numRaters='([0-9]+)'")
         rating, numRaters = tonumber(rating), tonumber(numRaters)
         if rating then rating = rating / 5.0 end
@@ -111,14 +132,21 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
                 ["Description"] = desc,
                 ["Length"] = length,
                 ["Tags"] = tags,
+                ["DatePublished"] = publishedDate,
+                ["DateModified"] = modifiedDate,
+                ["Submitter"] = submitter,
+                ["SubmitterURL"] = submitter and "http://www.youtube.com/" .. submitter or nil,
                 ["NumFaves"] = faves,
                 ["NumViews"] = views,
+                ["NumComments"] = comments,
                 ["RatingNorm"] = rating,
                 ["NumRatings"] = numRaters,
                 ["Thumbnail"] = thumbnail,
             })
         else
-            failCallback("API result did not have length information")
+            callback({
+                ["URL"] = "http://www.youtube.com/watch?v=" .. uri,
+            })
         end
     end)
 end

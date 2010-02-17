@@ -87,11 +87,46 @@ function Livestream.GetPlayer(uri, useJW)
             ["URI"] = url,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
+            ["MetadataFunc"] = function(callback, failCallback)
+                Livestream.QueryMetadata(uri, callback, failCallback)
+            end,
             ["HandlerArgs"] = {
                 ["VolumeMul"] = 0.1,
             },
         }
     end
+end
+
+function Livestream.QueryMetadata(uri, callback, failCallback)
+    local url = Format("http://x%sx.channel-api.livestream-api.com/2.0/info", uri:gsub("_", "-"))
+
+    http.Get(url, "", function(result, size)
+        if size == 0 then
+            failCallback("HTTP request failed (size = 0)")
+            return
+        end
+        
+        local title = PlayX.HTMLUnescape(string.match(result, "<title>([^<]+)</title>"))
+        local desc = PlayX.HTMLUnescape(string.match(result, "<description>([^<]+)</description>"))
+        local isLive = string.match(result, "<ls:isLive>([^<]+)</ls:isLive>") == "true"
+        local viewerCount = tonumber(string.match(result, "<ls:currentViewerCount>([^<]+)</ls:currentViewerCount>"))
+        local tags = PlayX.ParseTags(PlayX.HTMLUnescape(string.match(result, "<ls:tags>([^<]+)</ls:tags>")), ",")
+        
+        if title then
+            callback({
+                ["URL"] = "http://livestream.com/" .. uri,
+                ["Title"] = title,
+                ["Description"] = desc,
+                ["Tags"] = tags,
+                ["IsLive"] = isLive,
+                ["ViewerCount"] = viewerCount,
+            })
+        else
+            callback({
+                ["URL"] = "http://livestream.com/" .. uri,
+            })
+        end
+    end)
 end
 
 list.Set("PlayXProviders", "Livestream", Livestream)

@@ -36,8 +36,17 @@ function MP3.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = true,
+            ["MetadataFunc"] = function(callback, failCallback)
+                MP3.QueryMetadata(uri, callback, failCallback)
+            end,
         }
     end
+end
+
+function MP3.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
 end
 
 list.Set("PlayXProviders", "MP3", MP3)
@@ -66,8 +75,17 @@ function FlashVideo.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
+            ["MetadataFunc"] = function(callback, failCallback)
+                FlashVideo.QueryMetadata(uri, callback, failCallback)
+            end,
         }
     end
+end
+
+function FlashVideo.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
 end
 
 list.Set("PlayXProviders", "FlashVideo", FlashVideo)
@@ -85,8 +103,17 @@ function AnimatedImage.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = false,
+            ["MetadataFunc"] = function(callback, failCallback)
+                AnimatedImage.QueryMetadata(uri, callback, failCallback)
+            end,
         }
     end
+end
+
+function AnimatedImage.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
 end
 
 list.Set("PlayXProviders", "AnimatedImage", AnimatedImage)
@@ -115,8 +142,17 @@ function Image.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = true,
+            ["MetadataFunc"] = function(callback, failCallback)
+                Image.QueryMetadata(uri, callback, failCallback)
+            end,
         }
     end
+end
+
+function Image.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
 end
 
 list.Set("PlayXProviders", "Image", Image)

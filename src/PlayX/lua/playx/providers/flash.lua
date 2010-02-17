@@ -29,8 +29,17 @@ function Flash.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
+            ["MetadataFunc"] = function(callback, failCallback)
+                Flash.QueryMetadata(uri, callback, failCallback)
+            end,
         }
     end
+end
+
+function Flash.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
 end
 
 list.Set("PlayXProviders", "Flash", Flash)
@@ -55,11 +64,20 @@ function FlashMovie.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
+            ["MetadataFunc"] = function(callback, failCallback)
+                FlashMovie.QueryMetadata(uri, callback, failCallback)
+            end,
             ["HandlerArgs"] = {
                 ["ForcePlay"] = true,
             },
         }
     end
+end
+
+function FlashMovie.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
 end
 
 list.Set("PlayXProviders", "FlashMovie", FlashMovie)

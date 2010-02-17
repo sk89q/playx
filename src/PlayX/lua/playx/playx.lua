@@ -319,11 +319,21 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, ha
         ["Description"] = nil,
         ["Length"] = nil,
         ["Tags"] = nil,
+        ["DatePublished"] = nil,
+        ["DateModified"] = nil,
+        ["Submitter"] = nil,
+        ["SubmitterURL"] = nil,
+        ["SubmitterAvatar"] = nil,
         ["NumFaves"] = nil,
         ["NumViews"] = nil,
+        ["NumComments"] = nil,
         ["RatingNorm"] = nil,
         ["NumRatings"] = nil,
         ["Thumbnail"] = nil,
+        ["Width"] = nil,
+        ["Height"] = nil,
+        ["IsLive"] = nil,
+        ["ViewerCount"] = nil,
     }
     
     if length then

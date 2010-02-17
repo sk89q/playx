@@ -83,6 +83,19 @@ function PlayX.HTMLUnescape(s)
     return s
 end
 
+--- Gets a timestamp in UTC.
+-- @param t Time
+-- @return
+function PlayX.UTCTime(t)
+	local tSecs = os.time(t)
+	t = os.date("*t", tSecs)
+	local tUTC = os.date("!*t", tSecs)
+	tUTC.isdst = t.isdst
+	local utcSecs = os.time(tUTC)
+	return tSecs + os.difftime(tSecs, utcSecs)
+end
+
+
 --- Gets the tags out of a string.
 -- @param s
 -- @param delim Delimiter
