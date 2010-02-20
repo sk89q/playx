@@ -273,6 +273,8 @@ function PlayX.UpdateMetadata(data)
     table.Merge(PlayX.CurrentMedia, data)
     PlayX:GetInstance():SetWireMetadata(PlayX.CurrentMedia)
     
+    hook.Call("PlayXMetadataReceived", nil, {PlayX.CurrentMedia, data})
+    
     -- Now handle the length
     if data.Length then
 	    if GetConVar("playx_expire"):GetFloat() <= -1 then
@@ -357,6 +359,10 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, ha
         ["ViewerCount"] = nil,
     }
     
+    hook.Call("PlayXMediaBegun", nil, {handler, uri, start, resumeSupported,
+                                       lowFramerate, handlerArgs,
+                                       PlayX.CurrentMedia})
+    
     if length then
         PlayX.SetCurrentMediaLength(length)
     end
@@ -375,6 +381,8 @@ function PlayX.EndMedia()
     
     PlayX.CurrentMedia = nil
     PlayX.AdminTimeoutTimerRunning = false
+    
+    hook.Call("PlayXMediaEnded", nil, {})
     
     PlayX.SendEndUMsg()
 end
@@ -581,10 +589,12 @@ hook.Add("PlayerDisconnected", "PlayXPlayerDisconnected", PlayerDisconnected)
 
 timer.Adjust("PlayXMediaExpire", 1, 1, function()
     print("PlayX: Media has expired")
+    hook.Call("PlayXMediaExpired", nil, {})
     PlayX.EndMedia()
 end)
 
 timer.Adjust("PlayXAdminTimeout", 1, 1, function()
     print("PlayX: No administrators have been present for an extended period of time; timing out media")
+    hook.Call("PlayXAdminTimeout", nil, {})
     PlayX.EndMedia()
 end) 

@@ -83,6 +83,8 @@ end
 
 --- Internal function to update the FPS of the current player instance.
 local function DoFPSChange()
+    hook.Call("PlayXFPSChanged", nil, {PlayX:GetPlayerFPS()})
+    
     if PlayX.PlayerExists() then
         PlayX.GetInstance():SetFPS(PlayX:GetPlayerFPS())
     end
@@ -96,6 +98,10 @@ local function BeginPlay()
     PlayX.GetInstance():Play(PlayX.CurrentMedia.Handler, PlayX.CurrentMedia.URI,
                              CurTime() - PlayX.CurrentMedia.StartTime,
                              PlayX.GetPlayerVolume(), PlayX.CurrentMedia.HandlerArgs)
+    
+    hook.Call("PlayXPlayBegun", nil, {PlayX.CurrentMedia.Handler, PlayX.CurrentMedia.URI,
+                                      CurTime() - PlayX.CurrentMedia.StartTime,
+                                      PlayX.GetPlayerVolume(), PlayX.CurrentMedia.HandlerArgs})
     
     if not PlayX.SeenNotice then
         PlayX.ShowHint("Want to stop what's playing? Go to the Q menu > Options > PlayX")
@@ -112,6 +118,8 @@ local function EndPlay()
     PlayX.GetInstance():Stop()
     PlayX.Playing = false
     
+    hook.Call("PlayXPlayEnded", nil, {})
+    
     PlayX.UpdatePanels()
 end
 
@@ -120,6 +128,8 @@ local function DoEnable()
     if PlayX.Enabled then return end
     
     PlayX.Enabled = true
+    
+    hook.Call("PlayXEnabled", nil, {true})
     
     if PlayX.PlayerExists() then
         if PlayX.CurrentMedia and PlayX.CurrentMedia.ResumeSupported then
@@ -133,6 +143,8 @@ local function DoDisable()
     if not PlayX.Enabled then return end
     
     PlayX.Enabled = false
+    
+    hook.Call("PlayXEnabled", nil, {false})
     
     if PlayX.PlayerExists() then
         if PlayX.CurrentMedia and PlayX.Playing then
@@ -376,6 +388,8 @@ end
 
 --- Called on playx_volume change.
 local function VolumeChangeCallback(cvar, old, new)
+    hook.Call("PlayXVolumeChanged", nil, {PlayX.GetPlayerVolume()})
+    
     if PlayX.PlayerExists() and PlayX.CurrentMedia then
         PlayX.GetInstance():ChangeVolume(PlayX.GetPlayerVolume())
     end
