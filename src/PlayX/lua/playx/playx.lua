@@ -26,6 +26,7 @@ CreateConVar("playx_host_url", "http://localhost/playx/host.html",
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
+CreateConVar("playx_race_protection", "1", {FCVAR_ARCHIVE})
 
 -- Note: Not using cvar replication because this can start causing problems
 -- if the server has been left online for a while.
@@ -37,6 +38,7 @@ include("playx/providers.lua")
 
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
+PlayX.LastOpenTime = 0
 
 --- Checks if a player instance exists in the game.
 -- @return Whether a player exists
@@ -312,6 +314,7 @@ end
 function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
     timer.Stop("PlayXMediaExpire")
     timer.Stop("PlayXAdminTimeout")
+    PlayX.LastOpenTime = CurTime()
     
     print(string.format("PlayX: Beginning media %s with handler %s, start at %ss",
                         uri, handler, start))
@@ -455,6 +458,9 @@ local function ConCmdOpen(ply, cmd, args)
         PlayX.SendError(ply, "There is no player spawned! Go to the spawn menu > Entities")
     elseif not args[1] then
         ply:PrintMessage(HUD_PRINTCONSOLE, "playx_open requires a URI")
+    elseif GetConVar("playx_race_protection"):GetFloat() > 0 and 
+        (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
+        PlayX.SendError(ply, "Another video/media selection was started too recently.")
     else
         local uri = args[1]:Trim()
         local provider = PlayX.ConCmdToString(args[2], ""):Trim()
