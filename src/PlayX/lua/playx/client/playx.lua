@@ -30,7 +30,6 @@ CreateClientConVar("playx_use_jw", 1, false, false)
 CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
 CreateClientConVar("playx_error_windows", 1, true, false)
-CreateConVar("playx_host_url", "http://localhost/playx/host.html", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
 
 PlayX = {}
 
@@ -43,6 +42,7 @@ PlayX.Playing = false
 PlayX.CurrentMedia = nil
 PlayX.SeenNotice = false
 PlayX.JWPlayerURL = ""
+PlayX.HostURL = ""
 PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 
@@ -154,6 +154,12 @@ function PlayX.GetInstance()
     return props[1]
 end
 
+--- Checks whether the host URL is valid.
+-- @return Whether the host URL is valid
+function PlayX.HasValidHostURL()
+    return PlayX.HostURL:Trim():gmatch("^https?://.+") and true or false
+end
+
 --- Used to get the HTML, namely for debugging purposes.
 function PlayX.GetHTML()
     if PlayX.PlayerExists() then
@@ -200,12 +206,6 @@ end
 -- @return
 function PlayX.ChromeEnabled()
     return GetConVar("playx_use_chrome"):GetBool()
-end
-
---- Gets the host page URL.
--- @return
-function PlayX.GetHostURL()
-    return GetConVar("playx_host_url"):GetString()
 end
 
 --- Resume playing if it is not already playing. Error messages will 
@@ -467,6 +467,15 @@ local function UMsgJWURL(um)
     PlayX.UpdatePanels()
 end
 
+--- Called on PlayXHostURL user message.
+local function UMsgHostURL(um)
+    Msg("PlayX DEBUG: Host URL set\n")
+    
+    PlayX.HostURL = um:ReadString()
+    
+    PlayX.UpdatePanels()
+end
+
 --- Called on PlayXError user message.
 local function UMsgError(um)
     local err = um:ReadString()
@@ -478,6 +487,7 @@ datastream.Hook("PlayXBegin", DSBegin)
 usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
 usermessage.Hook("PlayXJWURL", UMsgJWURL)
+usermessage.Hook("PlayXHostURL", UMsgHostURL)
 usermessage.Hook("PlayXError", UMsgError)
 
 --- Called for concmd playx_resume.

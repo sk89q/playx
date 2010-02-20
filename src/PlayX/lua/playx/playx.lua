@@ -18,11 +18,17 @@
 
 require("datastream")
 
-CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf", {FCVAR_ARCHIVE})
-CreateConVar("playx_host_url", "http://localhost/playx/host.html", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
+-- FCVAR_GAMEDLL makes cvar change detection work
+CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf",
+             {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
+CreateConVar("playx_host_url", "http://localhost/playx/host.html",
+             {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
+
+-- Note: Not using cvar replication because this can start causing problems
+-- if the server has been left online for a while.
 
 PlayX = {}
 
@@ -48,7 +54,7 @@ end
 --- Checks whether the JW player is enabled.
 -- @return Whether the JW player is enabled
 function PlayX.IsUsingJW()
-    return GetConVar("playx_jw_url"):GetString():Trim() ~= ""
+    return GetConVar("playx_jw_url"):GetString():Trim():gmatch("^https?://.+") and true or false
 end
 
 --- Gets the URL of the JW player.
@@ -61,6 +67,18 @@ end
 -- @return
 function PlayX.JWPlayerSupportsYouTube()
     return GetConVar("playx_jw_youtube"):GetBool()
+end
+
+--- Gets the URL of the host file.
+-- @return
+function PlayX.GetHostURL()
+    return GetConVar("playx_host_url"):GetString():Trim()
+end
+
+--- Checks whether the host URL is valid.
+-- @return Whether the host URL is valid
+function PlayX.HasValidHost()
+    return PlayX.GetHostURL():Trim():gmatch("^https?://.+") and true or false
 end
 
 --- Returns whether a player is permitted to use the player.
@@ -415,13 +433,17 @@ function PlayX.SendSpawnDialogUMsg(ply)
 end
 
 local function JWURLCallback(cvar, old, new)
-    print("PlayX: Manually replicating value of playx_jw_url")
-    
+    -- Do our own cvar replication
     SendUserMessage("PlayXJWURL", nil, GetConVar("playx_jw_url"):GetString())
 end
 
--- TODO: This does not work
+local function HostURLCallback(cvar, old, new)
+    -- Do our own cvar replication
+    SendUserMessage("PlayXHostURL", nil, GetConVar("playx_host_url"):GetString())
+end
+
 cvars.AddChangeCallback("playx_jw_url", JWURLCallback)
+cvars.AddChangeCallback("playx_host_url", HostURLCallback)
 
 --- Called for concmd playx_open.
 local function ConCmdOpen(ply, cmd, args)
@@ -494,7 +516,9 @@ concommand.Add("playx_spawn", ConCmdSpawn)
 
 --- Called on game mode hook PlayerInitialSpawn.
 function PlayerInitialSpawn(ply)
+    -- Do our own cvar replication
     SendUserMessage("PlayXJWURL", ply, GetConVar("playx_jw_url"):GetString())
+    SendUserMessage("PlayXHostURL", ply, GetConVar("playx_host_url"):GetString())
     
     timer.Simple(3, function()
         if PlayX.CurrentMedia and PlayX.CurrentMedia.ResumeSupported then

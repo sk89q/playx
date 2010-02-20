@@ -225,7 +225,8 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     local result = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
                                            start, volume, uri, handlerArgs)
     
-    local usingChrome = PlayX.SupportsChrome and PlayX.ChromeEnabled() and not result.ForceIE
+    local usingChrome = PlayX.SupportsChrome and PlayX.ChromeEnabled() and PlayX.HasValidHostURL()
+        and not result.ForceIE
     
     -- Switching browser engines!
     if self.Browser and usingChrome ~= self.UsingChrome then
@@ -243,7 +244,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     end
     
     if self.UsingChrome then
-        self.Browser:LoadURL(PlayX.GetHostURL())
+        self.Browser:LoadURL(PlayX.HostURL)
         -- TODO: Remove hard-coded URL
     else
         self.Browser:SetHTML(result:GetHTML())
