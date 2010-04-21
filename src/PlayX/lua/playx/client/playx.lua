@@ -57,7 +57,7 @@ if PlayX.SupportsChrome then
     local mat = Material("playx/screen")
     local matSq = Material("playx/screen_sq")
 
-    if mat and matSq then
+    if mat and matSq and not mat:IsError() and not matSq:IsError() then
         PlayX.ProcMat = {
             Material = mat,
             Texture = mat:GetMaterialTexture("$basetexture"),
