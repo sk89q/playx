@@ -45,6 +45,7 @@ PlayX.JWPlayerURL = ""
 PlayX.HostURL = ""
 PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
+PlayX._UpdateWindow = nil
 
 PlayX.ProcMat = nil
 PlayX.ProcMatSq = nil
@@ -79,6 +80,28 @@ if PlayX.SupportsChrome then
         
         Msg("PlayX DEBUG: playx/screen and playx/screen_sq materials not detected; gm_chrome is unavailable\n")
     end
+end
+
+--- Percent encodes a value. This is also in functions.lua.
+-- @param s String
+-- @return Encoded
+function URLEncode(s)
+    s = tostring(s)
+    local new = ""
+    
+    for i = 1, #s do
+        local c = s:sub(i, i)
+        local b = c:byte()
+        if (b >= 65 and b <= 90) or (b >= 97 and b <= 122) or
+            (b >= 48 and b <= 57) or
+            c == "_" or c == "." or c == "~" then
+            new = new .. c
+        else
+            new = new .. string.format("%%%X", b)
+        end
+    end
+    
+    return new
 end
 
 --- Internal function to update the FPS of the current player instance.
@@ -350,6 +373,43 @@ function PlayX.OpenSpawnDialog()
     frame:InvalidateLayout(true, true)
 end
 
+--- Opens the update window.
+function PlayX.OpenUpdateWindow(ver)
+    if ver == nil then
+        RunConsoleCommand("playx_update_info")
+        return
+    end
+    
+    if PlayX._UpdateWindow and PlayX._UpdateWindow:IsValid() then
+        return
+    end
+    
+    local url = "http://playx.sk89q.com/update/?version=" .. URLEncode(ver)
+    
+    local frame = vgui.Create("DFrame")
+    PlayX._UpdateWindow = frame
+    frame:SetTitle("PlayX Update News")
+    frame:SetDeleteOnClose(true)
+    frame:SetScreenLock(true)
+    frame:SetSize(math.min(780, ScrW() - 0), ScrH() * 4/5)
+    frame:SetSizable(true)
+    frame:Center()
+    frame:MakePopup()
+    
+    local browser = vgui.Create("HTML", frame)
+    browser:SetVerticalScrollbarEnabled(false)
+    browser:OpenURL(url)
+
+    -- Layout
+    local oldPerform = frame.PerformLayout
+    frame.PerformLayout = function()
+        oldPerform(frame)
+        browser:StretchToParent(10, 28, 10, 10)
+    end
+    
+    frame:InvalidateLayout(true, true)
+end
+
 --- Shows a hint.
 -- @param msg
 function PlayX.ShowHint(msg)
@@ -490,6 +550,13 @@ local function UMsgHostURL(um)
     PlayX.UpdatePanels()
 end
 
+--- Called on PlayXUpdateInfo user message.
+local function UMsgUpdateInfo(um)
+    local ver = um:ReadString()
+    
+    PlayX.OpenUpdateWindow(ver)
+end
+
 --- Called on PlayXError user message.
 local function UMsgError(um)
     local err = um:ReadString()
@@ -502,6 +569,7 @@ usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
 usermessage.Hook("PlayXJWURL", UMsgJWURL)
 usermessage.Hook("PlayXHostURL", UMsgHostURL)
+usermessage.Hook("PlayXUpdateInfo", UMsgUpdateInfo)
 usermessage.Hook("PlayXError", UMsgError)
 
 --- Called for concmd playx_resume.
@@ -548,9 +616,15 @@ local function ConCmdDumpHTML()
     print(PlayX.GetHTML())
 end
 
+--- Called for concmd playx_update_window.
+local function ConCmdUpdateWindow()
+    PlayX.OpenUpdateWindow()
+end
+
 concommand.Add("playx_resume", ConCmdResume)
 concommand.Add("playx_hide", ConCmdHide)
 concommand.Add("playx_reset_render_bounds", ConCmdResetRenderBounds)
 concommand.Add("playx_gui_open", ConCmdGUIOpen)
 concommand.Add("playx_gui_close", ConCmdGUIClose)
 concommand.Add("playx_dump_html", ConCmdDumpHTML) -- Debug function
+concommand.Add("playx_update_window", ConCmdUpdateWindow)

@@ -227,6 +227,11 @@ local function ControlPanel(panel)
     if not PlayX.CurrentMedia then
         button:SetDisabled(true)
     end
+    
+    local button = panel:AddControl("Button", {
+        Label = "Check for Updates",
+        Command = "playx_update_window",
+    })
 end
 
 --- Draw the control panel.

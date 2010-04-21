@@ -40,6 +40,8 @@ PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
 PlayX.LastOpenTime = 0
 
+local _version = ""
+
 --- Checks if a player instance exists in the game.
 -- @return Whether a player exists
 function PlayX.PlayerExists()
@@ -421,6 +423,14 @@ function PlayX.SendEndUMsg()
     umsg.End()
 end
 
+--- Send the PlayXUpdateInfo umsg to a user. You should not have much of a
+-- a reason to call this method.
+function PlayX.SendUpdateInfoUMsg(ply, ver)
+    umsg.Start("PlayXUpdateInfo", ply)
+    umsg.String(ver)
+    umsg.End()
+end
+
 --- Send the PlayXEnd umsg to clients. You should not have much of a
 -- a reason to call this method.
 function PlayX.SendError(ply, err)
@@ -506,7 +516,7 @@ end
 
 --- Called for concmd playx_spawn.
 function ConCmdSpawn(ply, cmd, args)
-	if not ply or not ply:IsValid() then
+    if not ply or not ply:IsValid() then
         return
     elseif not PlayX.IsPermitted(ply) then
         PlayX.SendError(ply, "You do not have permission to use the player")
@@ -523,10 +533,22 @@ function ConCmdSpawn(ply, cmd, args)
         end
     end
 end
+
+--- Called for concmd playx_update_info.
+function ConCmdUpdateInfo(ply, cmd, args)
+    if not ply or not ply:IsValid() then
+        return
+    else	    
+        Msg(Format("PlayX: %s asked for update info; ver=%s\n", ply:GetName(), _version))
+	    
+	    PlayX.SendUpdateInfoUMsg(ply, _version)
+    end
+end
  
 concommand.Add("playx_open", ConCmdOpen)
 concommand.Add("playx_close", ConCmdClose)
 concommand.Add("playx_spawn", ConCmdSpawn)
+concommand.Add("playx_update_info", ConCmdUpdateInfo)
 
 --- Called on game mode hook PlayerInitialSpawn.
 function PlayerInitialSpawn(ply)
@@ -597,4 +619,13 @@ timer.Adjust("PlayXAdminTimeout", 1, 1, function()
     print("PlayX: No administrators have been present for an extended period of time; timing out media")
     hook.Call("PlayXAdminTimeout", nil, {})
     PlayX.EndMedia()
-end) 
+end)
+
+-- Get version
+if file.Exists("../addons/PlayX/info.txt") then
+    local contents = file.Read("../addons/PlayX/info.txt")
+    _version = string.match(contents, "\"version\"[ \t]*\"([^\"]+)\"")
+    if _version == nil then
+        _version = ""
+    end
+end
