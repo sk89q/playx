@@ -105,8 +105,9 @@ Server Cvars
 string playx_jw_url (def. "http://playx.googlecode.com/svn/jwplayer/player.swf")
     The JW Player URL. Required for a lot of functionality.
 
-bool playx_host_url (def. "1")
-    Required file for gm_chrome to work.
+bool playx_host_url (def. "http://sk89q.github.com/playx/host/host.html")
+    Required file for gm_chrome to work. You need to point this to the host.html
+    file provided with PlayX.
 
 bool playx_jw_youtube (def. "1")
     Flag to mark whether to use the JW Player for YouTube videos. In
