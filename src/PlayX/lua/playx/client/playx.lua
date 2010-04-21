@@ -512,6 +512,21 @@ local function DSBegin(_, id, encoded, decoded)
     end
 end
 
+--- Called on PlayXProvidersList user message.
+local function DSProvidersList(_, id, encoded, decoded)
+    Msg("PlayX DEBUG: Providers list received\n")
+    
+    local list = decoded.List
+    
+    PlayX.Providers = {}
+    
+    for _, v in pairs(list) do
+        PlayX.Providers[v[1]] = v[2]
+    end
+    
+    PlayX.UpdatePanels()
+end
+
 --- Called on PlayXEnd user message.
 local function UMsgEnd(um)
     Msg("PlayX DEBUG: Eng umsg received\n")
@@ -565,6 +580,7 @@ local function UMsgError(um)
 end
 
 datastream.Hook("PlayXBegin", DSBegin)
+datastream.Hook("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
 usermessage.Hook("PlayXJWURL", UMsgJWURL)

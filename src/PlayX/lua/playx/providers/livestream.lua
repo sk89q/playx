@@ -130,3 +130,4 @@ function Livestream.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "Livestream", Livestream)
+list.Add("PlayXProvidersList", {"Livestream", "Livestream"})

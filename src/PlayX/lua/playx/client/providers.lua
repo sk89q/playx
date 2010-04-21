@@ -18,7 +18,7 @@
 
 local HandlerResult = {}
 
-function HandlerResult:new(css, js, body, jsURL, center)
+function HandlerResult:new(css, js, body, jsURL, center, url)
     local instance = {
         ["CSS"] = css,
         ["Body"] = body,
@@ -26,6 +26,7 @@ function HandlerResult:new(css, js, body, jsURL, center)
         ["JSInclude"] = jsURL,
         ["Center"] = center,
         ["ForceIE"] = false,
+        ["ForceURL"] = url,
     }
     
     setmetatable(instance, self)
@@ -101,6 +102,15 @@ end
 -- @return Encoded string
 local function HTMLEncode(str)
     return str:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;"):gsub("\"", "&quot;")
+end
+
+--- Generates the HTML for an IFrame.
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+local function GenerateIFrame(width, height, url)    
+    return HandlerResult:new("", "", "", "", false, url)
 end
 
 --- Generates the HTML for an image viewer. The image viewer will automatiaclly
@@ -283,19 +293,12 @@ body {
     return HandlerResult:new(css, js, body, url)
 end
 
-PlayX.Providers = {
-    ["YouTube"] = "YouTube",
-    ["Flash"] = "Flash [don't force play]",
-    ["FlashMovie"] = "Flash movie [force play buttons]",
-    ["MP3"] = "MP3",
-    ["FlashVideo"] = "FLV/MP4/AAC",
-    ["AnimatedImage"] = "Animated image",
-    ["Image"] = "Image",
-    ["Livestream"] = "Livestream",
-    ["Vimeo"] = "Vimeo",
-}
+PlayX.Providers = {}
 
 PlayX.Handlers = {
+    ["IFrame"] = function(width, height, start, volume, uri, handlerArgs)
+        return GenerateIFrame(width, height, uri)
+    end,
     ["JW"] = function(width, height, start, volume, uri)
         return GenerateJWPlayer(width, height, start, volume, uri, handlerArgs)
     end,

@@ -556,6 +556,11 @@ function PlayerInitialSpawn(ply)
     SendUserMessage("PlayXJWURL", ply, GetConVar("playx_jw_url"):GetString())
     SendUserMessage("PlayXHostURL", ply, GetConVar("playx_host_url"):GetString())
     
+    -- Send providers list.
+    datastream.StreamToClients(ply, "PlayXProvidersList", {
+        ["List"] = list.Get("PlayXProvidersList"),
+    })
+    
     timer.Simple(3, function()
         if PlayX.CurrentMedia and PlayX.CurrentMedia.ResumeSupported then
             if PlayX.CurrentMedia.StopTime and PlayX.CurrentMedia.StopTime < CurTime() then

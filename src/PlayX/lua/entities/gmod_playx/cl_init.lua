@@ -244,10 +244,17 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     end
     
     if self.UsingChrome then
-        self.Browser:LoadURL(PlayX.HostURL)
-        -- TODO: Remove hard-coded URL
+        if result.ForceURL then
+            self.Browser:LoadURL(result.ForceURL)
+        else
+            self.Browser:LoadURL(PlayX.HostURL)
+        end
     else
-        self.Browser:SetHTML(result:GetHTML())
+        if result.ForceURL then
+            self.Browser:OpenURL(result.ForceURL)
+        else
+            self.Browser:SetHTML(result:GetHTML())
+        end
     
         if self.LowFramerateMode then
             self.Browser:StartAnimate(1000)
@@ -445,6 +452,15 @@ end
 
 -- For gm_chrome
 function ENT:onFinishLoading()
+    -- Don't have to do much if it's a URL that we are loading
+    if self.CurrentPage.ForceURL then
+        -- But let's remove the scrollbar
+        self.Browser:Exec([[
+document.body.style.overflow = 'hidden';
+]])
+        return
+    end
+    
     if self.CurrentPage.JS then
         self.Browser:Exec(self.CurrentPage.JS)
     end

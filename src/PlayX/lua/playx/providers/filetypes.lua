@@ -50,6 +50,7 @@ function MP3.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "MP3", MP3)
+list.Add("PlayXProvidersList", {"MP3", "MP3"})
 
 local FlashVideo = {}
 
@@ -89,6 +90,7 @@ function FlashVideo.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "FlashVideo", FlashVideo)
+list.Add("PlayXProvidersList", {"FlashVideo", "FLV/MP4/AAC"})
 
 local AnimatedImage = {}
 
@@ -117,6 +119,7 @@ function AnimatedImage.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "AnimatedImage", AnimatedImage)
+list.Add("PlayXProvidersList", {"AnimatedImage", "Animated image"})
 
 local Image = {}
 
@@ -156,3 +159,4 @@ function Image.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "Image", Image)
+list.Add("PlayXProvidersList", {"Image", "Image"})
