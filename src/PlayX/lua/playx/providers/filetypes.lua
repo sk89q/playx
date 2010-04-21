@@ -16,6 +16,59 @@
 -- 
 -- $Id$
 
+local Shoutcast = {}
+
+function Shoutcast.Detect(uri)
+    local m = PlayX.FindMatch(uri, {
+        "^http://[^:/]/;stream%.nsv$",
+        "^http://[^:/]:8080/?$",
+    })
+    
+    if m then
+        return m[1]
+    end
+end
+
+function Shoutcast.GetPlayer(uri, useJW)
+    local m = PlayX.FindMatch(uri, {
+        "^http://[^:/]+$",
+        "^http://[^:/]+/$",
+        "^http://[^:/]+:[0-9]+/$",
+        
+        "^http://[^:/]+/;stream%.nsv$",
+        "^http://[^:/]+:[0-9]+/;stream%.nsv$",
+    })
+    
+    if m then
+        if not uri:lower():find("^;stream%.nsv") then
+            if uri:find("/$") then
+                uri = uri .. ";stream%.nsv"
+            else
+                uri = uri .. "/;stream%.nsv"
+            end
+        end
+        
+        return {
+            ["Handler"] = "JWAudio",
+            ["URI"] = uri,
+            ["ResumeSupported"] = true,
+            ["LowFramerate"] = true,
+            ["MetadataFunc"] = function(callback, failCallback)
+                Shoutcast.QueryMetadata(uri, callback, failCallback)
+            end,
+        }
+    end
+end
+
+function Shoutcast.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
+end
+
+list.Set("PlayXProviders", "Shoutcast", Shoutcast)
+list.Add("PlayXProvidersList", {"Shoutcast", "Shoutcast"})
+
 local MP3 = {}
 
 function MP3.Detect(uri)
