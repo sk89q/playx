@@ -21,7 +21,7 @@ require("datastream")
 -- FCVAR_GAMEDLL makes cvar change detection work
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf",
              {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
-CreateConVar("playx_host_url", "http://localhost/playx/host.html",
+CreateConVar("playx_host_url", "http://sk89q.github.com/playx/host/host.html",
              {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
