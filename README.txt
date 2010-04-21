@@ -1,5 +1,5 @@
 PlayX
-Copyright (c) 2009 sk89q <http://www.sk89q.com>
+Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
 Licensed under the GNU General Public License v2
 http://github.com/sk89q/playx
 
