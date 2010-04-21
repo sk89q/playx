@@ -152,4 +152,4 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "YouTube", YouTube)
-list.Add("PlayXProvidersList", {"YouTube", "YouTube"})
+list.Set("PlayXProvidersList", "YouTube", {"YouTube"})

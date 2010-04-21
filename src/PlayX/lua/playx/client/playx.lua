@@ -520,8 +520,8 @@ local function DSProvidersList(_, id, encoded, decoded)
     
     PlayX.Providers = {}
     
-    for _, v in pairs(list) do
-        PlayX.Providers[v[1]] = v[2]
+    for k, v in pairs(list) do
+        PlayX.Providers[k] = v[1]
     end
     
     PlayX.UpdatePanels()

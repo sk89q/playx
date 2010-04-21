@@ -20,8 +20,8 @@ local Shoutcast = {}
 
 function Shoutcast.Detect(uri)
     local m = PlayX.FindMatch(uri, {
-        "^http://[^:/]/;stream%.nsv$",
-        "^http://[^:/]:8080/?$",
+        "^http://[^:/]+/;stream%.nsv$",
+        "^http://[^:/]+:[0-9]+/?$",
     })
     
     if m then
@@ -33,6 +33,7 @@ function Shoutcast.GetPlayer(uri, useJW)
     local m = PlayX.FindMatch(uri, {
         "^http://[^:/]+$",
         "^http://[^:/]+/$",
+        "^http://[^:/]+:[0-9]+$",
         "^http://[^:/]+:[0-9]+/$",
         
         "^http://[^:/]+/;stream%.nsv$",
@@ -67,7 +68,7 @@ function Shoutcast.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "Shoutcast", Shoutcast)
-list.Add("PlayXProvidersList", {"Shoutcast", "Shoutcast"})
+list.Set("PlayXProvidersList", "Shoutcast", {"Shoutcast"})
 
 local MP3 = {}
 
@@ -103,7 +104,7 @@ function MP3.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "MP3", MP3)
-list.Add("PlayXProvidersList", {"MP3", "MP3"})
+list.Set("PlayXProvidersList", "MP3", {"MP3"})
 
 local FlashVideo = {}
 
@@ -143,7 +144,7 @@ function FlashVideo.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "FlashVideo", FlashVideo)
-list.Add("PlayXProvidersList", {"FlashVideo", "FLV/MP4/AAC"})
+list.Set("PlayXProvidersList", "FlashVideo", {"FLV/MP4/AAC"})
 
 local AnimatedImage = {}
 
@@ -172,7 +173,7 @@ function AnimatedImage.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "AnimatedImage", AnimatedImage)
-list.Add("PlayXProvidersList", {"AnimatedImage", "Animated image"})
+list.Set("PlayXProvidersList", "AnimatedImage", {"Animated image"})
 
 local Image = {}
 
@@ -212,4 +213,4 @@ function Image.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "Image", Image)
-list.Add("PlayXProvidersList", {"Image", "Image"})
+list.Set("PlayXProvidersList", "Image", {"Image"})

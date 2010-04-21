@@ -43,4 +43,4 @@ function StaticWeb.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "StaticWeb", StaticWeb)
-list.Add("PlayXProvidersList", {"StaticWeb", "Non-browsable Webpage"})
+list.Set("PlayXProvidersList", "StaticWeb", {"Non-browsable Webpage"})

@@ -107,4 +107,4 @@ function Vimeo.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "Vimeo", Vimeo)
-list.Add("PlayXProvidersList", {"Vimeo", "Vimeo"})
+list.Set("PlayXProvidersList", "Vimeo", {"Vimeo"})
