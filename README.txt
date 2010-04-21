@@ -99,6 +99,8 @@ Usage
 
 PlayX can be used from the tool menu, under the "Options" tab.
 
+Please see http://wiki.github.com/sk89q/playx/usage for more detailed information.
+
 Server Cvars
 ------------
 
@@ -133,6 +135,4 @@ bool playx_race_protection (def. "1")
 Extending
 ---------
 
-PlayX can be extended in several ways.
-
-Please see EXTENDING.txt and API.txt.
+Please see API.txt.
