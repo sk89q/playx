@@ -244,11 +244,14 @@ function PlayX.LoadBookmarks()
         -- Default data
         data = [[
 The Device Has Been Modified,,http://youtube.com/watch?v=DQUaEF2bJZ0,modified,0:00,true
-Spaceman,,http://youtube.com/watch?v=Hc16Y9fiCvQ,spaceman,0:00,
 Cosmic Quandaries,,http://youtube.com/watch?v=CAD25s53wmE,,0:00,
-resonance,,http://youtube.com/watch?v=aX26MLlRfws,,0:00,
-Mae - Seasons,,http://youtube.com/watch?v=KGFIRcbvxds,seasons,0:00, 
+Seasons,,http://youtube.com/watch?v=KGFIRcbvxds,seasons,0:00, 
 The White Mountain,,http://vimeo.com/8918647,,0:00,
+100 Years,,http://www.youtube.com/watch?v=5hBlCDPK0ig,,0:00,
+Burnin' For You,,http://www.youtube.com/watch?v=ipqqEFoJPL4,,0:00,
+There She Goes,,http://www.youtube.com/watch?v=xX9TDQcCyVE,,0:00,
+Party in Your Bedroom,,http://www.youtube.com/watch?v=z7dIvtcd6tY,,0:00,
+Spaceman,,http://youtube.com/watch?v=Hc16Y9fiCvQ,spaceman,0:00,
 ]]
     end
     
