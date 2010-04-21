@@ -241,7 +241,7 @@ local function BookmarksPanel(panel)
     bookmarks:SetMultiSelect(false)
     bookmarks:AddColumn("Title")
     bookmarks:AddColumn("URI")
-    bookmarks:SetTall(500)
+    bookmarks:SetTall(ScrH() * 7.5/10)
     
     for k, bookmark in pairs(PlayX.Bookmarks) do
         local line = bookmarks:AddLine(bookmark.Title, bookmark.URI)
