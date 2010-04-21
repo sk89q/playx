@@ -6,38 +6,8 @@ That's all!
 
 PlayX can be used from the tool menu, under the "Options" tab.
 
-Extras
-------
+Usage
+-----
 
-Inside the contrib/ folder are some extra extensions for PlayX. They
-can be put into your lua/autorun/server/ folder of your Gmod
-installation. You can also put them into the lua/autorun/server/ folder
-of the PlayX addon.
-
-- playx_faves.lua
-  This lets you set some favorite media that can be played via a chat
-  command. Open up the file in Notepad (or your favorite text editor)
-  for more information.
-
-- playx_media_query.lua
-  This extension allows you to control PlayX, as well as search YouTube,
-  from chat. Anyone can invoke the YouTube functions, but only those
-  permitted to do so can control PlayX.
- 
-  Chat commands:
-    !yt <query> -  Search YouTube in-game for embeddable videos, and get
-       the first result (it will not play, though)
-    !ytplay [query] - Search YouTube, and play it as well, but if you do
-       not provide an argument/search query, then the last found video
-       (via !yt or so) will be played
-    !ytlisten [query] - Works just like !ytplay, except it will put videos
-       into low frame rate mode (for music-only videos)
-    !ytlast - Plays the last found video
-    !play <URI> - Plays a piece of media (provider is auto-detected)
-    !link <URI> - Alias of !play
-    !playx <URI> - Alias of !play
-  
-  In addition to that, a user can also just paste a YouTube URL anywhere
-  in his or her message and the title of the video will be looked up and
-  printed to chat. It will also set the "last result" as the URL, so you
-  can then just do !ytplay, !ytliste, or !ytlast.
+Please see:
+http://wiki.github.com/sk89q/playx/usage

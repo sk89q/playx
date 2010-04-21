@@ -105,6 +105,9 @@ Server Cvars
 string playx_jw_url (def. "http://playx.googlecode.com/svn/jwplayer/player.swf")
     The JW Player URL. Required for a lot of functionality.
 
+bool playx_host_url (def. "1")
+    Required file for gm_chrome to work.
+
 bool playx_jw_youtube (def. "1")
     Flag to mark whether to use the JW Player for YouTube videos. In
     addition to hosting the JW player, you also need to host the "yt.swf"
@@ -122,6 +125,9 @@ number playx_admin_timeout (def. "120")
 number playx_expire (def. "10")
     The grace period after a video ends before stopping the video. Set to
     "-1" to disable this feature. Defined in seconds.
+
+bool playx_race_protection (def. "1")
+    Enable media play race condition handling.
 
 Extending
 ---------
