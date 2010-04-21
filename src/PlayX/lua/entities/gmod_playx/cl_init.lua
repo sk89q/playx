@@ -461,6 +461,14 @@ document.body.appendChild(script);
 document.body.innerHTML = ']] .. JSEncodeString(self.CurrentPage.Body) .. [[';
 ]])
     end
+    
+    self.Browser:Exec([[
+document.body.style.margin = '0';
+document.body.style.padding = '0';
+document.body.style.border = '0';
+document.body.style.background = '#000000';
+document.body.style.overflow = 'hidden';
+]])
 
     self.Browser:Exec([[
 var style = document.createElement('style');
