@@ -16,7 +16,6 @@
 -- 
 -- $Id$
 
-require("chrome")
 require("datastream")
 
 CreateClientConVar("playx_enabled", 1, true, false)
@@ -31,175 +30,43 @@ CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
 CreateClientConVar("playx_error_windows", 1, true, false)
 
+------------------------------------------------------------
+-- PlayX Client API
+------------------------------------------------------------
+
 PlayX = {}
 
+include("playx/functions.lua")
 include("playx/client/bookmarks.lua")
-include("playx/client/providers.lua")
+include("playx/client/handlers.lua")
 include("playx/client/panel.lua")
+include("playx/client/ui.lua")
+include("playx/client/engines/html.lua")
+include("playx/client/engines/gm_chrome.lua")
 
 PlayX.Enabled = true
-PlayX.Playing = false
-PlayX.CurrentMedia = nil
-PlayX.SeenNotice = false
+PlayX.Instances = {}
 PlayX.JWPlayerURL = ""
 PlayX.HostURL = ""
-PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
-PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
-PlayX._UpdateWindow = nil
-
-PlayX.ProcMat = nil
-PlayX.ProcMatSq = nil
 
 local spawnWindow = nil
+local updateWindow = nil
 
-if PlayX.SupportsChrome then
-    Msg("PlayX DEBUG: gm_chrome detected\n")
-    
-    local mat = Material("playx/screen")
-    local matSq = Material("playx/screen_sq")
-
-    if mat and matSq and not mat:IsError() and not matSq:IsError() then
-        PlayX.ProcMat = {
-            Material = mat,
-            Texture = mat:GetMaterialTexture("$basetexture"),
-            TextureID = surface.GetTextureID("playx/screen"),
-            Width = 1024,
-            Height = 512,
-        }
-        PlayX.ProcMatSq = {
-            Material = matSq,
-            Texture = matSq:GetMaterialTexture("$basetexture"),
-            TextureID = surface.GetTextureID("playx/screen_sq"),
-            Width = 1024,
-            Height = 1024,
-        }
-        
-        Msg("PlayX DEBUG: playx/screen and playx/screen_sq materials detected\n")
-    else
-        PlayX.SupportsChrome = false
-        
-        Msg("PlayX DEBUG: playx/screen and playx/screen_sq materials not detected; gm_chrome is unavailable\n")
-    end
-end
-
---- Percent encodes a value. This is also in functions.lua.
--- @param s String
--- @return Encoded
-function URLEncode(s)
-    s = tostring(s)
-    local new = ""
-    
-    for i = 1, #s do
-        local c = s:sub(i, i)
-        local b = c:byte()
-        if (b >= 65 and b <= 90) or (b >= 97 and b <= 122) or
-            (b >= 48 and b <= 57) or
-            c == "_" or c == "." or c == "~" then
-            new = new .. c
-        else
-            new = new .. string.format("%%%X", b)
-        end
-    end
-    
-    return new
-end
-
---- Internal function to update the FPS of the current player instance.
-local function DoFPSChange()
-    hook.Call("PlayXFPSChanged", nil, {PlayX:GetPlayerFPS()})
-    
-    if PlayX.PlayerExists() then
-        PlayX.GetInstance():SetFPS(PlayX:GetPlayerFPS())
-    end
-end
-
---- Begins play of media on the instance.
-local function BeginPlay()
-    DoFPSChange()
-    
-    PlayX.GetInstance().LowFramerateMode = PlayX.CurrentMedia.LowFramerate
-    PlayX.GetInstance():Play(PlayX.CurrentMedia.Handler, PlayX.CurrentMedia.URI,
-                             CurTime() - PlayX.CurrentMedia.StartTime,
-                             PlayX.GetPlayerVolume(), PlayX.CurrentMedia.HandlerArgs)
-    
-    hook.Call("PlayXPlayBegun", nil, {PlayX.CurrentMedia.Handler, PlayX.CurrentMedia.URI,
-                                      CurTime() - PlayX.CurrentMedia.StartTime,
-                                      PlayX.GetPlayerVolume(), PlayX.CurrentMedia.HandlerArgs})
-    
-    if not PlayX.SeenNotice then
-        PlayX.ShowHint("Want to stop what's playing? Go to the Q menu > Options > PlayX")
-        PlayX.SeenNotice = true
-    end
-    
-    PlayX.Playing = true
-    
-    PlayX.UpdatePanels()
-end
-
---- Ends play on the instance.
-local function EndPlay()
-    PlayX.GetInstance():Stop()
-    PlayX.Playing = false
-    
-    hook.Call("PlayXPlayEnded", nil, {})
-    
-    PlayX.UpdatePanels()
-end
-
---- Enables the player.
-local function DoEnable()
-    if PlayX.Enabled then return end
-    
-    PlayX.Enabled = true
-    
-    hook.Call("PlayXEnabled", nil, {true})
-    
-    if PlayX.PlayerExists() then
-        if PlayX.CurrentMedia and PlayX.CurrentMedia.ResumeSupported then
-            BeginPlay()
-        end
-    end
-end
-
---- Disables the player.
-local function DoDisable()
-    if not PlayX.Enabled then return end
-    
-    PlayX.Enabled = false
-    
-    hook.Call("PlayXEnabled", nil, {false})
-    
-    if PlayX.PlayerExists() then
-        if PlayX.CurrentMedia and PlayX.Playing then
-            EndPlay()
-        end
-    end
-end
-
---- Checks whether the player is spawned.
+--- Checks whether there are any players. This doesn't check to see whether
+-- there are any PlayX entities, as something can still be playing even
+-- if the client is unaware of an entity.
 -- @return
 function PlayX.PlayerExists()
-    return table.Count(ents.FindByClass("gmod_playx")) > 0
+    return #PlayX.Instances > 0
 end
 
---- Gets the player instance entity
--- @return Entity or nil
-function PlayX.GetInstance()
-    local props = ents.FindByClass("gmod_playx")
-    return props[1]
-end
-
---- Checks whether the host URL is valid.
--- @return Whether the host URL is valid
-function PlayX.HasValidHostURL()
-    return PlayX.HostURL:Trim():gmatch("^https?://.+") and true or false
-end
-
---- Used to get the HTML, namely for debugging purposes.
-function PlayX.GetHTML()
-    if PlayX.PlayerExists() then
-        return PlayX.GetInstance().CurrentPage:GetHTML()
+--- Checks whether any media being played can be resumed.
+function PlayX.HasResumable()
+    for _, v in pairs(PlayX.Instances) do
+        if v.Media.Resumable then return true end
     end
+    
+    return false
 end
 
 --- Enables the player.
@@ -236,53 +103,52 @@ function PlayX.SetPlayerVolume(vol)
     RunConsoleCommand("playx_volume", vol)
 end
 
---- Checks to see if the user enabled gm_chrome. It does not check to see
--- whether it is supported, however. Use PlayX.SupportsChrome for that.
--- @return
-function PlayX.ChromeEnabled()
-    return GetConVar("playx_use_chrome"):GetBool()
-end
-
---- Resume playing if it is not already playing. Error messages will 
--- be printed to console. 
+--- Resume playing of everything.
 function PlayX.ResumePlay()
-    if not PlayX.PlayerExists() then
-        Msg("There is no PlayX player spawned!\n")
-    elseif not PlayX.CurrentMedia then
-        Msg("No media is queued to play!\n")
-    elseif not PlayX.CurrentMedia.ResumeSupported then
-        Msg("The current media cannot be resumed.\n")
+    if PlayX.PlayerExists() then
+        PlayX.ShowError("Nothing is playing.")
     elseif PlayX.Enabled then
-        BeginPlay()
+        local count = 0
+        
+        for _, v in pairs(PlayX.Instances) do
+            if v.Resumable then
+                v:Start()
+                count = count + 1
+            end
+        end
+        
+        if count == 0 then
+            PlayX.ShowError("The media being played cannot be resumed.")
+        end
     end
 end
 
---- Hides the player and stops it. Error messages will be printed to
--- console. 
-function PlayX.HidePlayer()
+--- Stops playing everything.
+function PlayX.StopPlay()
     if not PlayX.PlayerExists() then
-        Msg("There is no PlayX player spawned!\n")
-    elseif not PlayX.CurrentMedia then
-        Msg("No media is queued to play!\n")
-    elseif PlayX.Enabled then
-        EndPlay()
+        PlayX.ShowError("Nothing is playing.\n")
+    els
+        for _, v in pairs(PlayX.Instances) do
+            v:Stop()
+        end
     end
 end
+PlayX.HidePlayer = PlayX.StopPlay -- Legacy
 
---- Reset the render bounds of the project screen. Error messages will be
--- printed to console.
+--- Reset the render bounds of the project screen.
 function PlayX.ResetRenderBounds()
     if not PlayX.PlayerExists() then
-        Msg("There is no PlayX player spawned!\n")
-    elseif not PlayX.GetInstance().IsProjector then
-        Msg("The player is not a projector.\n")
-    else
-        PlayX.GetInstance():ResetRenderBounds()
+        PlayX.ShowError("Nothing is playing.\n")
+    elseif PlayX.Enabled then
+        for _, v in pairs(PlayX.Instances) do
+            if ValidEntity(v.Entity) then
+                v.Entity:ResetRenderBounds()
+            end
+        end
     end
 end
 
---- Puts in a request to open media. A request will be sent to the
--- server for processing.
+--- Sends a request to the server to play something.
 -- @param provider Name of provider, leave blank to auto-detect
 -- @param uri URI to play
 -- @param start Time to start the video at, in seconds
@@ -297,225 +163,162 @@ function PlayX.RequestOpenMedia(provider, uri, start, forceLowFramerate, useJW, 
                       ignoreLength and 1 or 0)
 end
 
---- Puts in a request to close media. A request will be sent to the server
--- for processing.
+--- Sends a request to the server to stop playing.
 function PlayX.RequestCloseMedia()
     RunConsoleCommand("playx_close")
 end
 
---- Opens the dialog for choosing a model to spawn the player with.
-function PlayX.OpenSpawnDialog()
-    if spawnWindow and spawnWindow:IsValid() then
-        return
-    end
+--- Builds an instance.
+-- @param handler
+-- @param arguments
+function PlayX.ResolveHandler(handler, arguments)
+    local handlers = list.Get("PlayXHandlers")
     
-    local frame = vgui.Create("DFrame")
-    frame:SetDeleteOnClose(true)
-    frame:SetTitle("Select Model for PlayX Player")
-    frame:SetSize(275, 400)
-    frame:SetSizable(true)
-    frame:Center()
-    frame:MakePopup()
-    spawnWindow = frame
-    
-    local modelList = vgui.Create("DPanelList", frame)
-    modelList:EnableHorizontal(true)
-    modelList:SetPadding(5)
-    
-    for model, _ in pairs(PlayXScreens) do
-        local spawnIcon = vgui.Create("SpawnIcon", modelList)
-        
-        spawnIcon:SetModel(model)
-        spawnIcon.Model = model
-        spawnIcon.DoClick = function()
-            surface.PlaySound("ui/buttonclickrelease.wav")
-            RunConsoleCommand("playx_spawn", spawnIcon.Model)
-            frame:Close()
-        end
-        
-        modelList:AddItem(spawnIcon)
-    end
-    
-    local cancelButton = vgui.Create("DButton", frame)
-    cancelButton:SetText("Cancel")
-    cancelButton:SetWide(80)
-    cancelButton.DoClick = function()
-        frame:Close()
-    end
-    
-    local customModelButton = vgui.Create("DButton", frame)
-    customModelButton:SetText("Custom...")
-    customModelButton:SetWide(80)
-    customModelButton:SetTooltip("Try PlayX's \"best attempt\" at using an arbitrary model")
-    customModelButton.DoClick = function()
-        Derma_StringRequest("Custom Model", "Enter a model path (i.e. models/props_lab/blastdoor001c.mdl)", "",
-            function(text)
-                local text = text:Trim()
-                if text ~= "" then
-                    RunConsoleCommand("playx_spawn", text)
-                    frame:Close()
-                else
-                    Derma_Message("You didn't enter a model path.", "Error", "OK")
-                end
-            end)
-    end
-    
-    local oldPerform = frame.PerformLayout
-    frame.PerformLayout = function()
-        oldPerform(frame)
-        modelList:StretchToParent(5, 25, 5, 35)
-	    cancelButton:SetPos(frame:GetWide() - cancelButton:GetWide() - 5,
-	                        frame:GetTall() - cancelButton:GetTall() - 5)
-	    customModelButton:SetPos(frame:GetWide() - cancelButton:GetWide() - customModelButton:GetWide() - 8,
-	                        frame:GetTall() - customModelButton:GetTall() - 5)
-    end
-    
-    frame:InvalidateLayout(true, true)
-end
-
---- Opens the update window.
-function PlayX.OpenUpdateWindow(ver)
-    if ver == nil then
-        RunConsoleCommand("playx_update_info")
-        return
-    end
-    
-    if PlayX._UpdateWindow and PlayX._UpdateWindow:IsValid() then
-        return
-    end
-    
-    local url = "http://playx.sk89q.com/update/?version=" .. URLEncode(ver)
-    
-    local frame = vgui.Create("DFrame")
-    PlayX._UpdateWindow = frame
-    frame:SetTitle("PlayX Update News")
-    frame:SetDeleteOnClose(true)
-    frame:SetScreenLock(true)
-    frame:SetSize(math.min(780, ScrW() - 0), ScrH() * 4/5)
-    frame:SetSizable(true)
-    frame:Center()
-    frame:MakePopup()
-    
-    local browser = vgui.Create("HTML", frame)
-    browser:SetVerticalScrollbarEnabled(false)
-    browser:OpenURL(url)
-
-    -- Layout
-    local oldPerform = frame.PerformLayout
-    frame.PerformLayout = function()
-        oldPerform(frame)
-        browser:StretchToParent(10, 28, 10, 10)
-    end
-    
-    frame:InvalidateLayout(true, true)
-end
-
---- Shows a hint.
--- @param msg
-function PlayX.ShowHint(msg)
-    GAMEMODE:AddNotify(msg, NOTIFY_GENERIC, 10);
-    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
-end
-
---- Shows an error message.
--- @param err
-function PlayX.ShowError(err)
-    if GetConVar("playx_error_windows"):GetBool() then
-        Derma_Message(err, "Error", "OK")
-        gui.EnableScreenClicker(true)
-        gui.EnableScreenClicker(false)
+    if handlers[handler] then
+        return handlers[handler].Build(arguments)
     else
-	    GAMEMODE:AddNotify("PlayX error: " .. tostring(err), NOTIFY_ERROR, 7);
-	    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
-	end
-end
-
---- Called on playx_enabled change.
-local function EnabledCallback(cvar, old, new)
-    if GetConVar("playx_enabled"):GetBool() then
-        DoEnable()
-    else
-        DoDisable()
-    end
-    
-    PlayX.UpdatePanels()
-end
-
---- Called on playx_fps change.
-local function FPSChangeCallback(cvar, old, new)
-    DoFPSChange()
-end
-
---- Called on playx_volume change.
-local function VolumeChangeCallback(cvar, old, new)
-    hook.Call("PlayXVolumeChanged", nil, {PlayX.GetPlayerVolume()})
-    
-    if PlayX.PlayerExists() and PlayX.CurrentMedia then
-        PlayX.GetInstance():ChangeVolume(PlayX.GetPlayerVolume())
+        Error("Unknown handler: " .. handler)
     end
 end
 
-cvars.AddChangeCallback("playx_enabled", EnabledCallback)
-cvars.AddChangeCallback("playx_fps", FPSChangeCallback)
-cvars.AddChangeCallback("playx_volume", VolumeChangeCallback)
-
-PlayX.Enabled = GetConVar("playx_enabled"):GetBool()
-
---- Called on PlayXBegin user message.
-local function DSBegin(_, id, encoded, decoded)
-    Msg("PlayX DEBUG: Begin media message received\n")
+--- Registers an instance
+-- @param instance
+function PlayX.Register(instance)
+    local entIndex = instance.EntityIndex
     
-    if not PlayX.PlayerExists() then -- This should not happen
-        ErrorNoHalt("Undefined state DS_BEGIN_NO_PLAYER; please report error")
-        return
+    if PlayX.Instances[entIndex] then
+        -- Do a destruct that tries to retain references
+        PlayX.Instances[entIndex]:Destruct(true)
     end
     
+    PlayX.Instances[entIndex] = instance
+end
+
+--- Un-registers an instance
+-- @param entIndex Entity index or instance
+function PlayX.Unregister(entIndex)
+    if type(entIndex) == 'table' then
+        entIndex = instance.EntityIndex
+    end
+    
+    if PlayX.Instances[entIndex] then
+        PlayX.Instances[entIndex]:Destruct(false)
+        PlayX.Instances[entIndex] = nil
+    end
+end
+
+------------------------------------------------------------
+-- PlayerInstance
+------------------------------------------------------------
+
+PlayerInstance = {}
+mkclass(PlayerInstance)
+
+--- Constructs a PlayerInstance.
+function PlayerInstance:Construct(entIndex, handler, arguments, startTime)
+    self.Handler = handler
+    self.Arguments = arguments
+    self.StartTime = startTime
+    self.ResumeSupported = arguments.ResumeSupported
+    self.LowFramerate = arguments.LowFramerate
+    self.EntityIndex = entIndex
+    self.Engine = nil
+    
+    if PlayX.Enabled then
+        self.Engine:Start()
+    end
+    
+    self.SetFPS = self.Engine.SetFPS
+    self.SetVolume = self.Engine.SetVolume
+    self.Destruct = self.Engine.Destruct
+end
+
+--- Used to get the associated entity. May return NULL entity, but it will
+-- never return a non gmod_playx entity.
+function PlayerInstance:GetEntity()
+    local ent = ents.GetByIndex(self.EntityIndex)
+    
+    if ValidEntity(ent) and ent:GetClass() ~= "gmod_playx" then
+        Error(string.format("Ent index %d is not a gmod_playx entity", entIndex))
+    end
+    
+    return ent
+end
+
+--- Starts playing.
+function PlayerInstance:Start()
+    if self.Engine then
+        self.Engine:Destruct(true) -- Kill old engine
+    end
+    
+    self.Engine = PlayX.ResolveHandler(handler, arguments)
+    
+    -- Attach the engine
+    if ValidEntity(self:GetEntity()) then
+        self:GetEntity():AttachEngine(self.Engine)
+    end
+end
+
+--- Stops playing.
+function PlayerInstance:Stop()
+    if self.Engine then
+        self.Engine:Destruct()
+    end
+    
+    -- Detach the engine
+    if ValidEntity(self:GetEntity()) then
+        self:GetEntity():AttachEngine(nil)
+    end
+end
+
+--- Set the FPS.
+-- @param fps
+function PlayerInstance:SetFPS(fps)
+    if self.Engine then
+        self.Engine:SetFPS(fps)
+    end
+end
+
+--- Set the volume.
+-- @param volume
+function PlayerInstance:SetVolume(volume)
+    if self.Engine then
+        self.Engine:SetVolume(volume)
+    end
+end
+
+--- Destruct.
+function PlayerInstance:Destruct()
+    if self.Engine then
+        self.Engine:Destruct()
+    end
+end
+
+------------------------------------------------------------
+-- PlayX Server->Client Messages
+------------------------------------------------------------
+
+--- Called on PlayXRegister user message.
+local function DSRegister(_, id, encoded, decoded)
+    local entIndex = decoded.EntityIndex
     local handler = decoded.Handler
-    local uri = decoded.URI
+    local arguments = decoded.Arguments
     local playAge = decoded.PlayAge
-    local resumeSupported = decoded.ResumeSupported
-    local lowFramerate = decoded.LowFramerate
-    local handlerArgs = decoded.HandlerArgs
+    local startTime = CurTime() - playAge
     
-    PlayX.Playing = true
-    PlayX.CurrentMedia = nil
+    local instance = PlayerInstance(entIndex, handler, arguments, startTime)
+    PlayX.Register(instance)
+end
+
+--- Called on PlayXUnregister user message.
+local function UMsgUnregister(um)
+    local entIndex = um:ReadLong()
     
-    if PlayX.Handlers[handler] then
-        if uri:len() > 325 then
-            print(string.format("PlayX: Playing %s using handler %s", uri, handler))
-        else
-            Msg(string.format("PlayX: Playing %s using handler %s\n", uri, handler))
-        end
-        
-        PlayX.CurrentMedia = {
-            ["Handler"] = handler,
-            ["URI"] = uri,
-            ["StartTime"] = CurTime() - playAge,
-            ["ResumeSupported"] = resumeSupported,
-            ["LowFramerate"] = lowFramerate,
-            ["HandlerArgs"] = handlerArgs,
-        }
-        
-        if PlayX.Enabled then
-            BeginPlay()
-        else
-            PlayX.UpdatePanels() -- This matters for the admin, as the "End Media" button needs to be updated
-            
-            if resumeSupported then
-                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see it.") 
-            else
-                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see the next thing that gets played.") 
-            end
-        end
-    else
-        Msg(string.format("PlayX: No such handler named %s, can't play %s\n", handler, uri))
-    end
+    PlayX.Deregister(entIndex)
 end
 
 --- Called on PlayXProvidersList user message.
 local function DSProvidersList(_, id, encoded, decoded)
-    Msg("PlayX DEBUG: Providers list received\n")
-    
     local list = decoded.List
     
     PlayX.Providers = {}
@@ -527,30 +330,13 @@ local function DSProvidersList(_, id, encoded, decoded)
     PlayX.UpdatePanels()
 end
 
---- Called on PlayXEnd user message.
-local function UMsgEnd(um)
-    Msg("PlayX DEBUG: Eng umsg received\n")
-    
-    PlayX.CurrentMedia = nil
-    
-    if PlayX.PlayerExists() and PlayX.Playing and PlayX.Enabled then
-        EndPlay()
-    else
-        PlayX.UpdatePanels() -- To make sure
-    end
-end
-
 --- Called on PlayXSpawnDialog user message.
 local function UMsgSpawnDialog(um)
-    Msg("PlayX DEBUG: Spawn dialog request received\n")
-    
     PlayX.OpenSpawnDialog()
 end
 
 --- Called on PlayXJWURL user message.
 local function UMsgJWURL(um)
-    Msg("PlayX DEBUG: JW URL set\n")
-    
     PlayX.JWPlayerURL = um:ReadString()
     
     PlayX.UpdatePanels()
@@ -558,8 +344,6 @@ end
 
 --- Called on PlayXHostURL user message.
 local function UMsgHostURL(um)
-    Msg("PlayX DEBUG: Host URL set\n")
-    
     PlayX.HostURL = um:ReadString()
     
     PlayX.UpdatePanels()
@@ -579,29 +363,55 @@ local function UMsgError(um)
     PlayX.ShowError(err)
 end
 
-datastream.Hook("PlayXBegin", DSBegin)
+datastream.Hook("PlayXRegister", DSRegister)
+usermessage.Hook("PlayXUnregister", UMsgUnregister)
 datastream.Hook("PlayXProvidersList", DSProvidersList)
-usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
 usermessage.Hook("PlayXJWURL", UMsgJWURL)
 usermessage.Hook("PlayXHostURL", UMsgHostURL)
 usermessage.Hook("PlayXUpdateInfo", UMsgUpdateInfo)
 usermessage.Hook("PlayXError", UMsgError)
 
---- Called for concmd playx_resume.
-local function ConCmdResume()
-    PlayX.ResumePlay()
+------------------------------------------------------------
+-- Cvar Change Callbacks
+------------------------------------------------------------
+
+--- Called on playx_enabled change.
+local function EnabledCallback(cvar, old, new)
+    for _, instance in pairs(PlayX.Instances) do
+        if PlayX.Enabled then
+            instance:Start()
+        else
+            instance:Stop()
+        end
+    end
+    
+    PlayX.UpdatePanels()
 end
 
---- Called for concmd playx_hide.
-local function ConCmdHide()
-    PlayX.HidePlayer()
+--- Called on playx_fps change.
+local function FPSChangeCallback(cvar, old, new)
+    for _, instance in pairs(PlayX.Instances) do
+        instance:SetFPS(PlayX.GetPlayerFPS())
+    end
 end
 
---- Called for concmd playx_reset_render_bounds.
-local function ConCmdResetRenderBounds()
-    PlayX.ResetRenderBounds()
+--- Called on playx_volume change.
+local function VolumeChangeCallback(cvar, old, new)
+    hook.Call("PlayXVolumeChanged", nil, {PlayX.GetPlayerVolume()})
+    
+    for _, instance in pairs(PlayX.Instances) do
+        instance:SetVolume(PlayX.GetPlayerVolume())
+    end
 end
+
+cvars.AddChangeCallback("playx_enabled", EnabledCallback)
+cvars.AddChangeCallback("playx_fps", FPSChangeCallback)
+cvars.AddChangeCallback("playx_volume", VolumeChangeCallback)
+
+------------------------------------------------------------
+-- Console Commands
+------------------------------------------------------------
 
 --- Called for concmd playx_gui_open.
 local function ConCmdGUIOpen()
@@ -622,25 +432,14 @@ local function ConCmdGUIOpen()
                            GetConVar("playx_ignore_length"):GetBool())
 end
 
---- Called for concmd playx_gui_close.
-local function ConCmdGUIClose()
-    PlayX.RequestCloseMedia()
-end
-
---- Called for concmd playx_dump_html.
-local function ConCmdDumpHTML()
-    print(PlayX.GetHTML())
-end
-
---- Called for concmd playx_update_window.
-local function ConCmdUpdateWindow()
-    PlayX.OpenUpdateWindow()
-end
-
-concommand.Add("playx_resume", ConCmdResume)
-concommand.Add("playx_hide", ConCmdHide)
-concommand.Add("playx_reset_render_bounds", ConCmdResetRenderBounds)
+concommand.Add("playx_resume", function() PlayX.ResumePlay() end)
+concommand.Add("playx_hide", function() PlayX.HidePlayer() end)
+concommand.Add("playx_reset_render_bounds", function() PlayX.ResetRenderBounds() end)
 concommand.Add("playx_gui_open", ConCmdGUIOpen)
-concommand.Add("playx_gui_close", ConCmdGUIClose)
-concommand.Add("playx_dump_html", ConCmdDumpHTML) -- Debug function
-concommand.Add("playx_update_window", ConCmdUpdateWindow)
+concommand.Add("playx_gui_close", function() PlayX.RequestCloseMedia() end)
+concommand.Add("playx_dump_html", function() PlayX.GetHTML() end)
+concommand.Add("playx_update_window", function() PlayX.OpenUpdateWindow() end)
+
+------------------------------------------------------------
+
+PlayX.Enabled = GetConVar("playx_enabled"):GetBool()

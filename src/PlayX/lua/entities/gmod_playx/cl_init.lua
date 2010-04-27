@@ -1,5 +1,5 @@
 -- PlayX
--- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -22,54 +22,67 @@ language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
 
-local function JSEncodeString(str)
-    return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
-        :gsub("\r", "\\r"):gsub("\n", "\\n")
-end
-
+--- Initializes the entity.
 function ENT:Initialize()
     self.Entity:DrawShadow(false)
-    self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
     
-    self.UsingChrome = false
-    self.CurrentPage = nil
-    self.Playing = false
-    self.FPS = 1
-    self.LowFramerateMode = false
-    self.DrawCenter = false
-    self.ProcMat = nil
+    -- We do the following so that the screen always appears, even if the
+    -- entity itself is not inside the player's view.
+    self:SetRenderBoundsWS(Vector(-50000, -50000, -50000),
+                           Vector(50000, 50000, 50000))
     
-    self:UpdateScreenBounds()
+    self.Centered = false
+    self:AttachEngine(PlayX.QueryForEngine(self)) -- Query for an engine
 end
 
+--- Attaches an engine to the entity. Pass nil to detatch the engine.
+function ENT:AttachEngine(engine)
+    self.Engine = engine
+    
+    if self.Engine then
+        self.Centered = self.Engine:IsCentered()
+        
+        -- We need to calculate the screen position
+        self:UpdateScreenBounds()
+    end
+end
+
+--- Updates the screen bounds, based on either the screen list or using
+-- an algorithm at detecting the screen.
 function ENT:UpdateScreenBounds()
+    if self.Engine == nil then
+        Error("ENT:UpdateScreenBounds() called without an attached engine")
+    end
+    
     local model = self.Entity:GetModel()
     local info = PlayXScreens[model:lower()]
     
+    -- Is this a pre-defined screen?
     if info then
         if info.IsProjector then
-            self:SetProjectorBounds(info.Forward, info.Right, info.Up)
+            self:SetProjectorBounds(info.Right, info.Up, info.Forward)
         else
-            local rotateAroundRight = info.RotateAroundRight
-            local rotateAroundUp = info.RotateAroundUp
-            local rotateAroundForward = info.RotateAroundForward
+            local right = info.RotateAroundRight
+            local up = info.RotateAroundUp
+            local forward = info.RotateAroundForward
             
             -- For backwards compatibility, adapt to the new rotation system
-            if type(rotateAroundRight) == 'boolean' then
-                rotateAroundRight = rotateAroundRight and -90 or 0
+            if type(right) == 'boolean' then
+                right = right and -90 or 0
             end
-            if type(rotateAroundUp) == 'boolean' then
-                rotateAroundUp = rotateAroundUp and 90 or 0
+            if type(up) == 'boolean' then
+                up = up and 90 or 0
             end
-            if type(rotateAroundForward) == 'boolean' then
-                rotateAroundForward = rotateAroundForward and 90 or 0
+            if type(forward) == 'boolean' then
+                forward = forward and 90 or 0
             end
             
             self:SetScreenBounds(info.Offset, info.Width, info.Height,
-                                 rotateAroundRight,
-                                 rotateAroundUp,
-                                 rotateAroundForward)
+                                 right,
+                                 up,
+                                 forward)
         end
+    -- Or let's do our best attempt at fitting a screen automatically.
     else
         local center = self.Entity:OBBCenter()
         local mins = self.Entity:OBBMins()
@@ -104,211 +117,72 @@ function ENT:UpdateScreenBounds()
     end
 end
 
-function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
-                             rotateAroundUp, rotateAroundForward)
+--- Set the bounds for non-projector screens.
+-- @param pos Offset
+-- @param width
+-- @param height
+-- @param right
+-- @param up
+-- @param forward
+function ENT:SetScreenBounds(pos, width, height, right, up, forward)
     self.IsProjector = false
     
     self.ScreenOffset = pos
-    self.ScreenWidth = width
-    self.ScreenHeight = height
+    self.ViewportWidth = width
+    self.ViewportHeight = height
     self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
     
-    if self.UsingChrome then
-        self.ProcMat = not self.IsSquare and PlayX.ProcMat or PlayX.ProcMatSq
-        self.HTMLWidth = self.ProcMat.Width
-        self.HTMLHeight = self.ProcMat.Height
-        self.IsSquare = false
-    else
-        if self.IsSquare then
-            self.HTMLWidth = 1024
-            self.HTMLHeight = 1024
-        else
-            self.HTMLWidth = 1024
-            self.HTMLHeight = 512
-        end
-    end
+    self.Width, self.Height = self.Engine:GetDimensions()
     
-    if width / height < self.HTMLWidth / self.HTMLHeight then
-        self.DrawScale = width / self.HTMLWidth
-        self.DrawWidth = self.HTMLWidth
+    -- Fit the content to the viewport
+    if width / height < self.Width / self.Height then
+        self.DrawScale = width / self.Width
+        self.DrawWidth = self.Width
         self.DrawHeight = height / self.DrawScale
         self.DrawShiftX = 0
-        self.DrawShiftY = (self.DrawHeight - self.HTMLHeight) / 2
+        self.DrawShiftY = (self.DrawHeight - self.Height) / 2
     else
-        self.DrawScale = height / self.HTMLHeight
+        self.DrawScale = height / self.Height
         self.DrawWidth = width / self.DrawScale
-        self.DrawHeight = self.HTMLHeight
-        self.DrawShiftX = (self.DrawWidth - self.HTMLWidth) / 2
+        self.DrawHeight = self.Height
+        self.DrawShiftX = (self.DrawWidth - self.Width) / 2
         self.DrawShiftY = 0
     end
     
-    self.RotateAroundRight = rotateAroundRight
-    self.RotateAroundUp = rotateAroundUp
-    self.RotateAroundForward = rotateAroundForward
+    self.Right = right
+    self.Up = up
+    self.Forward = forward
 end
 
-function ENT:SetProjectorBounds(forward, right, up)
+--- Set the bounds for projector screens.
+-- @param right
+-- @param up
+-- @param forward
+function ENT:SetProjectorBounds(right, up, forward)
     self.IsProjector = true
     
     self.Forward = forward
     self.Right = right
     self.Up = up
     
-    if self.UsingChrome then
-        self.ProcMat = not self.IsSquare and PlayX.ProcMat or PlayX.ProcMatSq
-        self.HTMLWidth = self.ProcMat.Width
-        self.HTMLHeight = self.ProcMat.Height
-    else
-        self.HTMLWidth = 1024
-        self.HTMLHeight = 512
-    end
+    self.Width, self.Height = self.Engine:GetDimensions()
     
     self.DrawScale = 1 -- Not used
 end
 
-function ENT:CreateBrowser()
-    self:UpdateScreenBounds()
-    
-    if self.UsingChrome then
-        Msg("PlayX DEBUG: Using gm_chrome\n")
-        
-        self.Browser = chrome.NewBrowser(self.ProcMat.Width, self.ProcMat.Height,
-                                         self.ProcMat.Texture, self:GetTable())
-    else
-        Msg("PlayX DEBUG: Using IE\n")
-        
-        if PlayXBrowser and PlayXBrowser:IsValid() then
-            Msg("Found existing PlayX browser; reusing\n")
-            self.Browser = PlayXBrowser
-        else
-            self.Browser = vgui.Create("HTML")
-            PlayXBrowser = self.Browser
-        end
-        
-        self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
-        self.Browser:SetPaintedManually(true)
-        self.Browser:SetVerticalScrollbarEnabled(false)
-        
-        if self.LowFramerateMode then
-            self.Browser:StartAnimate(1000)
-        else
-            self.Browser:StartAnimate(1000 / self.FPS)
-        end
-    end
-end
-
-function ENT:DestructBrowser()
-    if self.UsingChrome then
-        if self.Browser then
-            self.Browser:Free()
-            self.Browser = nil
-        end
-    else
-        if self.Browser and self.Browser:IsValid() then
-            --browser:Clear()
-            local html = [[ENT:DestructBrowser() called.]]
-            self.Browser:SetHTML(html)
-            self.Browser:SetPaintedManually(true)
-            self.Browser:StopAnimate()
-            
-            -- Creating a new HTML panel tends to crash clients occasionally, so
-            -- we're going try to keep a copy around
-            -- Don't know whether the crash is caused by the browser being created
-            -- or by the page browsing
-        end
-        
-        self.Browser = nil
-    end
-end
-
-function ENT:Play(handler, uri, start, volume, handlerArgs)
-    local result = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
-                                           start, volume, uri, handlerArgs)
-    
-    local usingChrome = PlayX.SupportsChrome and PlayX.ChromeEnabled() and PlayX.HasValidHostURL()
-        and not result.ForceIE
-    
-    -- Switching browser engines!
-    if self.Browser and usingChrome ~= self.UsingChrome then
-        self:DestructBrowser()
-        self.Browser = nil
-    end
-    
-    self.UsingChrome = usingChrome
-    
-    self.DrawCenter = result.center
-    self.CurrentPage = result
-    
-    if not self.Browser then
-        self:CreateBrowser()
-    end
-    
-    if self.UsingChrome then
-        if result.ForceURL then
-            self.Browser:LoadURL(result.ForceURL)
-        else
-            self.Browser:LoadURL(PlayX.HostURL)
-        end
-    else
-        if result.ForceURL then
-            self.Browser:OpenURL(result.ForceURL)
-        else
-            self.Browser:SetHTML(result:GetHTML())
-        end
-    
-        if self.LowFramerateMode then
-            self.Browser:StartAnimate(1000)
-        else
-            self.Browser:StartAnimate(1000 / self.FPS)
-        end
-    end
-    
-    self.Playing = true
-end
-
-function ENT:Stop()
-    self:DestructBrowser()
-    self.Playing = false
-end
-
-function ENT:ChangeVolume(volume)
-    if not self.Browser or not self.UsingChrome then
-        return false
-    end
-    
-    local js = self.CurrentPage.GetVolumeChangeJS(volume)
-    
-    if js then
-        self.Browser:Exec(js)
-        return true
-    end
-    
-    return false
-end
-
+--- Resets the render bounds.
 function ENT:ResetRenderBounds()
-    -- Not sure if this works
     self:SetRenderBoundsWS(Vector(-100, -100, -100), Vector(100, 100, 100))
     self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
-end
-
-function ENT:SetFPS(fps)
-    self.FPS = fps
-    
-    if not self.UsingChrome and self.Browser and self.Browser:IsValid() and not self.LowFramerateMode then
-        self.Browser:StartAnimate(1000 / self.FPS)
-    end
 end
 
 function ENT:Draw()
     self.Entity:DrawModel()
     
     if self.DrawScale then
-        if not self.UsingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
-            self.Browser:SetPaintedManually(false)
-        end
         render.SuppressEngineLighting(true)
         
+        -- Projector rendering
         if self.IsProjector then
             local excludeEntities = player.GetAll()
             table.insert(excludeEntities, self.Entity)
@@ -326,13 +200,13 @@ function ENT:Draw()
                 
                 local width = tr.HitPos:Distance(self.Entity:LocalToWorld(self.Entity:OBBCenter())) * 0.001
                 local height = width / 2
-                local pos = tr.HitPos - ang:Right() * height * self.HTMLHeight / 2
-                            - ang:Forward() * width * self.HTMLWidth / 2
+                local pos = tr.HitPos - ang:Right() * height * self.Height / 2
+                            - ang:Forward() * width * self.Width / 2
                             + ang:Up() * 2
                 
                 cam.Start3D2D(pos, ang, width)
-                if self.Browser and (self.UsingChrome or self.Browser:IsValid()) and self.Playing then
-                    self:PaintBrowser()
+                if self.Engine then
+                    self.Engine:Paint()
                 else
                     surface.SetDrawColor(0, 0, 0, 255)
                     surface.DrawRect(0, 0, 1024, 512)
@@ -348,23 +222,25 @@ function ENT:Draw()
             end
         else
             local shiftMultiplier = 1
-            if not self.DrawCenter then
+            if not self.Centered then
                 shiftMultiplier = 2
             end
             
-            local pos = self.Entity:LocalToWorld(self.ScreenOffset - 
-                Vector(0, self.DrawShiftX * self.DrawScale, self.DrawShiftY * shiftMultiplier * self.DrawScale))
+            local p = self.ScreenOffset - 
+                Vector(0, self.DrawShiftX * self.DrawScale,
+                       self.DrawShiftY * shiftMultiplier * self.DrawScale)
+            local pos = self.Entity:LocalToWorld(p)
             local ang = self.Entity:GetAngles()
             
-            ang:RotateAroundAxis(ang:Right(), self.RotateAroundRight)
-            ang:RotateAroundAxis(ang:Up(), self.RotateAroundUp)
-            ang:RotateAroundAxis(ang:Forward(), self.RotateAroundForward)
+            ang:RotateAroundAxis(ang:Right(), self.Right)
+            ang:RotateAroundAxis(ang:Up(), self.Up)
+            ang:RotateAroundAxis(ang:Forward(), self.Forward)
             
             cam.Start3D2D(pos, ang, self.DrawScale)
             surface.SetDrawColor(0, 0, 0, 255)
             surface.DrawRect(-self.DrawShiftX, -self.DrawShiftY * shiftMultiplier, self.DrawWidth, self.DrawHeight)
             if self.Browser and (self.UsingChrome or self.Browser:IsValid()) and self.Playing then
-                self:PaintBrowser()
+                    self.Engine:Paint()
             else
                 if not PlayX.Enabled then
                     draw.SimpleText("Re-enable the player in the tool menu -> Options",
@@ -379,122 +255,9 @@ function ENT:Draw()
         end
 
         render.SuppressEngineLighting(false)
-        if not self.UsingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
-            self.Browser:SetPaintedManually(true)
-        end
-    end
-end
-
-function ENT:PaintBrowser()
-    if self.UsingChrome then
-        self.Browser:Update()
-        surface.SetDrawColor(0, 0, 0, 255)
-        surface.DrawRect(0, 0, self.ProcMat.Width, self.ProcMat.Height)
-        surface.SetTexture(self.ProcMat.TextureID)
-        surface.DrawTexturedRect(0, 0, self.ProcMat.Width, self.ProcMat.Height)
-    else
-        self.Browser:PaintManual()
     end
 end
 
 function ENT:OnRemove()
-    -- NOTE: Gmod will call this method when Gmod "freezes" (you hear the
-    -- clicking and water sounds when you return to Gmod), even though
-    -- the entity may have not been deleted. We have to work around this,
-    -- so that the video continues playing. We also have to re-update the
-    -- render bounds, as Gmod will reset those.
-    
-    Msg("PlayX DEBUG: ENT:OnRemove() called\n")
-    
-    local ent = self
-    local browser = self.Browser
-    local usingChrome = self.UsingChrome
-    
-    -- Give Gmod 200ms to really delete the entity
-    timer.Simple(0.2, function()
-        if not ValidEntity(ent) and 
-            (not PlayX:PlayerExists() or PlayX.GetInstance() == ent) then -- Entity is really gone
-            Msg("PlayX DEBUG: Entity was really removed\n")
-            
-            -- From ENT:DestructBrowser()
-            if usingChrome then
-                if browser then
-                    browser:Free()
-                end
-            else
-                if browser and browser.IsValid and browser:IsValid() then
-                    --browser:Clear()
-                    local html = [[ENT:OnRemove() called.]]
-                    browser:SetHTML(html)
-                    browser:SetPaintedManually(true)
-                    browser:StopAnimate()
-                    
-                    -- Creating a new HTML panel tends to crash clients occasionally, so
-                    -- we're going try to keep a copy around
-                    -- Don't know whether the crash is caused by the browser being created
-                    -- or by the page browsing
-                end
-            end
-        elseif ValidEntity(ent) then -- Gmod lied
-            Msg("PlayX DEBUG: Entity was NOT really removed\n")
-            
-            ent:ResetRenderBounds()
-        elseif PlayX:PlayerExists() and ValidEntity(PlayX.GetInstance()) and
-            PlayX.GetInstance() ~= ent then
-            Msg("PlayX DEBUG: New PlayX entity created to replace old one\n")
-            
-            PlayX.GetInstance():ResetRenderBounds()
-        else
-            Msg("PlayX DEBUG: Multiple entities detected?\n")
-        end
-    end)
+    -- Loss of an entity won't mean that the engine will be destroyed
 end
-
--- For gm_chrome
-function ENT:onFinishLoading()
-    -- Don't have to do much if it's a URL that we are loading
-    if self.CurrentPage.ForceURL then
-        -- But let's remove the scrollbar
-        self.Browser:Exec([[
-document.body.style.overflow = 'hidden';
-]])
-        return
-    end
-    
-    if self.CurrentPage.JS then
-        self.Browser:Exec(self.CurrentPage.JS)
-    end
-    
-    if self.CurrentPage.JSInclude then
-        self.Browser:Exec([[
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = ']] .. JSEncodeString(self.CurrentPage.JSInclude) .. [[';
-document.body.appendChild(script);
-]])
-    else
-        self.Browser:Exec([[
-document.body.innerHTML = ']] .. JSEncodeString(self.CurrentPage.Body) .. [[';
-]])
-    end
-    
-    self.Browser:Exec([[
-document.body.style.margin = '0';
-document.body.style.padding = '0';
-document.body.style.border = '0';
-document.body.style.background = '#000000';
-document.body.style.overflow = 'hidden';
-]])
-
-    self.Browser:Exec([[
-var style = document.createElement('style');
-style.type = 'text/css';
-style.styleSheet.cssText = ']] .. JSEncodeString(self.CurrentPage.CSS) .. [[';
-document.getElementsByTagName('head')[0].appendChild(style);
-]])
-end
-
--- For gm_chrome
-function ENT:onBeginNavigation(url) end
-function ENT:onBeginLoading(url, status) end
-function ENT:onChangeFocus(focus) end

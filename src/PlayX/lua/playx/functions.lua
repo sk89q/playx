@@ -16,6 +16,33 @@
 -- 
 -- $Id$
 
+--- Makes a "class"
+-- @param t Table
+local function mkclass(t)
+    local mt = {}
+
+    mt.__call = function(self, ...)
+        local instance = {}
+        for k, v in pairs(self) do
+            instance[k] = v
+        end
+        if type(instance.construct) == 'function' then
+            instance:Construct(unpack(arg))
+        end
+        return instance
+    end
+
+    setmetatable(t, mt)
+end
+
+--- Encodes a script for JavaScript.
+-- @param str
+-- @return
+function PlayX.JSEncodeString(str)
+    return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
+        :gsub("\r", "\\r"):gsub("\n", "\\n")
+end
+
 --- Percent encodes a value.
 -- @param s String
 -- @return Encoded
