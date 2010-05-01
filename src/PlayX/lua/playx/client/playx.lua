@@ -41,8 +41,8 @@ PlayX.Enabled = true
 PlayX.Playing = false
 PlayX.CurrentMedia = nil
 PlayX.SeenNotice = false
-PlayX.JWPlayerURL = ""
-PlayX.HostURL = ""
+PlayX.JWPlayerURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
+PlayX.HostURL = "http://sk89q.github.com/playx/host/host.html"
 PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX._UpdateWindow = nil
