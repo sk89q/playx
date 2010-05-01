@@ -92,7 +92,7 @@ function PlayX.IsPermitted(ply)
     if PlayXIsPermittedHandler then
         return PlayXIsPermittedHook(ply)
     else
-        return ply:IsAdmin()
+        return ply:IsAdmin() or ply:IsSuperAdmin()
     end
 end
 
