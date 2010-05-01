@@ -62,6 +62,10 @@ function ENT:Initialize()
     end
 end
 
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
+end
+
 function ENT:SpawnFunction(ply, tr)
     PlayX.SendSpawnDialogUMsg(ply)
 end
