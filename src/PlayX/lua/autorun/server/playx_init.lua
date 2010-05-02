@@ -19,6 +19,7 @@
 AddCSLuaFile("autorun/client/playx_init.lua")
 AddCSLuaFile("playx/client/playx.lua")
 AddCSLuaFile("playx/client/providers.lua")
+AddCSLuaFile("playx/client/bookmarks.lua")
 AddCSLuaFile("playx/client/panel.lua")
 
 include("playx/playx.lua")
