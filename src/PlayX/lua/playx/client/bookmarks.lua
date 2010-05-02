@@ -243,15 +243,20 @@ function PlayX.LoadBookmarks()
     if data == nil then
         -- Default data
         data = [[
-The Device Has Been Modified,,http://youtube.com/watch?v=DQUaEF2bJZ0,modified,0:00,true
-Cosmic Quandaries,,http://youtube.com/watch?v=CAD25s53wmE,,0:00,
-Seasons,,http://youtube.com/watch?v=KGFIRcbvxds,seasons,0:00, 
-The White Mountain,,http://vimeo.com/8918647,,0:00,
-100 Years,,http://www.youtube.com/watch?v=5hBlCDPK0ig,,0:00,
-Burnin' For You,,http://www.youtube.com/watch?v=ipqqEFoJPL4,,0:00,
-There She Goes,,http://www.youtube.com/watch?v=xX9TDQcCyVE,,0:00,
-Party in Your Bedroom,,http://www.youtube.com/watch?v=z7dIvtcd6tY,,0:00,
-Spaceman,,http://youtube.com/watch?v=Hc16Y9fiCvQ,spaceman,0:00,
+Hold On (feat. Lazee),,http://youtube.com/watch?v=4uWZ0KD1A4M,,0:00,
+Black Black Heart,,http://youtube.com/watch?v=8U4C-zYrFUg,,0:00,
+8-bit Dr. Horrible's Sing Along Blog,,http://youtube.com/watch?v=9_9x9m8F1b4,,0:00,
+"Jupiter, the Bringer of Jollity",,http://youtube.com/watch?v=Nz0b4STz1lo,,0:00,1
+Libera Me From Hell,,http://youtube.com/watch?v=oAlztMvvNkk,,0:00,1
+Bye Bye Blackbird,,http://youtube.com/watch?v=qzpSIJpq11c,,0:00,1
+Life in Haiti,,http://vimeo.com/10282740,,0:00,
+Ancient Temple,,http://youtube.com/watch?v=CAyKxQM7jHM,,0:00,
+REACH,,http://youtube.com/watch?v=tzg2jjH2z8E,,0:00,
+More Today Than Yesterday,,http://youtube.com/watch?v=j45ezAAeMDw,,0:00,
+I Still Haven't Found What I'm Looking For,,http://youtube.com/watch?v=Pb1XXs7e7ac,,0:00,
+Pirates,,http://youtube.com/watch?v=rIn5cS2eVbg,,0:00,
+Do You Want To,,http://youtube.com/watch?v=4Oy3nzfA3Qk,,0:00,
+Bittersweet,,http://youtube.com/watch?v=6ka3PdGdtro,,0:00,1
 ]]
     end
     
