@@ -27,6 +27,8 @@ CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
 CreateConVar("playx_race_protection", "1", {FCVAR_ARCHIVE})
+CreateConVar("playx_wire_input", "0", {FCVAR_ARCHIVE})
+CreateConVar("playx_wire_input_delay", "2", {FCVAR_ARCHIVE})
 
 -- Note: Not using cvar replication because this can start causing problems
 -- if the server has been left online for a while.

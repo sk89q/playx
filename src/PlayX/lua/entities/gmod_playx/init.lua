@@ -23,6 +23,12 @@ include("shared.lua")
 
 resource.AddFile("materials/vgui/entities/gmod_playx.vmt")
 
+ENT.InputProvider = ""
+ENT.InputURI = ""
+ENT.InputStartAt = 0
+ENT.InputDisableJW = false
+ENT.InputForceLowFramerate = false
+
 function ENT:Initialize()
     self.Entity:PhysicsInit(SOLID_VPHYSICS)
     self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
@@ -30,7 +36,18 @@ function ENT:Initialize()
     self.Entity:DrawShadow(false)
     
     if WireAddon then
+        self.Inputs = Wire_CreateInputs(self.Entity, {
+            "Provider [STRING]",
+            "URI [STRING]",
+            "StartAt",
+            "DisableJW",
+            "ForceLowFramerate",
+            "Open",
+            "Close",
+        })
+        
         self.Outputs = Wire_CreateOutputs(self.Entity, {
+            "InputError [STRING]",
             "Provider [STRING]",
             "Handler [STRING]",
             "URI [STRING]",
@@ -131,6 +148,70 @@ function ENT:SetWireMetadata(data)
         Wire_TriggerOutput(self.Entity, "Height", data.Height and data.Height or -1)
         Wire_TriggerOutput(self.Entity, "IsLive", data.IsLive and data.IsLive or -1)
         Wire_TriggerOutput(self.Entity, "ViewerCount", data.ViewerCount and data.ViewerCount or -1)
+    end
+end
+
+function ENT:TriggerInput(iname, value)
+    if iname == "Close" then
+        if value > 0 then
+            if not GetConVar("playx_wire_input"):GetBool() then
+                Wire_TriggerOutput(self.Entity, "InputError", "Cvar playx_wire_input is not 1")
+            else
+                PlayX.CloseMedia()
+                Wire_TriggerOutput(self.Entity, "InputError", "")
+            end
+        end
+    elseif iname == "Open" then
+        if value > 0 then
+            if not GetConVar("playx_wire_input"):GetBool() then
+                Wire_TriggerOutput(self.Entity, "InputError", "Cvar playx_wire_input is not 1")
+            elseif GetConVar("playx_race_protection"):GetFloat() > 0 and 
+                (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
+                Wire_TriggerOutput(self.Entity, "InputError", "Race protection triggered (playx_race_protection)")
+            elseif GetConVar("playx_wire_input_delay"):GetFloat() > 0 and 
+                (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_wire_input_delay"):GetFloat() then
+                Wire_TriggerOutput(self.Entity, "InputError", 
+                    "Wire input flood protection triggered (playx_wire_input_delay = " .. 
+                    GetConVar("playx_wire_input_delay"):GetFloat() .. " seconds)")
+            else
+                local uri = self.InputURI:Trim()
+                local provider = self.InputProvider:Trim()
+                local start = self.InputStartAt
+                local forceLowFramerate = self.InputForceLowFramerate
+                local useJW = not self.InputDisableJW
+                
+                if uri == "" then
+                    Wire_TriggerOutput(self.Entity, "InputError", "Empty URI inputted")
+                elseif start == nil then
+                    Wire_TriggerOutput(self.Entity, "InputError", "Time format inputted for StartAt unrecognized")
+                elseif start < 0 then
+                    Wire_TriggerOutput(self.Entity, "InputError", "Non-negative start time is required")
+                else
+                    MsgN(string.format("Video played via wire input: %s", uri))
+                    print(provider, uri, start, forceLowFramerate, useJW)
+                    
+                    local result, err = PlayX.OpenMedia(provider, uri, start,
+                                                        forceLowFramerate, useJW,
+                                                        false)
+                    
+                    if not result then
+                        Wire_TriggerOutput(self.Entity, "InputError", err)
+                    else
+                        Wire_TriggerOutput(self.Entity, "InputError", "")
+                    end
+                end
+            end
+        end
+    elseif iname == "Provider" then
+        self.InputProvider = tostring(value)
+    elseif iname == "URI" then
+        self.InputURI = tostring(value)
+    elseif iname == "StartAt" then
+        self.InputStartAt = PlayX.ParseTimeString(tostring(value))
+    elseif iname == "DisableJW" then
+        self.InputDisableJW = value > 0
+    elseif iname == "ForceLowFramerate" then
+        self.InputForceLowFramerate = value > 0
     end
 end
 
