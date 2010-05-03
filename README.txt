@@ -132,6 +132,12 @@ number playx_expire (def. "10")
 bool playx_race_protection (def. "1")
     Enable media play race condition handling.
 
+bool playx_wire_input (def. "0")
+    Set to 1 to allow Wiremod input.
+
+bool playx_wire_input_delay (def. "2")
+    Delay between opening media with Wiremod input.
+
 Extending
 ---------
 
