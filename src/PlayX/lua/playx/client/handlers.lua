@@ -1,5 +1,5 @@
 -- PlayX
--- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,33 +16,51 @@
 -- 
 -- $Id$
 
-local HandlerResult = {}
+local WebResource = PlayX.MakeClass()
 
-function HandlerResult:new(css, js, body, jsURL, center, url)
-    local instance = {
-        ["CSS"] = css,
-        ["Body"] = body,
-        ["JS"] = js,
-        ["JSInclude"] = jsURL,
-        ["Center"] = center,
-        ["ForceIE"] = false,
-        ["ForceURL"] = url,
-    }
-    
-    setmetatable(instance, self)
-    self.__index = self
-    return instance
+function WebResource:Initialize(vars)
+    self.URL = vars.URL or nil
+    self.CSS = vars.CSS or ""
+    self.Script = vars.Script or ""
+    self.ScriptURL = vars.ScriptURL or nil
+    self.Body = vars.Body or ""
+    self.VolumeScriptFunction = vars.VolumeScriptFunction or nil
 end
 
-function HandlerResult:GetVolumeChangeJS(volume)
-    return nil
+function WebResource:Merge(resource)
+    self.URL = resource.URL
+    self.CSS = resource.CSS
+    self.Script = resource.Script
+    self.Body = resource.Body
 end
 
-function HandlerResult:AppendJavaScript(js)
-    self.JS = (self.JS and self.JS or "") .. js
+function WebResource:GetVolumeScript(volume)
+    if self.VolumeScriptFunction then
+        return self.VolumeScriptFunction(volume)
+    end
 end
 
-function HandlerResult:GetHTML()
+function WebResource:GetURL()
+    return self.URL
+end
+
+function WebResource:GetCSS()
+    return self.CSS
+end
+
+function WebResource:GetScript()
+    return self.Script
+end
+
+function WebResource:GetScriptURL()
+    return self.ScriptURL
+end
+
+function WebResource:GetBody()
+    return self.Body
+end
+
+function WebResource:GetHTML()
     return [[
 <!DOCTYPE html>
 <html>
@@ -52,7 +70,7 @@ function HandlerResult:GetHTML()
 ]] .. self.CSS .. [[
 </style>
 <script type="text/javascript">
-]] .. (self.JS and self.JS or "") .. [[
+]] .. self.Script .. [[
 </script>
 </head>
 <body>
@@ -62,58 +80,18 @@ function HandlerResult:GetHTML()
 ]]
 end
 
---- Percent encodes a value.
--- @param s String
--- @return Encoded
-local function URLEncode(s)
-    s = tostring(s)
-    local new = ""
+local function TryWebEngines(resource)
+    local chrome = PlayX.GetEngine("ChromeEngine")
+    local ie = PlayX.GetEngine("HTMLEngine")
     
-    for i = 1, #s do
-        local c = s:sub(i, i)
-        local b = c:byte()
-        if (b >= 65 and b <= 90) or (b >= 97 and b <= 122) or
-            (b >= 48 and b <= 57) or
-            c == "_" or c == "." or c == "~" then
-            new = new .. c
-        else
-            new = new .. string.format("%%%X", b)
-        end
+    if chrome:IsSupported() then
+        return chrome(resource)
     end
     
-    return new
+    return ie(resource)
 end
 
---- Percent encodes a table for the query part of a URL.
--- @param vars Table of keys and values
--- @return Encoded string
-local function URLEncodeTable(vars)
-    local str = ""
-    
-    for k, v in pairs(vars) do
-        str = str .. URLEncode(k) .. "=" .. URLEncode(v) .. "&"
-    end
-    
-    return str:sub(1, -2)
-end
-
---- HTML encodes a string.
--- @param str
--- @return Encoded string
-local function HTMLEncode(str)
-    return str:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;"):gsub("\"", "&quot;")
-end
-
---- Generates the HTML for an IFrame.
--- @param width
--- @param height
--- @param url
--- @return HTML
-local function GenerateIFrame(width, height, url)    
-    return HandlerResult:new("", "", "", "", false, url)
-end
-
---- Generates the HTML for an image viewer. The image viewer will automatiaclly
+--- Generates the HTML for an image viewer. The image viewer will automatically
 -- center the image (once size information becomes exposed in JavaScript).
 -- @param width
 -- @param height
@@ -160,14 +138,16 @@ setInterval(function() {
 <table border="0" cellpadding="0" cellmargin="0" style="width: ]] .. width .. [[px; height: ]] .. height .. [[px">
 <tr>
 <td style="text-align: center">
-<img src="]] .. url .. [[" alt="" onload="resize(this); keepResizing = false" style="margin: auto" />
+<img src="]] .. PlayX.HTMLEncode(url) .. [[" alt="" onload="resize(this); keepResizing = false" style="margin: auto" />
 </td>
 </tr>
 </table>
 </div>
 ]]
     
-    return HandlerResult:new(css, js, body)
+    return WebResource({
+        CSS = css,
+    })
 end
 
 --- Generates the HTML for a Flash player viewer.
@@ -180,8 +160,8 @@ end
 -- @return HTML
 local function GenerateFlashPlayer(width, height, url, flashVars, js, forcePlay)
     local extraParams = ""
-    local url = HTMLEncode(url)
-    local flashVars = flashVars and URLEncodeTable(flashVars) or ""
+    local url = PlayX.HTMLEncode(url)
+    local flashVarsString = flashVars and PlayX.URLEncodeTable(flashVars) or ""
     
     local css = [[
 body {
@@ -193,7 +173,7 @@ body {
 }]]
     
     if forcePlay then        
-        js = (js and js or "") .. [[
+        js = (js or "") .. [[
 setInterval(function() {
   try {
     var player = document.getElementById('player');
@@ -203,6 +183,7 @@ setInterval(function() {
   } catch (e) {}
 }, 1000);
 ]]
+
         extraParams = [[
 <param name="loop" value="false">
 ]]
@@ -218,34 +199,37 @@ setInterval(function() {
   <param name="quality" value="high">
   <param name="allowscriptaccess" value="always">
   <param name="allowfullscreen" value="false">
-  <param name="FlashVars" value="]] .. flashVars .. [[">
+  <param name="FlashVars" value="]] .. flashVarsString .. [[">
 ]] .. extraParams .. [[
 </object> 
 </div>
 ]]
-    
-    local result = HandlerResult:new(css, js, body)
-    if forcePlay then result.ForceIE = true end
-    return result
+
+    return WebResource({
+        CSS = css,
+        Script = js,
+        Body = body,
+    })
 end
 
 --- Generate the HTML page for the JW player.
 -- @param width
 -- @param height
--- @param start In seconds
--- @param volume 0-100
--- @param uri
+-- @param url 
 -- @param provider JW player provider ("image", "audio", etc.)
+-- @param start
+-- @param volume
 -- @return HTML
-local function GenerateJWPlayer(width, height, start, volume, uri, provider)
+local function GenerateJWPlayer(width, height, url, provider, start, volume)
     local flashURL = PlayX.JWPlayerURL
+    
     local flashVars = {
         ["autostart"] = "true",
         ["backcolor"] = "000000",
         ["frontcolor"] = "444444",
         ["start"] = start,
         ["volume"] = volume,
-        ["file"] = uri,
+        ["file"] = url,
         ["playerready"] = "jwInit",
     }
     
@@ -253,9 +237,7 @@ local function GenerateJWPlayer(width, height, start, volume, uri, provider)
         flashVars["provider"] = provider
     end
     
-    local result = GenerateFlashPlayer(width, height, flashURL, flashVars)
-    
-    result.GetVolumeChangeJS = function(volume)
+    local volumeScriptFunction = function(volume)
         return [[
 try {
   document.getElementById('player').sendEvent("VOLUME", "]] .. tostring(volume) .. [[");
@@ -263,7 +245,10 @@ try {
 ]]
     end
     
-    return result
+    local resource = GenerateFlashPlayer(width, height, flashURL, flashVars)
+    resource.volumeScriptFunction = volumeScriptFunction
+    
+    return TryWebEngines(resource)
 end
 
 --- Generates the HTML code for an included JavaScript file.
@@ -271,7 +256,7 @@ end
 -- @param height
 -- @param url
 -- @return HTML
-local function GenerateJSEmbed(width, height, url, js)
+local function GenerateScriptEmbed(width, height, url, js)
     local url = HTMLEncode(url)
     
     local css = [[
@@ -290,113 +275,154 @@ body {
 </div>
 ]]
     
-    return HandlerResult:new(css, js, body, url)
+    return WebResource({
+        CSS = css,
+        Script = js,
+        Body = body,
+        ScriptURL = url,
+    })
 end
 
-PlayX.Providers = {}
+local function StaticURLHandler(args, width, height, start, volume)
+    return TryWebEngines(WebResource({
+        URL = args.URL,
+    }))
+end
 
-PlayX.Handlers = {
-    ["IFrame"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateIFrame(width, height, uri)
-    end,
-    ["JW"] = function(width, height, start, volume, uri)
-        return GenerateJWPlayer(width, height, start, volume, uri, handlerArgs)
-    end,
-    ["JWVideo"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateJWPlayer(width, height, start, volume, uri, "video")
-    end,
-    ["JWAudio"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateJWPlayer(width, height, start, volume, uri, "sound")
-    end,
-    ["JWRTMP"] = function(width, height, start, volume, uri, handlerArgs)
-        return GenerateJWPlayer(width, height, start, volume, uri, "rtmp")
-    end,
-    ["Flash"] = function(width, height, start, volume, uri, handlerArgs)
-        local flashVars = handlerArgs.FlashVars and handlerArgs.FlashVars or {}
-        local forcePlay = handlerArgs.ForcePlay
-        local center = handlerArgs.Center
-        local result = GenerateFlashPlayer(width, height, uri, flashVars, nil, forcePlay)
-        result.center = center
-        return result
-    end,
-    ["Image"] = function(width, height, start, volume, uri, handlerArgs)
-        local result = GenerateImageViewer(width, height, uri)
-        result.center = true
-        return result
-    end,
-    ["FlashAPI"] = function(width, height, start, volume, uri, handlerArgs)
-        local url = uri
-        local js = ""
-        local result = nil
-        local volChangeJSF = nil
+local function JWPlayerHandler(args, width, height, start, volume)
+    return {
+        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URL,
+                                                nil, start, volume)),
+        Centered = false,
+    }
+end
+
+local function JWAudioHandler(args, width, height, start, volume)
+    return {
+        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URL, "sound")),
+        Centered = false,
+    }
+end
+
+local function JWVideoHandler(args, width, height, start, volume)
+    return {
+        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URI, "video")),
+        Centered = false,
+    }
+end
+
+local function JWRTMPHandler(args, width, height, start, volume)
+    return {
+        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URL, "rtmp")),
+        Centered = false,
+    }
+end
+
+local function FlashHandler(args, width, height, start, volume)
+    local flashVars = args.FlashVars or {}
+    local forcePlay = args.ForcePlay or false
+    local centered = args.Centered
+    local result = GenerateFlashPlayer(width, height, args.URL,
+                                       flashVars, nil, forcePlay)
+    
+    if forcePlay then
+        return {
+            Engine = PlayX.GetEngine("HTMLEngine")(result),
+            Centered = false,
+        }
+    else
+        return {
+            Engine = TryWebEngines(result),
+            Centered = false,
+        }
+    end
+end
+
+local function ImageHandler(args, width, height, start, volume)
+    return {
+        Engine = TryWebEngines(GenerateImageViewer(width, height, args.URL)),
+        Centered = true,
+    }
+end
+
+local function FlashAPIHandler(args, width, height, start, volume)
+    local url = args.URL
+    local jsVolMul = args.ScriptVolumeMul and args.ScriptVolumeMul or 1
+    local jsStartMul = args.ScriptStartMul and args.ScriptStartMul or 1
+    
+    if not args.NoDimRepl then
+        url = url:gsub("__width__", width)
+        url = url:gsub("__height__", height)
+    end
+    
+    if args.VolumeMul ~= nil then
+        url = url:gsub("__volume__", args.VolumeMul * volume)
+    end
+    
+    if args.StartMul ~= nil then
+        url = url:gsub("__start__", args.StartMul * start)
+    end
+    
+    if args.ScriptInitFunc ~= nil then
+        local code = ""
         
-        if not handlerArgs.NoDimRepl then
-            url = url:gsub("__width__", width)
-            url = url:gsub("__height__", height)
+        if args.ScriptVolumeFunc then
+            code = code .. "player." .. args.ScriptVolumeFunc .. "(" .. 
+                tostring(jsVolMul * volume) .. ");"
         end
         
-        if handlerArgs.VolumeMul ~= nil then
-            url = url:gsub("__volume__", handlerArgs.VolumeMul * volume)
+        if args.ScriptStartFunc then
+            code = code .. "player." .. args.ScriptStartFunc .. "(" .. 
+                tostring(jsStartMul * start) .. ");"
         end
         
-        if handlerArgs.StartMul ~= nil then
-            url = url:gsub("__start__", handlerArgs.StartMul * start)
+        if args.ScriptPlayFunc then
+            code = code .. "player." .. args.ScriptPlayFunc .. "();"
+        end
+    
+        if args.RawInitScript ~= nil then
+            code = code .. args.RawInitScript
         end
         
-        if handlerArgs.JSInitFunc ~= nil then
-            local code = ""
-            local jsVolMul = handlerArgs.JSVolumeMul and handlerArgs.JSVolumeMul or 1
-            local jsStartMul = handlerArgs.JSStartMul and handlerArgs.JSStartMul or 1
-            
-            if handlerArgs.JSVolumeFunc then
-                code = code .. "player." .. handlerArgs.JSVolumeFunc .. "(" .. 
-                    tostring(jsVolMul * volume) .. ");"
-                
-                volChangeJSF = function(volume)
-                    return "try { player." .. 
-                        handlerArgs.JSVolumeFunc .. "(" .. 
-                        tostring(jsVolMul * volume) .. "); } catch (e) {}"
-                end
-            end
-            
-            if handlerArgs.JSStartFunc then
-                code = code .. "player." .. handlerArgs.JSStartFunc .. "(" .. 
-                    tostring(jsStartMul * start) .. ");"
-            end
-            
-            if handlerArgs.JSPlayFunc then
-                code = code .. "player." .. handlerArgs.JSPlayFunc .. "();"
-            end
-        
-            if handlerArgs.RawInitJS ~= nil then
-                code = code .. handlerArgs.RawInitJS
-            end
-            
-            js = js .. [[
+        js = js .. [[
 var player;
-function ]] .. handlerArgs.JSInitFunc .. [[() {
+function ]] .. args.ScriptInitFunc .. [[() {
   try {
     player = document.getElementById('player');
 ]] .. code .. [[
   } catch (e) {}
 }
 ]]
+    end
+    
+    if args.RawScript ~= nil then
+        js = js .. args.RawScript
+    end
+    
+    local resource
+    
+    if args.URLIsJavaScript then -- Include a Script file instead
+        resource = GenerateScriptEmbed(width, height, url, js)
+    else
+        resource = GenerateFlashPlayer(width, height, url, nil, js)
+    end
+    
+    if args.ScriptVolumeFunc then
+        resource.volumeScriptFunction = function(volume)
+            return "try { player." .. 
+                args.ScriptVolumeFunc .. "(" .. 
+                tostring(jsVolMul * volume) .. "); } catch (e) {}"
         end
-        
-        if handlerArgs.RawJS ~= nil then
-            js = js .. handlerArgs.RawJS
-        end
-        
-        if handlerArgs.URLIsJavaScript then -- Include a JS file instead
-            result = GenerateJSEmbed(width, height, url, js)
-        else
-            result = GenerateFlashPlayer(width, height, url, nil, js)
-        end
-        
-        if volChangeJSF then
-            result.GetVolumeChangeJS = volChangeJSF
-        end
-        
-        return result
-    end,
-}
+    end
+    
+    return TryWebEngines(resource)
+end
+
+list.Set("PlayXHandlers", "StaticURL", StaticURLHandler)
+list.Set("PlayXHandlers", "JW", JWPlayerHandler)
+list.Set("PlayXHandlers", "JWVideo", JWAudioHandler)
+list.Set("PlayXHandlers", "JWVideo", JWVideoHandler)
+list.Set("PlayXHandlers", "JWRTMP", JWRTMPHandler)
+list.Set("PlayXHandlers", "Flash", FlashHandler)
+list.Set("PlayXHandlers", "Image", ImageHandler)
+list.Set("PlayXHandlers", "FlashAPI", FlashAPIHandler)

@@ -52,7 +52,7 @@ end
 -- @param ply Optional player argument
 -- @return Entity or nil
 function PlayX.GetInstance(ply)
-    local instance = hook.Call("PlayXGetInstance", true, ply)
+    local instance = hook.Call("PlayXGetInstance", false, ply)
     
     if ValidEntity(instance) then
         return instance
@@ -66,6 +66,36 @@ end
 -- @return
 function PlayX.GetInstances()
     return ents.FindByClass("gmod_playx")
+end
+
+--- Checks whether the JW player is enabled.
+-- @return Whether the JW player is enabled
+function PlayX.IsUsingJW()
+    return GetConVar("playx_jw_url"):GetString():Trim():gmatch("^https?://.+") and true or false
+end
+
+--- Gets the URL of the JW player.
+-- @return
+function PlayX.GetJWURL()
+    return GetConVar("playx_jw_url"):GetString():Trim()
+end
+
+--- Returns whether the JW player supports YouTube.
+-- @return
+function PlayX.JWPlayerSupportsYouTube()
+    return GetConVar("playx_jw_youtube"):GetBool()
+end
+
+--- Gets the URL of the host file.
+-- @return
+function PlayX.GetHostURL()
+    return GetConVar("playx_host_url"):GetString():Trim()
+end
+
+--- Checks whether the host URL is valid.
+-- @return Whether the host URL is valid
+function PlayX.HasValidHost()
+    return PlayX.GetHostURL():Trim():gmatch("^https?://.+") and true or false
 end
 
 --- Returns whether a user is permitted to use the player.
@@ -97,6 +127,7 @@ function PlayX.SpawnForPlayer(ply, model)
     end
     
     local pos, ang = hook.Call("PlayXSpawnPlayX", ply, model)
+    local ent
     
     -- No hook?
     if pos == nil or pos == true then
@@ -107,7 +138,7 @@ function PlayX.SpawnForPlayer(ply, model)
         local tr = ply.GetEyeTraceNoCursor and ply:GetEyeTraceNoCursor() or
             ply:GetEyeTrace()
 
-        local ent = ents.Create("gmod_playx")
+        ent = ents.Create("gmod_playx")
         ent:SetModel(model)
         
         local info = PlayXScreens[model:lower()]
@@ -153,7 +184,7 @@ function PlayX.SpawnForPlayer(ply, model)
         return false, ang
     -- Custom spawn location
     else
-        local ent = ents.Create("gmod_playx")
+        ent = ents.Create("gmod_playx")
         ent:SetModel(model)
         ent:SetAngles(ang)
         ent:SetPos(pos)
@@ -185,7 +216,7 @@ end
 -- @return Result
 function PlayX.ResolveProvider(provider, uri, useJW)
     -- See if there is a hook for resolving providers
-    local result = hook.Call("PlayXResolveProvider", true, provider, uri, useJW)
+    local result = hook.Call("PlayXResolveProvider", false, provider, uri, useJW)
     
     if result then
         return result
@@ -206,7 +237,7 @@ function PlayX.ResolveProvider(provider, uri, useJW)
         end
     -- Auto-detect provider
     else
-        for id, p in pairs(PlayX.GetProviders()) do
+        for id, p in pairs(list.Get("PlayXProviders")) do
             local resolvedURI = p.Detect(uri)
             
             if resolvedURI then
@@ -222,6 +253,11 @@ function PlayX.ResolveProvider(provider, uri, useJW)
     end
     
     return result
+end
+
+function PlayX.GetAutoSubscribers()
+    return player.GetAll()
+    -- @TODO: Change
 end
 
 --- Sends an error to the client.
@@ -248,6 +284,13 @@ function PlayX.SendSpawnDialog(ply)
     end
 end
 
+--- Used to replicate a cvar using a custom method (that doesn't cause
+-- overflow issues).
+local function ReplicateVar(cvar, old, new, ply)
+    new = new or GetConVar(cvar):GetString()
+    SendUserMessage("PlayXReplicate", ply, cvar, new)
+end
+
 --- Called on game mode hook PlayerInitialSpawn.
 function PlayerInitialSpawn(ply)
     ReplicateVar("playx_jw_url", nil, nil, ply)
@@ -260,17 +303,10 @@ function PlayerInitialSpawn(ply)
     local instances = PlayX.GetInstances()
     
     for _, instance in pairs(instances) do
-        if hook.Call("PlayXShouldSubscribe", true, ply, instance) then
+        if hook.Call("PlayXShouldSubscribe", false, ply, instance) then
             instance:Subscribe(ply)
         end
     end
-end
-
---- Used to replicate a cvar using a custom method (that doesn't cause
--- overflow issues).
-local function ReplicateVar(cvar, old, new, ply)
-    new = new or GetConVar(cvar):GetString()
-    SendUserMessage("PlayXReplicate", ply, cvar, new)
 end
 
 hook.Add("PlayerInitialSpawn", "PlayXPlayerInitialSpawn", PlayerInitialSpawn)

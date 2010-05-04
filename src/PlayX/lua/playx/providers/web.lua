@@ -26,7 +26,9 @@ function StaticWeb.GetPlayer(uri, useJW)
     if uri:find("^http://") then
         return {
             ["Handler"] = "IFrame",
-            ["URI"] = uri,
+            ["Arguments"] = {
+                URL = uri,
+            },
             ["ResumeSupported"] = true,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)

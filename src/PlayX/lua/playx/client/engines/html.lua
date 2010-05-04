@@ -21,8 +21,7 @@
 local browserCache = nil
 local alreadyCreated = false
 
-local HTMLEngine = {}
-mkclass(HTMLEngine)
+local HTMLEngine = PlayX.MakeClass()
 
 --- Returns on the status of this engine's support.
 -- @return Boolean indicating statues
@@ -34,7 +33,7 @@ end
 -- @param isSquare
 -- @param fps
 -- @param resource
-function HTMLEngine:Initialize(isSquare, fps, resource)    
+function HTMLEngine:Setup(isSquare, resource)    
     if isSquare then
         self.Width = 1024
         self.Height = 1024
@@ -59,7 +58,7 @@ function HTMLEngine:Initialize(isSquare, fps, resource)
     
     self.Browser:SetPaintedManually(true)
     self.Browser:SetVerticalScrollbarEnabled(false)
-    self.Browser:StartAnimate(fps > 0 and 1000 or 1000 / fps)
+    self.Browser:StartAnimate(1000)
     
     self:Load(resource)
 end
@@ -83,7 +82,7 @@ end
 
 --- Changes the volume.
 -- @param volume
-function ChromeEngine:SetVolume(volume)
+function HTMLEngine:SetVolume(volume)
     local js = self.Resource:GetVolumeJS()
     if js then
         self.Browser:Exec(js)
@@ -100,7 +99,7 @@ end
 --- Changes the FPS.
 -- @param fps
 function HTMLEngine:SetFPS(fps)
-    self.Browser:StartAnimate(fps > 0 and 1000 or 1000 / fps)
+    self.Browser:StartAnimate(1000 / fps)
 end
 
 --- Returns where the content should be centered.
@@ -118,3 +117,5 @@ function HTMLEngine:Destroy()
     
     alreadyCreated = false
 end
+
+list.Set("PlayXEngines", "HTMLEngine", HTMLEngine)

@@ -16,9 +16,9 @@
 -- 
 -- $Id$
 
---- Makes a "class"
+--- Makes a "class".
 -- @param t Table
-local function mkclass(t)
+function PlayX.MakeClass()
     local mt = {}
 
     mt.__call = function(self, ...)
@@ -26,19 +26,22 @@ local function mkclass(t)
         for k, v in pairs(self) do
             instance[k] = v
         end
-        if type(instance.construct) == 'function' then
-            instance:Construct(unpack(arg))
+        if type(instance.Initialize) == 'function' then
+            instance:Initialize(unpack(arg))
         end
         return instance
     end
-
+    
+    local t = {}
     setmetatable(t, mt)
+    
+    return t
 end
 
 --- Encodes a script for JavaScript.
 -- @param str
 -- @return
-function PlayX.JSEncodeString(str)
+function PlayX.JSEncode(str)
     return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
         :gsub("\r", "\\r"):gsub("\n", "\\n")
 end
@@ -76,6 +79,16 @@ function PlayX.URLEncodeTable(vars)
     end
     
     return str:sub(1, -2)
+end
+
+--- HTML encodes a string.
+-- @param str
+-- @return Encoded string
+function PlayX.HTMLEncode(str)
+    return str:gsub("&", "&amp;")
+        :gsub("<", "&lt;")
+        :gsub(">", "&gt;")
+        :gsub("\"", "&quot;")
 end
 
 --- Attempts to match a list of patterns against a string, and returns

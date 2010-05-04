@@ -26,9 +26,6 @@ local function ConCmdOpen(ply, cmd, args)
         PlayX.SendError(ply, "There is no player spawned! Go to the spawn menu > Entities")
     elseif not args[1] then
         ply:PrintMessage(HUD_PRINTCONSOLE, "playx_open requires a URI")
-    elseif GetConVar("playx_race_protection"):GetFloat() > 0 and 
-        (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
-        PlayX.SendError(ply, "Another video/media selection was started too recently.")
     else
         local uri = args[1]:Trim()
         local provider = PlayX.ConCmdToString(args[2], ""):Trim()
@@ -42,9 +39,9 @@ local function ConCmdOpen(ply, cmd, args)
         elseif start < 0 then
             PlayX.SendError(ply, "A non-negative start time is required")
         else
-            local result, err = PlayX.OpenMedia(provider, uri, start,
-                                                forceLowFramerate, useJW,
-                                                ignoreLength)
+            local result, err = PlayX:GetInstance(ply)
+                :OpenMedia(provider, uri, start, forceLowFramerate,
+                           useJW, ignoreLength)
             
             if not result then
                 PlayX.SendError(ply, err)

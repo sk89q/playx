@@ -34,8 +34,7 @@ if isInstalled then
     end
 end
 
-local ChromeEngine = {}
-mkclass(ChromeEngine)
+local ChromeEngine = PlayX.MakeClass()
 
 --- Returns on the status of this engine's support.
 -- @return Boolean indicating statues
@@ -43,53 +42,42 @@ function ChromeEngine.IsSupported()
     return isSupported
 end
 
---- Constructs the object.
--- @param isSquare
--- @param fps
+--- Constructs the object. This is implicitly called by the handler.
 -- @param resource
-function ChromeEngine:Initialize(isSquare, fps, resource)
+function ChromeEngine:Initialize(resource, b)
+    self.Resource = resource
+end
+
+--- Actually creates the browser. This is explicitly called by the entity.
+-- @param isSquare
+function ChromeEngine:Setup(isSquare)
     -- If we are using a square screen, then a square material works much
     -- better, so we need to differentiate.
     if isSquare then
         self.Material = matSq
-        self.Teture = matSq:GetMaterialTexture("$basetexture")
+        self.Texture = matSq:GetMaterialTexture("$basetexture")
         self.TextureID = surface.GetTextureID("playx/screen_sq")
         self.Width = 1024
         self.Height = 1024
     else
         self.Material = mat
-        self.Teture = mat:GetMaterialTexture("$basetexture")
+        self.Texture = mat:GetMaterialTexture("$basetexture")
         self.TextureID = surface.GetTextureID("playx/screen")
         self.Width = 1024
         self.Height = 512
     end
     
-    self.Browser = chrome.NewBrowser(self.Width, self.Height, self.Texture,
-                                     self:GetTable())
+    self.Browser = chrome.NewBrowser(self.Width, self.Height, self.Texture, self)
     
-    self.Resource = resource
-end
-
---- Gets the dimensions of the object drawn by this engine.
--- @return Width, height
-function ChromeEngine:GetDimensions()
+    self:Load()
+    
     return self.Width, self.Height
 end
 
-function ChromeEngine:Start()
-    self:Load(self.Resource)
-end
-
-function ChromeEngine:Stop()
-    self:Load(self.Resource)
-end
-
 --- Loads media.
-function ChromeEngine:Load(resource)
-    self.Resource = resource
-    
-    if resource:GetURL() then
-        self.Browser:LoadURL(resource:GetURL())
+function ChromeEngine:Load()
+    if self.Resource:GetURL() then
+        self.Browser:LoadURL(self.Resource:GetURL())
     else
         if PlayX.HostURL == "" then
             Error("PlayX: Host URL is invalid")
@@ -116,7 +104,7 @@ end
 --- Changes the volume.
 -- @param volume
 function ChromeEngine:SetVolume(volume)
-    local js = self.Resource:GetVolumeJS(volume)
+    local js = self.Resource:GetVolumeScript(volume)
     if js then
         self.Browser:Exec(js)
     end
@@ -145,14 +133,14 @@ document.body.style.overflow = 'hidden';
         return
     else
         -- Execute JavaScript
-        self.Browser:Exec(self.Resource:GetJS())
+        self.Browser:Exec(self.Resource:GetScript())
         
         -- Include a JavaScript file
-        if self.Resource:GetJSURL() then
+        if self.Resource:GetScriptURL() then
             self.Browser:Exec([[
 var script = document.createElement('script');
 script.type = 'text/javascript';
-script.src = ']] .. PlayX.JSEncodeString(self.Resource:GetJSURL()) .. [[';
+script.src = ']] .. PlayX.JSEncodeString(self.Resource:GetScriptURL()) .. [[';
 document.body.appendChild(script);
     ]])
         -- Or set the HTML
@@ -185,3 +173,5 @@ end
 function ChromeEngine:onBeginNavigation(url) end
 function ChromeEngine:onBeginLoading(url, status) end
 function ChromeEngine:onChangeFocus(focus) end
+
+list.Set("PlayXEngines", "ChromeEngine", ChromeEngine)

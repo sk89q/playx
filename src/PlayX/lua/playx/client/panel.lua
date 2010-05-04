@@ -150,12 +150,10 @@ local function SettingsPanel(panel)
         })
     end
     
-    if PlayX:GetInstance() and PlayX:GetInstance().IsProjector then
-        panel:AddControl("Button", {
-            Label = "Fix Screen Not Always Appearing",
-            Command = "playx_reset_render_bounds",
-        })
-    end
+    panel:AddControl("Button", {
+        Label = "Fix Screen Not Always Appearing",
+        Command = "playx_reset_render_bounds",
+    })
 end
 
 --- Draw the control panel.

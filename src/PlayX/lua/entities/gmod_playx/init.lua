@@ -23,11 +23,11 @@ resource.AddFile("materials/vgui/entities/gmod_playx.vmt")
 include("shared.lua")
 
 ENT.Subscribed = {}
-ENT.Media = {}
+ENT.Media = nil
 
 --- Returns play status.
 -- @return
-function ENT:IsPlaying()
+function ENT:HasMedia()
     return self.Media ~= nil
 end
 
@@ -42,12 +42,12 @@ function ENT:Subscribe(ply)
     if not self.Subscribed[ply] then
         self.Subscribed[ply] = true
         
-        if self:IsPlaying() then
+        if self:HasMedia() then
             -- Need to alert the client to the media
             self:SendBeginMessage(ply)
         end
         
-        hook.Call("PlayXSubscribe", true, self, ply)
+        hook.Call("PlayXSubscribe", false, self, ply)
     end
 end
 
@@ -59,12 +59,12 @@ function ENT:Unsubscribe(ply)
     if not self.Subscribed[ply] then
         self.Subscribed[ply] = nil
         
-        if self:IsPlaying() then
+        if self:HasMedia() then
             -- Need to tell the client to stop playing
             self:SendEndMessage(ply)
         end
         
-        hook.Call("PlayXUnsubscribe", true, self, ply)
+        hook.Call("PlayXUnsubscribe", false, self, ply)
     end
 end
 
@@ -107,7 +107,7 @@ function ENT:OpenMedia(provider, uri, start, lowFramerate, useJW, noTimeout)
         return false, err
     end
     
-    self:BeginMedia(result.Handler, result.URI, start, result.ResumeSupported,
+    self:BeginMedia(result.Handler, result.URI, start, result.Resumable,
                     lowFramerate, result.HandlerArgs)
     
     self:UpdateMetadata({
@@ -144,14 +144,14 @@ end
 -- @param handler
 -- @param arguments
 -- @param start
--- @param resumeSupported
+-- @param resumable
 -- @param lowFramerate
 -- @param length Length of the media in seconds, can be nil
-function ENT:BeginMedia(handler, arguments, start, resumeSupported,
+function ENT:BeginMedia(handler, arguments, start, resumable,
                         lowFramerate, length)
     local arguments = arguments or {}
-    local start = startor 0
-    local resumeSupported = resumeSupported or false
+    local start = start or 0
+    local resumable = resumable or false
     local lowFramerate = lowFramerate or false
     
     self.Media = {
@@ -159,7 +159,7 @@ function ENT:BeginMedia(handler, arguments, start, resumeSupported,
         Arguments = arguments,
         StartAt = start,
         StartTime = CurTime() - start,
-        ResumeSupported = resumeSupported,
+        Resumable = resumable,
         LowFramerate = lowFramerate,
         StopTime = nil,
         -- Filled by metadata functions
@@ -189,7 +189,7 @@ function ENT:BeginMedia(handler, arguments, start, resumeSupported,
     
     self:UpdateMetadata() -- Trigger Wiremod outputs
     
-    hook.Call("PlayXMediaBegin", true, self, self.Media)
+    hook.Call("PlayXMediaBegin", false, self, self.Media)
     
     if length then
         self:SetMediaLength(length)
@@ -206,7 +206,7 @@ function ENT:EndMedia()
     
     self:UpdateMetadata() -- Trigger Wiremod outputs
     
-    hook.Call("PlayXMediaEnd", true, self)
+    hook.Call("PlayXMediaEnd", false, self)
     
     self.SendEndMessage()
 end
@@ -224,7 +224,7 @@ function ENT:SendBeginMessage(ply)
     else
         filter = RecipientFilter()
         
-        for ply, _ in pairs(self.Subscribers) do
+        for ply, _ in pairs(self.Subscribed) do
             filter:AddPlayer(ply)
         end
     end
@@ -234,7 +234,7 @@ function ENT:SendBeginMessage(ply)
         Handler = self.Media.Handler,
         Arguments = self.Media.Arguments,
         PlayAge = CurTime() - self.Media.StartTime,
-        ResumeSupported = self.Media.ResumeSupported,
+        Resumable = self.Media.Resumable,
         LowFramerate = self.Media.LowFramerate,
     })
 end
@@ -253,7 +253,7 @@ function ENT:SendEndMessage(ply)
     else
         filter = RecipientFilter()
         
-        for ply, _ in pairs(self.Subscribers) do
+        for ply, _ in pairs(self.Subscribed) do
             filter:AddPlayer(ply)
         end
     end
@@ -275,7 +275,7 @@ function ENT:UpdateMetadata(data)
     table.Merge(PlayX.CurrentMedia, data)
     PlayX:GetInstance():SetWireMetadata(PlayX.CurrentMedia)
     
-    hook.Call("PlayXMetadataReceived", true, self, ent.Media, data)
+    hook.Call("PlayXMetadataReceived", false, self, ent.Media, data)
     
     -- TODO: Length handling, expiration
 end
@@ -315,6 +315,10 @@ function ENT:Initialize()
         })
         
         self:ClearWireOutputs()
+    end
+    
+    for _, ply in pairs(PlayX.GetAutoSubscribers(self)) do
+        self:Subscribe(ply)
     end
 end
 

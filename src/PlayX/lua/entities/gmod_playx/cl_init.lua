@@ -22,6 +22,24 @@ language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
 
+ENT.Engine = nil
+ENT.EngineError = nil
+ENT.Media = nil
+ENT.Started = false
+ENT.Centered = false
+
+--- Returns engine status.
+-- @return
+function ENT:HasEngine()
+    return self.Engine ~= nil
+end
+
+--- Returns play status.
+-- @return
+function ENT:HasMedia()
+    return self.Media ~= nil
+end
+
 --- Initializes the entity.
 function ENT:Initialize()
     self.Entity:DrawShadow(false)
@@ -32,28 +50,71 @@ function ENT:Initialize()
                            Vector(50000, 50000, 50000))
     
     self.Centered = false
-    self:AttachEngine(PlayX.QueryForEngine(self)) -- Query for an engine
+    
+    self:CalculateScreenBounds()
 end
 
---- Attaches an engine to the entity. Pass nil to detatch the engine.
-function ENT:AttachEngine(engine)
-    self.Engine = engine
+function ENT:GetStartTime()
+    if self:HasMedia() then
+        return CurTime() - self.Media.StartTime
+    end
+end
+
+function ENT:Begin(handler, arguments, resumable, lowFramerate, startTime)
+    self:Stop() -- Kill previous engine
     
-    if self.Engine then
-        self.Centered = self.Engine:IsCentered()
-        
-        -- We need to calculate the screen position
-        self:UpdateScreenBounds()
+    self.Media = {
+        Handler = handler,
+        Arguments = arguments,
+        StartTime = startTime,
+        Resumable = resumable,
+        LowFramerate = lowFramerate,
+    }
+end
+
+function ENT:End()
+    self:Stop()
+    
+    self.Media = nil
+    self.Started = false
+end
+
+function ENT:Start()
+    self.Started = true
+    
+    if self:HasEngine() then
+        self.Engine:Destruct()
+        self.Engine = nil
+    end
+    
+    self:CalculateScreenBounds()
+    self:UpdateFPS()
+end
+
+function ENT:Stop()
+    self.Started = false
+    
+    if self:HasEngine() then
+        self.Engine:Destruct()
+        self.Engine = nil
+    end
+end
+
+function ENT:UpdateFPS()
+    if self:HasEngine() and self:HasMedia() then
+        self.Engine:SetFPS(PlayX.GetPlayerFPS())
+    end
+end
+
+function ENT:UpdateVolume()
+    if self:HasEngine() then
+        self.Engine:SetVolume(PlayX.GetPlayerVolume())
     end
 end
 
 --- Updates the screen bounds, based on either the screen list or using
 -- an algorithm at detecting the screen.
-function ENT:UpdateScreenBounds()
-    if self.Engine == nil then
-        Error("ENT:UpdateScreenBounds() called without an attached engine")
-    end
-    
+function ENT:CalculateScreenBounds()
     local model = self.Entity:GetModel()
     local info = PlayXScreens[model:lower()]
     
@@ -132,7 +193,16 @@ function ENT:SetScreenBounds(pos, width, height, right, up, forward)
     self.ViewportHeight = height
     self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
     
-    self.Width, self.Height = self.Engine:GetDimensions()
+    if self:HasMedia() then
+        self:CreateEngine(width, height, self.IsSquare)
+    end
+    
+    if self:HasEngine() then
+        self.Width, self.Height = self.Engine:Setup(self.IsSquare)
+    else
+        self.Width = 1024
+        self.Height = self.IsSquare and 1024 or 512
+    end
     
     -- Fit the content to the viewport
     if width / height < self.Width / self.Height then
@@ -165,9 +235,28 @@ function ENT:SetProjectorBounds(right, up, forward)
     self.Right = right
     self.Up = up
     
-    self.Width, self.Height = self.Engine:GetDimensions()
+    if self:HasMedia() then
+        self.Width, self.Height = self:CreateEngine(1024, 512, false)
+    end
+    
+    if self:HasEngine() then    
+        self.Width, self.Height = self.Engine:Setup(false)
+    else
+        self.Width = 1024
+        self.Height = 512
+    end
     
     self.DrawScale = 1 -- Not used
+end
+
+function ENT:CreateEngine(width, height, isSquare)
+    local r = PlayX.ResolveHandler(self.Media.Handler, self.Media.Arguments,
+                                   width, height, self:GetStartTime(),
+                                   PlayX.GetPlayerVolume())
+    
+    self.Engine = r.Engine
+    self.EngineError = r.Error
+    self.Centered = r.Centered
 end
 
 --- Resets the render bounds.
@@ -205,7 +294,7 @@ function ENT:Draw()
                             + ang:Up() * 2
                 
                 cam.Start3D2D(pos, ang, width)
-                if self.Engine then
+                if self:HasEngine() then
                     self.Engine:Paint()
                 else
                     surface.SetDrawColor(0, 0, 0, 255)
