@@ -43,6 +43,7 @@ include("playx/client/engines/gm_chrome.lua")
 PlayX.Enabled = GetConVar("playx_enabled"):GetBool()
 PlayX.JWPlayerURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
 PlayX.HostURL = "http://sk89q.github.com/playx/host/host.html"
+PlayX.Providers = {}
 
 --- Checks if a player instance exists in the game.
 -- @return Whether a player exists
@@ -216,6 +217,10 @@ local function HandleBeginMessage(_, id, encoded, decoded)
     end
 end
 
+local function HandleProvidersList(_, id, encoded, decoded)
+    PlayX.Providers = decoded.List
+end
+
 --- Called on PlayXEnd user message.
 -- Sent when the server tell the client to stop playing. This may happen if
 -- the user gets unsubscribed from a player.
@@ -238,6 +243,7 @@ local function HandleError(um)
 end
 
 datastream.Hook("PlayXBegin", HandleBeginMessage)
+datastream.Hook("PlayXProvidersList", HandleProvidersList)
 usermessage.Hook("PlayXEnd", HandleEndMessage)
 usermessage.Hook("PlayXSpawnDialog", function() PlayX.OpenSpawnDialog() end)
 usermessage.Hook("PlayXError", HandleError)
