@@ -78,7 +78,7 @@ function ENT:GetSubscribers()
         if IsValid(ply) then
             table.insert(players, ply)
         else -- Lost a player?
-            self.Subscribers[_] = nil
+            self.Subscribers[ply] = nil
         end
     end
     
