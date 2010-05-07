@@ -34,7 +34,9 @@ local function ConCmdOpen(ply, cmd, args)
         local useJW = PlayX.ConCmdToBool(args[5], true)
         local ignoreLength = PlayX.ConCmdToBool(args[6], false)
         
-        if start == nil then
+        if uri == "" then
+            PlayX.SendError(ply, "A URI is required")
+        elseif start == nil then
             PlayX.SendError(ply, "The time format you entered for \"Start At\" isn't understood")
         elseif start < 0 then
             PlayX.SendError(ply, "A non-negative start time is required")
