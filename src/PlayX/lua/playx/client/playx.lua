@@ -57,6 +57,32 @@ function PlayX.GetInstances()
     return ents.FindByClass("gmod_playx")
 end
 
+function PlayX.HasMedia()
+    for _, v in pairs(PlayX.GetInstances()) do
+        if v:HasMedia() then return true end
+    end
+    
+    return false
+end
+
+function PlayX.HasPlaying()
+    for _, v in pairs(PlayX.GetInstances()) do
+        if v:IsPlaying() then return true end
+    end
+    
+    return false
+end
+
+function PlayX.GetPlayingCount()
+    local count = 0
+    
+    for _, v in pairs(PlayX.GetInstances()) do
+        if v:IsPlaying() then count = count + 1 end
+    end
+    
+    return count
+end
+
 --- Checks whether any media being played can be resumed.
 function PlayX.HasResumable()
     for _, v in pairs(PlayX.GetInstances()) do
@@ -64,6 +90,16 @@ function PlayX.HasResumable()
     end
     
     return false
+end
+
+function PlayX.GetResumableCount()
+    local count = 0
+    
+    for _, v in pairs(PlayX.GetInstances()) do
+        if v:IsResumable() then count = count + 1 end
+    end
+    
+    return count
 end
 
 function PlayX.GetEngine(name)

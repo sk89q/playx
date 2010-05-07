@@ -42,6 +42,14 @@ function ChromeEngine.IsSupported()
     return isSupported
 end
 
+function ChromeEngine.IsModuleInstalled()
+    return isInstalled
+end
+
+function ChromeEngine.AreMaterialsInstalled()
+    return mat and matSq and not mat:IsError() and not matSq:IsError()
+end
+
 function ChromeEngine:Initialize()
     self.Volume = nil
 end

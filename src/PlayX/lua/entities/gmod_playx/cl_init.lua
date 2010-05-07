@@ -41,6 +41,10 @@ function ENT:HasMedia()
     return self.Media ~= nil
 end
 
+function ENT:IsPlaying()
+    return self.Engine ~= nil
+end
+
 --- Initializes the entity.
 function ENT:Initialize()
     self.Entity:DrawShadow(false)

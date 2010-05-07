@@ -42,14 +42,14 @@ local function SettingsPanel(panel)
         Command = "playx_error_windows",
     }):SetTooltip("Uncheck to use hints instead")
     
-    if not PlayX.HasChrome then
+    if not PlayX.GetEngine("ChromeEngine").IsModuleInstalled() then
         chromeCheck:SetDisabled(true)
         
         panel:AddControl("Label", {
             Text = "Installing gm_chrome provides vast improvements in performance. " ..
             "Visit http://wiki.github.com/sk89q/playx/gm_chrome for more information."
         })
-    elseif not PlayX.SupportsChrome then
+    elseif not PlayX.GetEngine("ChromeEngine").AreMaterialsInstalled() then
         chromeCheck:SetDisabled(true)
         
         panel:AddControl("Label", {
@@ -83,8 +83,10 @@ local function SettingsPanel(panel)
             "for a change in volume to take effect."
     })
     
-    if PlayX.CurrentMedia then
-        if PlayX.CurrentMedia.ResumeSupported then
+    if PlayX.HasMedia() then
+        local playingCount = PlayX.GetPlayingCount()
+        
+        if PlayX.GetResumableCount() == playingCount then
             local button = panel:AddControl("Button", {
                 Label = "Hide Player",
                 Command = "playx_hide",
@@ -110,7 +112,7 @@ local function SettingsPanel(panel)
                 Text = "The current media supports resuming."
             })
         else
-            if PlayX.Playing then
+            if PlayX.HasPlaying() then
                 panel:AddControl("Button", {
                     Label = "Stop Play",
                     Command = "playx_hide",
@@ -146,7 +148,7 @@ local function SettingsPanel(panel)
         end
     else
         panel:AddControl("Label", {
-            Text = "No media is playing at the moment."
+            Text = "Nothing is playing at the moment."
         })
     end
     
@@ -222,7 +224,7 @@ local function ControlPanel(panel)
         Command = "playx_gui_close",
     })
     
-    if not PlayX.CurrentMedia then
+    if #PlayX.GetInstances() == 1 and not PlayX.HasMedia() then
         button:SetDisabled(true)
     end
     
