@@ -131,9 +131,13 @@ function ENT:OpenMedia(provider, uri, start, lowFramerate, useJW, noTimeout)
 end
 
 --- Stops playing.
-function PlayX.CloseMedia()
-    if PlayX.Media then
-        PlayX.EndMedia()
+function ENT:CloseMedia()
+    if self.Media then
+        self:EndMedia()
+    
+        return true
+    else
+        return false, "Nothing is playing"
     end
 end
 
@@ -208,7 +212,7 @@ function ENT:EndMedia()
     
     hook.Call("PlayXMediaEnd", false, self)
     
-    self.SendEndMessage()
+    self:SendEndMessage()
 end
 
 --- Sends the PlayX play message to subscribed clients. This is an
@@ -331,7 +335,7 @@ function ENT:SpawnFunction(ply, tr)
 end
 
 function ENT:OnRemove()
-    PlayX.CloseMedia()
+    self:CloseMedia()
 end
 
 function ENT:ClearWireOutputs()

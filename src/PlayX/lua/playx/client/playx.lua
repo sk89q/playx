@@ -133,13 +133,14 @@ end
 
 --- Resume playing of everything.
 function PlayX.ResumePlay()
-    if PlayX.PlayerExists() then
+    if not PlayX.HasMedia() then
         PlayX.ShowError("Nothing is playing.")
     else
         local count = 0
         
         for _, v in pairs(PlayX.GetInstances()) do
-            if v:Resume() then
+            if v:IsResumable() then
+                v:Start()
                 count = count + 1
             end
         end
@@ -148,17 +149,21 @@ function PlayX.ResumePlay()
             PlayX.ShowError("The media being played cannot be resumed.")
         end
     end
+    
+    PlayX.UpdatePanels()
 end
 
 --- Stops playing everything.
 function PlayX.StopPlay()
-    if not PlayX.PlayerExists() then
+    if not PlayX.HasMedia() then
         PlayX.ShowError("Nothing is playing.\n")
     else
         for _, v in pairs(PlayX.GetInstances()) do
             v:Stop()
         end
     end
+    
+    PlayX.UpdatePanels()
 end
 PlayX.HidePlayer = PlayX.StopPlay -- Legacy
 
@@ -236,7 +241,7 @@ local function HandleBeginMessage(_, id, encoded, decoded)
     local handler = decoded.Handler
     local arguments = decoded.Arguments
     local playAge = decoded.PlayAge
-    local resumable = decoded.ResumeSupported
+    local resumable = decoded.Resumable
     local lowFramerate = decoded.LowFramerate
     local startTime = CurTime() - playAge
     
@@ -251,6 +256,8 @@ local function HandleBeginMessage(_, id, encoded, decoded)
     else
         Error("PlayXBegin message referred to non-existent entity")
     end
+    
+    PlayX.UpdatePanels()
 end
 
 local function HandleProvidersList(_, id, encoded, decoded)
@@ -268,6 +275,8 @@ local function HandleEndMessage(um)
     else
         Error("PlayXEnd message referred to non-existent entity")
     end
+    
+    PlayX.UpdatePanels()
 end
 
 --- Called on PlayXError user message.

@@ -56,8 +56,14 @@ function ConCmdClose(ply, cmd, args)
         return
     elseif not PlayX.IsPermitted(ply) then
         PlayX.SendError(ply, "You do not have permission to use the player")
+    elseif not PlayX.PlayerExists() then
+        PlayX.SendError(ply, "There is no player spawned!")
     else
-        PlayX.EndMedia()
+	    local result, err = PlayX:GetInstance(ply):CloseMedia()
+	    
+	    if not result then
+	        PlayX.SendError(ply, err)
+	    end
     end
 end
 

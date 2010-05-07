@@ -41,6 +41,10 @@ function ENT:HasMedia()
     return self.Media ~= nil
 end
 
+function ENT:IsResumable()
+    return self.Media ~= nil and self.Media.Resumable
+end
+
 function ENT:IsPlaying()
     return self.Engine ~= nil
 end

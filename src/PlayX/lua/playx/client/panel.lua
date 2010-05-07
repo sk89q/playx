@@ -84,19 +84,17 @@ local function SettingsPanel(panel)
     })
     
     if PlayX.HasMedia() then
-        local playingCount = PlayX.GetPlayingCount()
-        
-        if PlayX.GetResumableCount() == playingCount then
+        if PlayX.GetResumableCount() == #PlayX.GetInstances() then
             local button = panel:AddControl("Button", {
                 Label = "Hide Player",
                 Command = "playx_hide",
             })
             
-            if not PlayX.Playing then
+            if not PlayX.HasPlaying() then
                 button:SetDisabled(true)
             end
             
-            if PlayX.Playing then
+            if PlayX.HasPlaying() then
                 panel:AddControl("Button", {
                     Label = "Re-initialize Player",
                     Command = "playx_resume",
