@@ -355,6 +355,7 @@ local function FlashAPIHandler(args, screenWidth, screenHeight, start, volume)
     local url = args.URL
     local jsVolMul = args.ScriptVolumeMul and args.ScriptVolumeMul or 1
     local jsStartMul = args.ScriptStartMul and args.ScriptStartMul or 1
+    local js = ""
     
     local width, height = engine:AllocateScreen(screenWidth, screenHeight)
     

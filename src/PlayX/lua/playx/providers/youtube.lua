@@ -66,8 +66,8 @@ function YouTube.GetPlayer(uri, useJW)
                 ["Handler"] = "FlashAPI",
                 ["Arguments"] = {
                     URL = url,
-                    JSInitFunc = "onYouTubePlayerReady",
-                    JSVolumeFunc = "setVolume",
+                    ScriptInitFunc = "onYouTubePlayerReady",
+                    ScriptVolumeFunc = "setVolume",
                     StartMul = 1,
                 },
                 ["Resumable"] = true,
