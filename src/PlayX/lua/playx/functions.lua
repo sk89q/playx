@@ -19,23 +19,29 @@
 --- Makes a "class".
 -- @param t Table
 function PlayX.MakeClass()
-    local mt = {}
-
-    mt.__call = function(self, ...)
-        local instance = {}
-        for k, v in pairs(self) do
-            instance[k] = v
-        end
-        if type(instance.Initialize) == 'function' then
-            instance:Initialize(unpack(arg))
-        end
-        return instance
-    end
-    
     local t = {}
-    setmetatable(t, mt)
+    
+    setmetatable(t, {
+        __call = function(self, ...)
+            local instance = {}
+            
+            for k, v in pairs(self) do
+                instance[k] = v
+            end
+            
+            if type(instance.Initialize) == 'function' then
+                instance:Initialize(unpack(arg))
+            end
+            
+            return instance
+        end
+    })
     
     return t
+end
+
+function PlayX.IsSquare(width, height)
+    return math.abs(width / height - 1) < 0.2
 end
 
 --- Encodes a script for JavaScript.
@@ -121,6 +127,11 @@ function PlayX.HTMLUnescape(s)
     s = s:gsub("<[^<]+>", "")
     
     return s
+end
+
+function PlayX.JSEncode(str)
+    return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
+        :gsub("\r", "\\r"):gsub("\n", "\\n")
 end
 
 --- Gets a timestamp in UTC.

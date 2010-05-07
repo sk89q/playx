@@ -255,6 +255,10 @@ function PlayX.ResolveProvider(provider, uri, useJW)
     return result
 end
 
+function PlayX.GetProvider(id)
+    return list.Get("PlayXProviders")[id]
+end
+
 function PlayX.GetAutoSubscribers()
     return player.GetAll()
     -- @TODO: Change

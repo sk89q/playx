@@ -40,7 +40,9 @@ function YouTube.GetPlayer(uri, useJW)
         if useJW and PlayX.JWPlayerSupportsYouTube() then
             return {
                 ["Handler"] = "JW",
-                ["URI"] = "http://www.youtube.com/watch?v=" .. uri,
+                ["Arguments"] = {
+                    URL = "http://www.youtube.com/watch?v=" .. uri,
+                },
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
                 ["MetadataFunc"] = function(callback, failCallback)
@@ -62,17 +64,17 @@ function YouTube.GetPlayer(uri, useJW)
             
             return {
                 ["Handler"] = "FlashAPI",
-                ["URI"] = url,
+                ["Arguments"] = {
+                    URL = url,
+                    JSInitFunc = "onYouTubePlayerReady",
+                    JSVolumeFunc = "setVolume",
+                    StartMul = 1,
+                },
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
                 ["MetadataFunc"] = function(callback, failCallback)
                     YouTube.QueryMetadata(uri, callback, failCallback)
                 end,
-                ["HandlerArgs"] = {
-                    ["JSInitFunc"] = "onYouTubePlayerReady",
-                    ["JSVolumeFunc"] = "setVolume",
-                    ["StartMul"] = 1,
-                },
             }
         end
     end

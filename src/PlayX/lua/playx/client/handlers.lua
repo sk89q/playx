@@ -80,15 +80,15 @@ function WebResource:GetHTML()
 ]]
 end
 
-local function TryWebEngines(resource)
+local function TryWebEngines()
     local chrome = PlayX.GetEngine("ChromeEngine")
     local ie = PlayX.GetEngine("HTMLEngine")
     
-    if chrome:IsSupported() then
-        return chrome(resource)
+    if chrome:IsSupported() and GetConVar("playx_use_chrome"):GetBool() then
+        return chrome()
     end
     
-    return ie(resource)
+    return ie()
 end
 
 --- Generates the HTML for an image viewer. The image viewer will automatically
@@ -248,7 +248,7 @@ try {
     local resource = GenerateFlashPlayer(width, height, flashURL, flashVars)
     resource.volumeScriptFunction = volumeScriptFunction
     
-    return TryWebEngines(resource)
+    return resource
 end
 
 --- Generates the HTML code for an included JavaScript file.
@@ -283,86 +283,96 @@ body {
     })
 end
 
-local function StaticURLHandler(args, width, height, start, volume)
-    return TryWebEngines(WebResource({
+local function StaticURLHandler(args, screenWidth, screenHeight, start, volume)
+    local engine, err = TryWebEngines()
+    if not engine then return false, err end
+    
+    engine:AllocateScreen(screenWidth, screenHeight)
+    engine:Load(WebResource({
         URL = args.URL,
     }))
+    
+    return engine
 end
 
-local function JWPlayerHandler(args, width, height, start, volume)
-    return {
-        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URL,
-                                                nil, start, volume)),
-        Centered = false,
-    }
+local function JWPlayerHandler(args, screenWidth, screenHeight, start, volume)
+    local engine, err = TryWebEngines()
+    if not engine then return false, err end
+    
+    local width, height = engine:AllocateScreen(screenWidth, screenHeight)
+    local resource = GenerateJWPlayer(width, height, args.URL,
+                                      args.Provider, start, volume)
+    
+    engine:Load(resource)
+    
+    return engine
 end
 
-local function JWAudioHandler(args, width, height, start, volume)
-    return {
-        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URL, "sound")),
-        Centered = false,
-    }
-end
-
-local function JWVideoHandler(args, width, height, start, volume)
-    return {
-        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URI, "video")),
-        Centered = false,
-    }
-end
-
-local function JWRTMPHandler(args, width, height, start, volume)
-    return {
-        Engine = TryWebEngines(GenerateJWPlayer(width, height, args.URL, "rtmp")),
-        Centered = false,
-    }
-end
-
-local function FlashHandler(args, width, height, start, volume)
+local function FlashHandler(args, screenWidth, screenHeight, start, volume)
     local flashVars = args.FlashVars or {}
     local forcePlay = args.ForcePlay or false
     local centered = args.Centered
-    local result = GenerateFlashPlayer(width, height, args.URL,
-                                       flashVars, nil, forcePlay)
+    local resource = GenerateFlashPlayer(width, height, args.URL,
+                                         flashVars, nil, forcePlay)
     
     if forcePlay then
-        return {
-            Engine = PlayX.GetEngine("HTMLEngine")(result),
-            Centered = false,
-        }
+        local engine, err = PlayX.GetEngine("HTMLEngine")
+        if not engine then return false, err end
+        
+        engine:AllocateScreen(screenWidth, screenHeight)
+        engine:Load(resource)
+	    
+	    return engine
     else
-        return {
-            Engine = TryWebEngines(result),
-            Centered = false,
-        }
+	    local engine, err = TryWebEngines()
+	    if not engine then return false, err end
+	    
+	    engine:AllocateScreen(screenWidth, screenHeight)
+	    engine:Load(resource)
+	    
+        return engine
     end
 end
 
-local function ImageHandler(args, width, height, start, volume)
-    return {
-        Engine = TryWebEngines(GenerateImageViewer(width, height, args.URL)),
-        Centered = true,
-    }
+local function ImageHandler(args, screenWidth, screenHeight, start, volume)
+    local engine, err = TryWebEngines()
+    if not engine then return false, err end
+    
+    local width, height = engine:AllocateScreen(screenWidth, screenHeight)
+    local resource = GenerateImageViewer(width, height, args.URL)
+    
+    engine:Load(resource)
+    
+    return engine
 end
 
-local function FlashAPIHandler(args, width, height, start, volume)
+local function FlashAPIHandler(args, screenWidth, screenHeight, start, volume)
+    local engine, err = TryWebEngines()
+    if not engine then return false, err end
+    
     local url = args.URL
     local jsVolMul = args.ScriptVolumeMul and args.ScriptVolumeMul or 1
     local jsStartMul = args.ScriptStartMul and args.ScriptStartMul or 1
     
+    local width, height = engine:AllocateScreen(screenWidth, screenHeight)
+    
+    -- Replace width/height in URL
     if not args.NoDimRepl then
         url = url:gsub("__width__", width)
         url = url:gsub("__height__", height)
     end
     
+    -- Replace volume in URL
     if args.VolumeMul ~= nil then
         url = url:gsub("__volume__", args.VolumeMul * volume)
     end
     
+    -- Replace start time in URL
     if args.StartMul ~= nil then
         url = url:gsub("__start__", args.StartMul * start)
     end
     
+    -- Create player initialization code
     if args.ScriptInitFunc ~= nil then
         local code = ""
         
@@ -395,18 +405,21 @@ function ]] .. args.ScriptInitFunc .. [[() {
 ]]
     end
     
+    -- Add raw script code?
     if args.RawScript ~= nil then
         js = js .. args.RawScript
     end
     
+    -- Now build the resource
     local resource
     
-    if args.URLIsJavaScript then -- Include a Script file instead
+    if args.URLIsJavaScript then -- Include a script file instead
         resource = GenerateScriptEmbed(width, height, url, js)
     else
         resource = GenerateFlashPlayer(width, height, url, nil, js)
     end
     
+    -- Volume change function
     if args.ScriptVolumeFunc then
         resource.volumeScriptFunction = function(volume)
             return "try { player." .. 
@@ -415,14 +428,13 @@ function ]] .. args.ScriptInitFunc .. [[() {
         end
     end
     
-    return TryWebEngines(resource)
+    engine:Load(resource)
+    
+    return engine
 end
 
 list.Set("PlayXHandlers", "StaticURL", StaticURLHandler)
 list.Set("PlayXHandlers", "JW", JWPlayerHandler)
-list.Set("PlayXHandlers", "JWVideo", JWAudioHandler)
-list.Set("PlayXHandlers", "JWVideo", JWVideoHandler)
-list.Set("PlayXHandlers", "JWRTMP", JWRTMPHandler)
-list.Set("PlayXHandlers", "Flash", FlashHandler)
 list.Set("PlayXHandlers", "Image", ImageHandler)
+list.Set("PlayXHandlers", "Flash", FlashHandler)
 list.Set("PlayXHandlers", "FlashAPI", FlashAPIHandler)

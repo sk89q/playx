@@ -50,8 +50,11 @@ function Shoutcast.GetPlayer(uri, useJW)
         end
         
         return {
-            ["Handler"] = "JWAudio",
-            ["URI"] = uri,
+            ["Handler"] = "JW",
+            ["Arguments"] = {
+                URL = uri,
+                Provider = "sound",
+            },
             ["ResumeSupported"] = true,
             ["LowFramerate"] = true,
             ["MetadataFunc"] = function(callback, failCallback)
@@ -86,8 +89,11 @@ end
 function MP3.GetPlayer(uri, useJW)
     if uri:lower():find("^http://") then
         return {
-            ["Handler"] = "JWAudio",
-            ["URI"] = uri,
+            ["Handler"] = "JW",
+            ["Arguments"] = {
+                URL = uri,
+                Provider = "sound",
+            },
             ["ResumeSupported"] = true,
             ["LowFramerate"] = true,
             ["MetadataFunc"] = function(callback, failCallback)
@@ -126,8 +132,11 @@ end
 function FlashVideo.GetPlayer(uri, useJW)
     if uri:lower():find("^http://") then
         return {
-            ["Handler"] = "JWVideo",
-            ["URI"] = uri,
+            ["Handler"] = "JW",
+            ["Arguments"] = {
+                URL = uri,
+                Provider = "video",
+            },
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
@@ -156,7 +165,9 @@ function AnimatedImage.GetPlayer(uri, useJW)
     if uri:lower():find("^http://") then
         return {
             ["Handler"] = "Image",
-            ["URI"] = uri,
+            ["Arguments"] = {
+                URL = uri,
+            },
             ["ResumeSupported"] = true,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
@@ -196,7 +207,9 @@ function Image.GetPlayer(uri, useJW)
     if uri:lower():find("^http://") then
         return {
             ["Handler"] = "Image",
-            ["URI"] = uri,
+            ["Arguments"] = {
+                URL = uri,
+            },
             ["ResumeSupported"] = true,
             ["LowFramerate"] = true,
             ["MetadataFunc"] = function(callback, failCallback)

@@ -26,7 +26,9 @@ function Flash.GetPlayer(uri, useJW)
     if uri:lower():find("^http://") then
         return {
             ["Handler"] = "Flash",
-            ["URI"] = uri,
+            ["Arguments"] = {
+                URL = uri,
+            },
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
@@ -62,15 +64,15 @@ function FlashMovie.GetPlayer(uri, useJW)
     if uri:lower():find("^http://") then
         return {
             ["Handler"] = "Flash",
-            ["URI"] = uri,
+            ["Arguments"] = {
+                URL = uri,
+                ForcePlay = true,
+            },
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
                 FlashMovie.QueryMetadata(uri, callback, failCallback)
             end,
-            ["HandlerArgs"] = {
-                ["ForcePlay"] = true,
-            },
         }
     end
 end

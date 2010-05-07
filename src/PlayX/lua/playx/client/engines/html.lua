@@ -29,12 +29,8 @@ function HTMLEngine.IsSupported()
     return true -- Always supported
 end
 
---- Constructs the object.
--- @param isSquare
--- @param fps
--- @param resource
-function HTMLEngine:Setup(isSquare, resource)    
-    if isSquare then
+function HTMLEngine:AllocateScreen(screenWidth, screenHeight)     
+    if PlayX.IsSquare(screenWidth, screenHeight) then
         self.Width = 1024
         self.Height = 1024
     else
@@ -56,16 +52,11 @@ function HTMLEngine:Setup(isSquare, resource)
     
     alreadyCreated = true
     
+    self.Browser:SetSize(self.Width, self.Height)
     self.Browser:SetPaintedManually(true)
     self.Browser:SetVerticalScrollbarEnabled(false)
     self.Browser:StartAnimate(1000)
     
-    self:Load(resource)
-end
-
---- Gets the dimensions of the object drawn by this engine.
--- @return Width, height
-function HTMLEngine:GetDimensions()
     return self.Width, self.Height
 end
 
@@ -89,10 +80,17 @@ function HTMLEngine:SetVolume(volume)
     end
 end
 
+function HTMLEngine:PrePaint()
+    self.Browser:SetPaintedManually(false)
+end
+
 --- Renders to a surface.
 function HTMLEngine:Paint()
-    self.Browser:SetPaintedManually(false)
     self.Browser:PaintManual()
+    self.Browser:SetPaintedManually(true)
+end
+
+function HTMLEngine:PostPaint()
     self.Browser:SetPaintedManually(true)
 end
 
@@ -111,9 +109,9 @@ end
 --- Destroys the browser instance.
 function HTMLEngine:Destroy()
     local html = [[HTMLEngine:Destroy() called.]]
-    browser:SetHTML(html)
-    browser:SetPaintedManually(true)
-    browser:StopAnimate()
+    self.Browser:SetHTML(html)
+    self.Browser:SetPaintedManually(true)
+    self.Browser:StopAnimate()
     
     alreadyCreated = false
 end

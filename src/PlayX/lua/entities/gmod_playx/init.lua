@@ -107,7 +107,7 @@ function ENT:OpenMedia(provider, uri, start, lowFramerate, useJW, noTimeout)
         return false, err
     end
     
-    self:BeginMedia(result.Handler, result.URI, start, result.Resumable,
+    self:BeginMedia(result.Handler, result.Arguments, start, result.Resumable,
                     lowFramerate, result.HandlerArgs)
     
     self:UpdateMetadata({
@@ -239,6 +239,10 @@ function ENT:SendBeginMessage(ply)
     })
 end
 
+function ENT:SetMediaLength(length)
+    -- @TODO: ENT:SetMediaLength()
+end
+
 --- Sends the end message to subscribed clients. This is an
 -- internal method and there is little reason to call it manually.
 -- Calling this without updating the entity server-side will put the
@@ -268,14 +272,14 @@ end
 -- no effect or there is no media playing has no effect.
 -- @param data Metadata structure
 function ENT:UpdateMetadata(data)
-    if not PlayX.PlayerExists() or not PlayX.CurrentMedia then
-        return
-    end
-    
-    table.Merge(PlayX.CurrentMedia, data)
-    PlayX:GetInstance():SetWireMetadata(PlayX.CurrentMedia)
-    
-    hook.Call("PlayXMetadataReceived", false, self, ent.Media, data)
+    --if not PlayX.PlayerExists() or not PlayX.CurrentMedia then
+    --    return
+    --end
+    --
+    --table.Merge(PlayX.CurrentMedia, data)
+    --PlayX:GetInstance():SetWireMetadata(PlayX.CurrentMedia)
+    --
+    --hook.Call("PlayXMetadataReceived", false, self, ent.Media, data)
     
     -- TODO: Length handling, expiration
 end

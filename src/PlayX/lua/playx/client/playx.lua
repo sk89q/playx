@@ -41,8 +41,8 @@ include("playx/client/engines/html.lua")
 include("playx/client/engines/gm_chrome.lua")
 
 PlayX.Enabled = GetConVar("playx_enabled"):GetBool()
-PlayX.JWPlayerURL = ""
-PlayX.HostURL = ""
+PlayX.JWPlayerURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
+PlayX.HostURL = "http://sk89q.github.com/playx/host/host.html"
 
 --- Checks if a player instance exists in the game.
 -- @return Whether a player exists
@@ -76,7 +76,8 @@ end
 -- @param height
 -- @param start
 -- @param volume
-function PlayX.ResolveHandler(handler, args, width, height, start, volume)
+function PlayX.ResolveHandler(handler, args, screenWidth, screenHeight,
+                              start, volume)
     -- See if there is a hook for resolving handlers
     local result = hook.Call("PlayXResolveHandler", false, handler)
     
@@ -87,7 +88,7 @@ function PlayX.ResolveHandler(handler, args, width, height, start, volume)
     local handlers = list.Get("PlayXHandlers")
     
     if handlers[handler] then
-        return handlers[handler](args, width, height, start, volume)
+        return handlers[handler](args, screenWidth, screenHeight, start, volume)
     else
         Error("PlayX: Unknown handler: " .. tostring(handler))
     end
@@ -201,6 +202,8 @@ local function HandleBeginMessage(_, id, encoded, decoded)
     local resumable = decoded.ResumeSupported
     local lowFramerate = decoded.LowFramerate
     local startTime = CurTime() - playAge
+    
+    MsgN("PlayX: Received PlayXBegin with handler " .. handler)
     
     if ValidEntity(ent) then
         ent:Begin(handler, arguments, resumable, lowFramerate,

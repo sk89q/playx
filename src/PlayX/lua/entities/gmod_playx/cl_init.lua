@@ -18,6 +18,7 @@
 
 include("shared.lua")
 
+language.Add("gmod_playx", "PlayX Player")
 language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
@@ -83,7 +84,7 @@ function ENT:Start()
     self.Started = true
     
     if self:HasEngine() then
-        self.Engine:Destruct()
+        self.Engine:Destroy()
         self.Engine = nil
     end
     
@@ -95,7 +96,7 @@ function ENT:Stop()
     self.Started = false
     
     if self:HasEngine() then
-        self.Engine:Destruct()
+        self.Engine:Destroy()
         self.Engine = nil
     end
 end
@@ -121,7 +122,9 @@ function ENT:CalculateScreenBounds()
     -- Is this a pre-defined screen?
     if info then
         if info.IsProjector then
-            self:SetProjectorBounds(info.Right, info.Up, info.Forward)
+            --self:SetProjectorBounds(info.Right, info.Up, info.Forward)
+            self:SetScreenBounds(nil, 1024, 512,
+                                 info.Right, info.Up, info.Forward)
         else
             local right = info.RotateAroundRight
             local up = info.RotateAroundUp
@@ -139,9 +142,7 @@ function ENT:CalculateScreenBounds()
             end
             
             self:SetScreenBounds(info.Offset, info.Width, info.Height,
-                                 right,
-                                 up,
-                                 forward)
+                                 right, up, forward)
         end
     -- Or let's do our best attempt at fitting a screen automatically.
     else
@@ -186,19 +187,18 @@ end
 -- @param up
 -- @param forward
 function ENT:SetScreenBounds(pos, width, height, right, up, forward)
-    self.IsProjector = false
+    self.IsProjector = pos == nil
     
     self.ScreenOffset = pos
-    self.ViewportWidth = width
-    self.ViewportHeight = height
-    self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
+    self.ScreenWidth = width
+    self.ScreenHeight = height
     
     if self:HasMedia() then
-        self:CreateEngine(width, height, self.IsSquare)
+        self:CreateEngine(width, height)
     end
     
     if self:HasEngine() then
-        self.Width, self.Height = self.Engine:Setup(self.IsSquare)
+        self.Width, self.Height = self.Engine.Width, self.Engine.Height
     else
         self.Width = 1024
         self.Height = self.IsSquare and 1024 or 512
@@ -236,11 +236,11 @@ function ENT:SetProjectorBounds(right, up, forward)
     self.Up = up
     
     if self:HasMedia() then
-        self.Width, self.Height = self:CreateEngine(1024, 512, false)
+        self:CreateEngine(1024, 512)
     end
     
     if self:HasEngine() then    
-        self.Width, self.Height = self.Engine:Setup(false)
+        self.Width, self.Height = self.Engine.Width, self.Engine.Height
     else
         self.Width = 1024
         self.Height = 512
@@ -249,14 +249,15 @@ function ENT:SetProjectorBounds(right, up, forward)
     self.DrawScale = 1 -- Not used
 end
 
-function ENT:CreateEngine(width, height, isSquare)
-    local r = PlayX.ResolveHandler(self.Media.Handler, self.Media.Arguments,
-                                   width, height, self:GetStartTime(),
-                                   PlayX.GetPlayerVolume())
+function ENT:CreateEngine(screenWidth, screenHeight)
+    local engine, engineError = 
+        PlayX.ResolveHandler(self.Media.Handler, self.Media.Arguments,
+                             screenWidth, screenHeight,
+                             self:GetStartTime(),
+                             PlayX.GetPlayerVolume())
     
-    self.Engine = r.Engine
-    self.EngineError = r.Error
-    self.Centered = r.Centered
+    self.Engine = engine
+    self.EngineError = engineError
 end
 
 --- Resets the render bounds.
@@ -270,6 +271,9 @@ function ENT:Draw()
     
     if self.DrawScale then
         render.SuppressEngineLighting(true)
+        if self.Engine and self.Engine.PrePaint then
+            self.Engine:PrePaint()
+        end
         
         -- Projector rendering
         if self.IsProjector then
@@ -294,7 +298,7 @@ function ENT:Draw()
                             + ang:Up() * 2
                 
                 cam.Start3D2D(pos, ang, width)
-                if self:HasEngine() then
+                if self.Engine then
                     self.Engine:Paint()
                 else
                     surface.SetDrawColor(0, 0, 0, 255)
@@ -328,8 +332,8 @@ function ENT:Draw()
             cam.Start3D2D(pos, ang, self.DrawScale)
             surface.SetDrawColor(0, 0, 0, 255)
             surface.DrawRect(-self.DrawShiftX, -self.DrawShiftY * shiftMultiplier, self.DrawWidth, self.DrawHeight)
-            if self.Browser and (self.UsingChrome or self.Browser:IsValid()) and self.Playing then
-                    self.Engine:Paint()
+            if self.Engine then
+                self.Engine:Paint()
             else
                 if not PlayX.Enabled then
                     draw.SimpleText("Re-enable the player in the tool menu -> Options",
@@ -343,10 +347,16 @@ function ENT:Draw()
             cam.End3D2D()
         end
 
+        if self.Engine and self.Engine.PostPaint then
+            self.Engine:PostPaint()
+        end
         render.SuppressEngineLighting(false)
     end
 end
 
 function ENT:OnRemove()
-    -- Loss of an entity won't mean that the engine will be destroyed
+    if self:HasEngine() then
+        self.Engine:Destroy()
+        self.Engine = nil
+    end
 end

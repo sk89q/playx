@@ -84,15 +84,15 @@ function Livestream.GetPlayer(uri, useJW)
         
         return {
             ["Handler"] = "FlashAPI",
-            ["URI"] = url,
+            ["Arguments"] = {
+                URL = url,
+                VolumeMul = 0.1,
+            },
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
                 Livestream.QueryMetadata(uri, callback, failCallback)
             end,
-            ["HandlerArgs"] = {
-                ["VolumeMul"] = 0.1,
-            },
         }
     end
 end

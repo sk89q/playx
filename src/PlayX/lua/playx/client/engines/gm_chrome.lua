@@ -42,18 +42,8 @@ function ChromeEngine.IsSupported()
     return isSupported
 end
 
---- Constructs the object. This is implicitly called by the handler.
--- @param resource
-function ChromeEngine:Initialize(resource, b)
-    self.Resource = resource
-end
-
---- Actually creates the browser. This is explicitly called by the entity.
--- @param isSquare
-function ChromeEngine:Setup(isSquare)
-    -- If we are using a square screen, then a square material works much
-    -- better, so we need to differentiate.
-    if isSquare then
+function ChromeEngine:AllocateScreen(screenWidth, screenHeight)    
+    if PlayX.IsSquare(screenWidth, screenHeight) then
         self.Material = matSq
         self.Texture = matSq:GetMaterialTexture("$basetexture")
         self.TextureID = surface.GetTextureID("playx/screen_sq")
@@ -69,19 +59,20 @@ function ChromeEngine:Setup(isSquare)
     
     self.Browser = chrome.NewBrowser(self.Width, self.Height, self.Texture, self)
     
-    self:Load()
-    
     return self.Width, self.Height
 end
 
 --- Loads media.
-function ChromeEngine:Load()
+function ChromeEngine:Load(resource)
+    self.Resource = resource
+    
     if self.Resource:GetURL() then
         self.Browser:LoadURL(self.Resource:GetURL())
     else
         if PlayX.HostURL == "" then
             Error("PlayX: Host URL is invalid")
         end
+        
         self.Browser:LoadURL(PlayX.HostURL)
     end
 end
@@ -110,15 +101,12 @@ function ChromeEngine:SetVolume(volume)
     end
 end
 
---- Returns where the content should be centered.
--- @return
-function ChromeEngine:IsCentered()
-    return self.resource.Centered
-end
-
 --- Destroys the browser instance.
 function ChromeEngine:Destroy()
-    self.Browser:Free()
+    if self.Browser then
+        self.Browser:Free()
+        self.Browser = nil
+    end
 end
 
 --- Called by gm_chrome when the page has finished loading. We need to do
@@ -140,13 +128,13 @@ document.body.style.overflow = 'hidden';
             self.Browser:Exec([[
 var script = document.createElement('script');
 script.type = 'text/javascript';
-script.src = ']] .. PlayX.JSEncodeString(self.Resource:GetScriptURL()) .. [[';
+script.src = ']] .. PlayX.JSEncode(self.Resource:GetScriptURL()) .. [[';
 document.body.appendChild(script);
     ]])
         -- Or set the HTML
         else
             self.Browser:Exec([[
-document.body.innerHTML = ']] .. PlayX.JSEncodeString(self.Resource:GetBody()) .. [[';
+document.body.innerHTML = ']] .. PlayX.JSEncode(self.Resource:GetBody()) .. [[';
     ]])
         end
         
@@ -163,7 +151,7 @@ document.body.style.overflow = 'hidden';
         self.Browser:Exec([[
 var style = document.createElement('style');
 style.type = 'text/css';
-style.styleSheet.cssText = ']] .. PlayX.JSEncodeString(self.Resource:GetCSS()) .. [[';
+style.styleSheet.cssText = ']] .. PlayX.JSEncode(self.Resource:GetCSS()) .. [[';
 document.getElementsByTagName('head')[0].appendChild(style);
     ]])
     end
