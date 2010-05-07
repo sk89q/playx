@@ -365,7 +365,17 @@ end
 
 function ENT:OnRemove()
     if self:HasEngine() then
-        self.Engine:Destroy()
-        self.Engine = nil
+        local ent = self
+        local engine = self.Engine
+	    
+	    -- Give Gmod 200ms to really delete the entity
+	    timer.Simple(0.2, function()
+	        if not ValidEntity(ent) then -- Entity is really gone
+		        engine:Destroy()
+		        engine = nil
+	        elseif ValidEntity(ent) then -- Gmod lied
+	            ent:ResetRenderBounds()
+	        end
+	   end)
     end
 end
