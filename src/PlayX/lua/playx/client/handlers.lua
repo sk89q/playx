@@ -174,7 +174,7 @@ body {
   overflow: hidden;
 }]]
     
-    if forcePlay then        
+    if forcePlay then
         js = (js or "") .. [[
 setInterval(function() {
   try {
@@ -314,26 +314,25 @@ local function FlashHandler(args, screenWidth, screenHeight, start, volume)
     local flashVars = args.FlashVars or {}
     local forcePlay = args.ForcePlay or false
     local centered = args.Centered
-    local resource = GenerateFlashPlayer(width, height, args.URL,
-                                         flashVars, nil, forcePlay)
+    
+    local engine, err
     
     if forcePlay then
-        local engine, err = PlayX.GetEngine("HTMLEngine")
-        if not engine then return false, err end
-        
-        engine:AllocateScreen(screenWidth, screenHeight)
-        engine:Load(resource)
-	    
-	    return engine
+        local e, err = PlayX.GetEngine("HTMLEngine")
+        if not e then return false, err end
+        engine = e()
     else
-	    local engine, err = TryWebEngines()
+	    engine, err = TryWebEngines()
 	    if not engine then return false, err end
-	    
-	    engine:AllocateScreen(screenWidth, screenHeight)
-	    engine:Load(resource)
-	    
-        return engine
     end
+	
+    local width, height = engine:AllocateScreen(screenWidth, screenHeight)
+    
+    local resource = GenerateFlashPlayer(width, height, args.URL,
+                                         flashVars, nil, forcePlay)
+    engine:Load(resource)
+    
+    return engine
 end
 
 local function ImageHandler(args, screenWidth, screenHeight, start, volume)
