@@ -237,7 +237,7 @@ local function GenerateJWPlayer(width, height, url, provider, start, volume)
         flashVars["provider"] = provider
     end
     
-    local volumeScriptFunction = function(volume)
+    local VolumeScriptFunction = function(volume)
         return [[
 try {
   document.getElementById('player').sendEvent("VOLUME", "]] .. tostring(volume) .. [[");
@@ -246,7 +246,7 @@ try {
     end
     
     local resource = GenerateFlashPlayer(width, height, flashURL, flashVars)
-    resource.volumeScriptFunction = volumeScriptFunction
+    resource.VolumeScriptFunction = VolumeScriptFunction
     
     return resource
 end
@@ -421,7 +421,7 @@ function ]] .. args.ScriptInitFunc .. [[() {
     
     -- Volume change function
     if args.ScriptVolumeFunc then
-        resource.volumeScriptFunction = function(volume)
+        resource.VolumeScriptFunction = function(volume)
             return "try { player." .. 
                 args.ScriptVolumeFunc .. "(" .. 
                 tostring(jsVolMul * volume) .. "); } catch (e) {}"

@@ -42,6 +42,10 @@ function ChromeEngine.IsSupported()
     return isSupported
 end
 
+function ChromeEngine:Initialize()
+    self.Volume = nil
+end
+
 function ChromeEngine:AllocateScreen(screenWidth, screenHeight)    
     if PlayX.IsSquare(screenWidth, screenHeight) then
         self.Material = matSq
@@ -95,9 +99,12 @@ end
 --- Changes the volume.
 -- @param volume
 function ChromeEngine:SetVolume(volume)
-    local js = self.Resource:GetVolumeScript(volume)
-    if js then
-        self.Browser:Exec(js)
+    if volume ~= self.Volume then
+	    local js = self.Resource:GetVolumeScript(volume)
+	    if js then
+	        self.Browser:Exec(js)
+	    end
+	    self.Volume = volume
     end
 end
 
