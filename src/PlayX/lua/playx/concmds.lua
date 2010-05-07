@@ -24,9 +24,13 @@ local function ConCmdOpen(ply, cmd, args)
         PlayX.SendError(ply, "You do not have permission to use the player")
     elseif not PlayX.PlayerExists() then
         PlayX.SendError(ply, "There is no player spawned! Go to the spawn menu > Entities")
+    elseif PlayX.RaceProtectionTriggered() then
+        PlayX.SendError(ply, "Another video/media selection was started too recently.")
     elseif not args[1] then
         ply:PrintMessage(HUD_PRINTCONSOLE, "playx_open requires a URI")
     else
+        MsgN("PlayX: Open media request from " .. ply:GetName())
+        
         local uri = args[1]:Trim()
         local provider = PlayX.ConCmdToString(args[2], ""):Trim()
         local start = PlayX.ParseTimeString(args[3])
@@ -61,6 +65,8 @@ function ConCmdClose(ply, cmd, args)
     elseif not PlayX.PlayerExists() then
         PlayX.SendError(ply, "There is no player spawned!")
     else
+        MsgN("PlayX: Close media request from " .. ply:GetName())
+        
 	    local result, err = PlayX:GetInstance(ply):CloseMedia()
 	    
 	    if not result then

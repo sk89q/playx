@@ -98,6 +98,22 @@ function PlayX.HasValidHost()
     return PlayX.GetHostURL():Trim():gmatch("^https?://.+") and true or false
 end
 
+function PlayX.RaceProtectionTriggered()
+    local time = GetConVar("playx_race_protection"):GetFloat()
+    
+    if time > 0 then
+        local check = CurTime() - time
+        
+        for _, v in pairs(PlayX.GetInstances()) do
+            if v.LastBeginTime and v.LastBeginTime > check then
+                return true
+            end
+        end
+    end
+    
+    return false
+end
+
 --- Returns whether a user is permitted to use the player.
 -- You can override this by creating a hook named PlayXPermitPlayer, taking in
 -- two argments, a Player and the PlayX entity, and returning true or false.
