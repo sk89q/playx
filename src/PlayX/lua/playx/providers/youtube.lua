@@ -43,7 +43,7 @@ function YouTube.GetPlayer(uri, useJW)
                 ["Arguments"] = {
                     URL = "http://www.youtube.com/watch?v=" .. uri,
                 },
-                ["ResumeSupported"] = true,
+                ["Resumable"] = true,
                 ["LowFramerate"] = false,
                 ["MetadataFunc"] = function(callback, failCallback)
                     YouTube.QueryMetadata(uri, callback, failCallback)
@@ -70,7 +70,7 @@ function YouTube.GetPlayer(uri, useJW)
                     JSVolumeFunc = "setVolume",
                     StartMul = 1,
                 },
-                ["ResumeSupported"] = true,
+                ["Resumable"] = true,
                 ["LowFramerate"] = false,
                 ["MetadataFunc"] = function(callback, failCallback)
                     YouTube.QueryMetadata(uri, callback, failCallback)

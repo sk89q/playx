@@ -39,7 +39,7 @@ function Vimeo.GetPlayer(uri, useJW)
                 JSVolumeFunc = "api_setVolume",
                 JSStartFunc = "api_seekTo",
             },
-            ["ResumeSupported"] = false,
+            ["Resumable"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
                 Vimeo.QueryMetadata(uri, callback, failCallback)

@@ -42,7 +42,7 @@ function ENT:Subscribe(ply)
     if not self.Subscribed[ply] then
         self.Subscribed[ply] = true
         
-        if self:HasMedia() then
+        if self:HasMedia() and self.Media.Resumable then
             -- Need to alert the client to the media
             self:SendBeginMessage(ply)
         end
@@ -56,7 +56,7 @@ end
 -- safely called for an unsubscribed user.
 -- @param ply
 function ENT:Unsubscribe(ply)
-    if not self.Subscribed[ply] then
+    if self.Subscribed[ply] then
         self.Subscribed[ply] = nil
         
         if self:HasMedia() then
@@ -108,7 +108,7 @@ function ENT:OpenMedia(provider, uri, start, lowFramerate, useJW, noTimeout)
     end
     
     self:BeginMedia(result.Handler, result.Arguments, start, result.Resumable,
-                    lowFramerate, result.HandlerArgs)
+                    lowFramerate or result.LowFramerate)
     
     self:UpdateMetadata({
         Provider = provider,
