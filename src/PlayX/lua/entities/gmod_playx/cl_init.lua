@@ -103,7 +103,7 @@ end
 
 function ENT:UpdateFPS()
     if self:HasEngine() and self:HasMedia() then
-        self.Engine:SetFPS(PlayX.GetPlayerFPS())
+        self.Engine:SetFPS(self.Media.LowFramerate and 1 or PlayX.GetPlayerFPS())
     end
 end
 
@@ -258,6 +258,7 @@ function ENT:CreateEngine(screenWidth, screenHeight)
     
     self.Engine = engine
     self.EngineError = engineError
+    self.Centered = self.Engine and self.Engine.Centered or false
 end
 
 --- Resets the render bounds.

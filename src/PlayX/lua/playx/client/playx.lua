@@ -206,8 +206,7 @@ local function HandleBeginMessage(_, id, encoded, decoded)
     MsgN("PlayX: Received PlayXBegin with handler " .. handler)
     
     if ValidEntity(ent) then
-        ent:Begin(handler, arguments, resumable, lowFramerate,
-                  startTime, PlayX.GetPlayerFPS())
+        ent:Begin(handler, arguments, resumable, lowFramerate, startTime)
         
         if PlayX.Enabled then
             ent:Start()

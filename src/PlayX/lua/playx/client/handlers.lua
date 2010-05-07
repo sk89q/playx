@@ -98,7 +98,7 @@ end
 -- @param url
 -- @return HTML
 local function GenerateImageViewer(width, height, url)
-    local url = HTMLEncode(url)
+    local url = PlayX.HTMLEncode(url)
     
     -- CSS to center the image
     local css = [[
@@ -147,6 +147,8 @@ setInterval(function() {
     
     return WebResource({
         CSS = css,
+        Script = js,
+        Body = body,
     })
 end
 
@@ -342,6 +344,7 @@ local function ImageHandler(args, screenWidth, screenHeight, start, volume)
     local resource = GenerateImageViewer(width, height, args.URL)
     
     engine:Load(resource)
+    engine.Centered = true
     
     return engine
 end
