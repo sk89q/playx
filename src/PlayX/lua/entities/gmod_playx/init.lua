@@ -334,10 +334,6 @@ function ENT:SpawnFunction(ply, tr)
     PlayX.SendSpawnDialog(ply)
 end
 
-function ENT:OnRemove()
-    self:CloseMedia()
-end
-
 function ENT:ClearWireOutputs()
     if WireAddon then
         Wire_TriggerOutput(self.Entity, "Provider", "")
