@@ -35,20 +35,21 @@ include("playx/functions.lua")
 include("playx/providers.lua")
 include("playx/concmds.lua")
 
---- Checks if a player instance exists in the game.
--- @return Whether a player exists
+--- Returns true if there are any PlayX entities.
+-- @return
 function PlayX.PlayerExists()
     return table.Count(ents.FindByClass("gmod_playx")) > 0
 end
 
 --- Gets the player instance entity.
--- Note that, as of v3.x, there can be multiple PlayX instances, reducing the
--- effectiveness of this function. However, a Player can be passed to help
--- choose the best instance, and that is what some of the PlayX functions
--- that use this function do. A hook named "PlayXGetInstance" taking one
--- argument, the Player, can return a specific PlayX instance. That hook can
--- be useful if you are using multiple PlayX players but you wish to retain the
--- console commands, and want the console commands to affect the 'right' player.
+-- The console commands call this function to determine the PlayX instance
+-- to act upon. By default, it returns either the PlayX entity that a user
+-- is looking at, or if that is not available, the closest entity to the user.
+-- The player parameter is optional, so in its absense, this function will
+-- return the first entity returned by ents.FindByClass.
+-- You can override the behavior of this function by registering the
+-- PlayXGetInstance hook, taking in the same argument, and returning a PlayX
+-- entity. It can return nil in the absense of a PlayX entity.
 -- @param ply Optional player argument
 -- @return Entity or nil
 function PlayX.GetInstance(ply)
@@ -98,6 +99,8 @@ function PlayX.HasValidHost()
     return PlayX.GetHostURL():Trim():gmatch("^https?://.+") and true or false
 end
 
+--- Returns true if race protection is currently on.
+-- @return Boolean
 function PlayX.RaceProtectionTriggered()
     local time = GetConVar("playx_race_protection"):GetFloat()
     
