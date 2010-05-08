@@ -25,6 +25,11 @@ include("shared.lua")
 ENT.Subscribed = {}
 ENT.Media = nil
 ENT.LastBeginTime = nil
+ENT.InputProvider = ""
+ENT.InputURI = ""
+ENT.InputStartAt = 0
+ENT.InputDisableJW = false
+ENT.InputForceLowFramerate = false
 
 --- Returns play status.
 -- @return
@@ -296,12 +301,6 @@ function ENT:UpdateMetadata(data)
     -- TODO: Length handling, expiration
 end
 
-ENT.InputProvider = ""
-ENT.InputURI = ""
-ENT.InputStartAt = 0
-ENT.InputDisableJW = false
-ENT.InputForceLowFramerate = false
-
 function ENT:Initialize()
     self.Entity:PhysicsInit(SOLID_VPHYSICS)
     self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
@@ -353,6 +352,12 @@ function ENT:Initialize()
     for _, ply in pairs(PlayX.GetAutoSubscribers(self)) do
         self:Subscribe(ply)
     end
+end
+
+function ENT:WireInputProtectionTriggered()
+    return GetConVar("playx_wire_input_delay"):GetFloat() > 0 and 
+        self.LastBeginTime and
+        (CurTime() - self.LastBeginTime) < GetConVar("playx_wire_input_delay"):GetFloat()
 end
 
 function ENT:SpawnFunction(ply, tr)
@@ -433,11 +438,9 @@ function ENT:TriggerInput(iname, value)
         if value > 0 then
             if not GetConVar("playx_wire_input"):GetBool() then
                 Wire_TriggerOutput(self.Entity, "InputError", "Cvar playx_wire_input is not 1")
-            elseif GetConVar("playx_race_protection"):GetFloat() > 0 and 
-                (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
+            elseif PlayX.RaceProtectionTriggered() then
                 Wire_TriggerOutput(self.Entity, "InputError", "Race protection triggered (playx_race_protection)")
-            elseif GetConVar("playx_wire_input_delay"):GetFloat() > 0 and 
-                (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_wire_input_delay"):GetFloat() then
+            elseif self:WireInputProtectionTriggered() then
                 Wire_TriggerOutput(self.Entity, "InputError", 
                     "Wire input flood protection triggered (playx_wire_input_delay = " .. 
                     GetConVar("playx_wire_input_delay"):GetFloat() .. " seconds)")
@@ -456,11 +459,10 @@ function ENT:TriggerInput(iname, value)
                     Wire_TriggerOutput(self.Entity, "InputError", "Non-negative start time is required")
                 else
                     MsgN(string.format("Video played via wire input: %s", uri))
-                    print(provider, uri, start, forceLowFramerate, useJW)
                     
-                    local result, err = PlayX.OpenMedia(provider, uri, start,
-                                                        forceLowFramerate, useJW,
-                                                        false)
+                    local result, err = self:OpenMedia(provider, uri, start,
+                                                       forceLowFramerate, useJW,
+                                                       false)
                     
                     if not result then
                         Wire_TriggerOutput(self.Entity, "InputError", err)
