@@ -271,7 +271,7 @@ function PlayX.ResolveProvider(provider, uri, useJW)
         end
     end
     
-    return result
+    return result, nil, provider
 end
 
 function PlayX.GetProvider(id)

@@ -104,7 +104,7 @@ function ENT:OpenMedia(provider, uri, start, lowFramerate, useJW, noTimeout)
     local useJW = useJW and PlayX.IsUsingJW() or false
     local noTimeout = noTimeout or false
     
-    local result, err = PlayX.ResolveProvider(provider, uri, useJW)
+    local result, err, provider = PlayX.ResolveProvider(provider, uri, useJW)
     
     if not result then
         return false, err
@@ -280,15 +280,18 @@ end
 -- has begun playing. Calling this when there is no player spawned has
 -- no effect or there is no media playing has no effect.
 -- @param data Metadata structure
-function ENT:UpdateMetadata(data)
-    --if not PlayX.PlayerExists() or not PlayX.CurrentMedia then
-    --    return
-    --end
-    --
-    --table.Merge(PlayX.CurrentMedia, data)
-    --PlayX:GetInstance():SetWireMetadata(PlayX.CurrentMedia)
-    --
-    --hook.Call("PlayXMetadataReceived", false, self, ent.Media, data)
+function ENT:UpdateMetadata(data)    
+    if self.Media then
+	    if data ~= nil then
+	       table.Merge(self.Media, data)
+	    end
+	    
+        self:SetWireMetadata(self.Media)
+	    
+	    hook.Call("PlayXMetadataReceived", false, self, self.Media, data)
+    else
+        self:ClearWireOutputs()
+    end
     
     -- TODO: Length handling, expiration
 end
