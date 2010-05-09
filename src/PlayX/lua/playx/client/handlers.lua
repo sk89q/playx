@@ -16,7 +16,7 @@
 -- 
 -- $Id$
 
-local WebResource = PlayX.MakeClass()
+local WebResource = playxlib.MakeClass()
 
 function WebResource:Initialize(vars)
     self.URL = vars.URL or nil
@@ -98,7 +98,7 @@ end
 -- @param url
 -- @return HTML
 local function GenerateImageViewer(width, height, url)
-    local url = PlayX.HTMLEncode(url)
+    local url = playxlib.HTMLEscape(url)
     
     -- CSS to center the image
     local css = [[
@@ -138,7 +138,7 @@ setInterval(function() {
 <table border="0" cellpadding="0" cellmargin="0" style="width: ]] .. width .. [[px; height: ]] .. height .. [[px">
 <tr>
 <td style="text-align: center">
-<img src="]] .. PlayX.HTMLEncode(url) .. [[" alt="" onload="resize(this); keepResizing = false" style="margin: auto" />
+<img src="]] .. playxlib.HTMLEscape(url) .. [[" alt="" onload="resize(this); keepResizing = false" style="margin: auto" />
 </td>
 </tr>
 </table>
@@ -162,8 +162,8 @@ end
 -- @return HTML
 local function GenerateFlashPlayer(width, height, url, flashVars, js, forcePlay)
     local extraParams = ""
-    local url = PlayX.HTMLEncode(url)
-    local flashVarsString = flashVars and PlayX.URLEncodeTable(flashVars) or ""
+    local url = playxlib.HTMLEscape(url)
+    local flashVarsString = flashVars and playxlib.URLEscapeTable(flashVars) or ""
     
     local css = [[
 body {

@@ -19,7 +19,7 @@
 local Vimeo = {}
 
 function Vimeo.Detect(uri, useJW)
-    local m = PlayX.FindMatch(uri:gsub("%?.*$", ""), {
+    local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
         "^http://[A-Za-z0-9%.%-]*%.vimeo%.com/([0-9]+)",
         "^http://vimeo%.com/([0-9]+)",
     })
@@ -59,26 +59,26 @@ function Vimeo.QueryMetadata(uri, callback, failCallback)
             return
         end
         
-        local title = PlayX.HTMLUnescape(string.match(result, "<title>([^<]+)</title>"))
-        local desc = PlayX.HTMLUnescape(string.match(result, "<description>([^<]+)</description>"))
+        local title = playxlib.HTMLUnescape(string.match(result, "<title>([^<]+)</title>"))
+        local desc = playxlib.HTMLUnescape(string.match(result, "<description>([^<]+)</description>"))
         
         local publishedDate = nil
         local y, mo, d, h, m, s = string.match(result, "<upload_date>([0-9]+)%-([0-9]+)%-([0-9]+) ([0-9]+):([0-9]+):([0-9]+)</upload_date>")
         if y then
-            publishedDate = PlayX.UTCTime{year=tonumber(y), month=tonumber(mo),
+            publishedDate = playxlib.UTCTime{year=tonumber(y), month=tonumber(mo),
                                           day=tonumber(d), hour=tonumber(h),
                                           min=tonumber(m), sec=tonumber(s)}
         end
         
-        local thumbnail = PlayX.HTMLUnescape(string.match(result, "<thumbnail_large>([^<]+)</thumbnail_large>"))
-        local submitter = PlayX.HTMLUnescape(string.match(result, "<user_name>([^<]+)</user_name>"))
-        local submitterURL = PlayX.HTMLUnescape(string.match(result, "<user_url>([^<]+)</user_url>"))
-        local submitterAvatar = PlayX.HTMLUnescape(string.match(result, "<user_portrait_huge>([^<]+)</user_portrait_huge>"))
+        local thumbnail = playxlib.HTMLUnescape(string.match(result, "<thumbnail_large>([^<]+)</thumbnail_large>"))
+        local submitter = playxlib.HTMLUnescape(string.match(result, "<user_name>([^<]+)</user_name>"))
+        local submitterURL = playxlib.HTMLUnescape(string.match(result, "<user_url>([^<]+)</user_url>"))
+        local submitterAvatar = playxlib.HTMLUnescape(string.match(result, "<user_portrait_huge>([^<]+)</user_portrait_huge>"))
         local likes = tonumber(string.match(result, "<stats_number_of_likes>([0-9]+)</stats_number_of_likes>"))
         local plays = tonumber(string.match(result, "<stats_number_of_plays>([0-9]+)</stats_number_of_plays>"))
         local comments = tonumber(string.match(result, "<stats_number_of_comments>([0-9]+)</stats_number_of_comments>"))
         local length = tonumber(string.match(result, "<duration>([0-9]+)</duration>"))
-        local tags = PlayX.ParseTags(PlayX.HTMLUnescape(string.match(result, "<tags>([^<]+)</tags>")), ",")
+        local tags = playxlib.ParseTags(playxlib.HTMLUnescape(string.match(result, "<tags>([^<]+)</tags>")), ",")
         local width = tonumber(string.match(result, "<width>([0-9]+)</width>"))
         local height = tonumber(string.match(result, "<height>([0-9]+)</height>"))
         

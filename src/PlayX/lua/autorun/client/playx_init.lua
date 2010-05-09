@@ -16,5 +16,6 @@
 -- 
 -- $Id$
 
+include("playxlib.lua")
 include("playx/client/playx.lua")
 

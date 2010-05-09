@@ -21,7 +21,7 @@
 local browserCache = nil
 local alreadyCreated = false
 
-local HTMLEngine = PlayX.MakeClass()
+local HTMLEngine = playxlib.MakeClass()
 
 --- Returns on the status of this engine's support.
 -- @return Boolean indicating statues
@@ -29,8 +29,10 @@ function HTMLEngine.IsSupported()
     return true -- Always supported
 end
 
+--- Allocates a display for the provided screen width and height.
+-- @return Width and height
 function HTMLEngine:AllocateScreen(screenWidth, screenHeight)     
-    if PlayX.IsSquare(screenWidth, screenHeight) then
+    if playxlib.IsSquare(screenWidth, screenHeight) then
         self.Width = 1024
         self.Height = 1024
     else
@@ -61,6 +63,7 @@ function HTMLEngine:AllocateScreen(screenWidth, screenHeight)
 end
 
 --- Loads media.
+-- @param resource WebResource
 function HTMLEngine:Load(resource)
     self.Resource = resource
 
@@ -80,6 +83,7 @@ function HTMLEngine:SetVolume(volume)
     end
 end
 
+--- Called before Paint().
 function HTMLEngine:PrePaint()
     self.Browser:SetPaintedManually(false)
 end
@@ -90,6 +94,7 @@ function HTMLEngine:Paint()
     self.Browser:SetPaintedManually(true)
 end
 
+--- Called before PostPaint().
 function HTMLEngine:PostPaint()
     self.Browser:SetPaintedManually(true)
 end
@@ -98,12 +103,6 @@ end
 -- @param fps
 function HTMLEngine:SetFPS(fps)
     self.Browser:StartAnimate(1000 / fps)
-end
-
---- Returns where the content should be centered.
--- @return
-function HTMLEngine:IsCentered()
-    return self.resource.Centered
 end
 
 --- Destroys the browser instance.

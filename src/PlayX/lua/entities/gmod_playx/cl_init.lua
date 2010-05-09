@@ -29,27 +29,33 @@ ENT.Media = nil
 ENT.Started = false
 ENT.Centered = false
 
---- Returns engine status.
--- @return
+--- Returns true if there is an attached engine.
+-- @return Boolean
 function ENT:HasEngine()
     return self.Engine ~= nil
 end
 
---- Returns play status.
--- @return
+--- Returns true if there is media.
+-- @return Boolean
 function ENT:HasMedia()
     return self.Media ~= nil
 end
 
+--- Returns true if the current media is resumable. If there is no media, then
+-- this function will return false.
+-- @return Boolean
 function ENT:IsResumable()
     return self.Media ~= nil and self.Media.Resumable
 end
 
+--- Returns whether something is playing.
+-- @return Boolean
 function ENT:IsPlaying()
     return self.Engine ~= nil
 end
 
 --- Initializes the entity.
+-- @hidden
 function ENT:Initialize()
     self.Entity:DrawShadow(false)
     
@@ -63,12 +69,23 @@ function ENT:Initialize()
     self:CalculateScreenBounds()
 end
 
-function ENT:GetStartTime()
+--- Get the amount of time that the media has elapsed. Note that if the media
+-- was not started at the beginning, that difference will be reflected in
+-- the output of this function.
+-- @return Time in seconds
+function ENT:GetElapsedTime()
     if self:HasMedia() then
         return CurTime() - self.Media.StartTime
     end
 end
 
+--- Begin a media.
+-- @param handler
+-- @param arguments
+-- @param resumable
+-- @param lowFramerate
+-- @param startTime
+-- @hidden
 function ENT:Begin(handler, arguments, resumable, lowFramerate, startTime)
     self:Stop() -- Kill previous engine
     
@@ -81,6 +98,8 @@ function ENT:Begin(handler, arguments, resumable, lowFramerate, startTime)
     }
 end
 
+--- Stops media.
+-- @hidden
 function ENT:End()
     self:Stop()
     
@@ -88,7 +107,14 @@ function ENT:End()
     self.Started = false
 end
 
+--- Start playing the media. If there is no media, then nothing will happen.
+-- Even if the media is not resumable, calling this function will cause the
+-- media to start playing, even if it starts from the beginning. 
 function ENT:Start()
+    if not self:HasMedia() then
+        return
+    end
+    
     self.Started = true
     
     if self:HasEngine() then
@@ -100,6 +126,7 @@ function ENT:Start()
     self:UpdateFPS()
 end
 
+--- Stop playing.
 function ENT:Stop()
     self.Started = false
     
@@ -109,12 +136,16 @@ function ENT:Stop()
     end
 end
 
+--- Updates the FPS.
+-- @hidden
 function ENT:UpdateFPS()
     if self:HasEngine() and self:HasMedia() then
         self.Engine:SetFPS(self.Media.LowFramerate and 1 or PlayX.GetPlayerFPS())
     end
 end
 
+--- Update the volume.
+-- @hidden
 function ENT:UpdateVolume()
     if self:HasEngine() then
         self.Engine:SetVolume(PlayX.GetPlayerVolume())
@@ -123,6 +154,7 @@ end
 
 --- Updates the screen bounds, based on either the screen list or using
 -- an algorithm at detecting the screen.
+-- @hidden
 function ENT:CalculateScreenBounds()
     local model = self.Entity:GetModel()
     local info = PlayXScreens[model:lower()]
@@ -194,6 +226,7 @@ end
 -- @param right
 -- @param up
 -- @param forward
+-- @hidden
 function ENT:SetScreenBounds(pos, width, height, right, up, forward)
     self.IsProjector = pos == nil
     
@@ -236,6 +269,7 @@ end
 -- @param right
 -- @param up
 -- @param forward
+-- @hidden
 function ENT:SetProjectorBounds(right, up, forward)
     self.IsProjector = true
     
@@ -257,11 +291,13 @@ function ENT:SetProjectorBounds(right, up, forward)
     self.DrawScale = 1 -- Not used
 end
 
+--- Creates the engine for drawing.
+-- @hidden
 function ENT:CreateEngine(screenWidth, screenHeight)
     local engine, engineError = 
         PlayX.ResolveHandler(self.Media.Handler, self.Media.Arguments,
                              screenWidth, screenHeight,
-                             self:GetStartTime(),
+                             self:GetElapsedTime(),
                              PlayX.GetPlayerVolume())
     
     self.Engine = engine
@@ -275,6 +311,8 @@ function ENT:ResetRenderBounds()
     self:SetRenderBoundsWS(Vector(-50000, -50000, -50000), Vector(50000, 50000, 50000))
 end
 
+--- Draw function.
+-- @hidden
 function ENT:Draw()
     self.Entity:DrawModel()
     
@@ -363,6 +401,8 @@ function ENT:Draw()
     end
 end
 
+--- On remove function.
+-- @hidden
 function ENT:OnRemove()
     if self:HasEngine() then
         local ent = self

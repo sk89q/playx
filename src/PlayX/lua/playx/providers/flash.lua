@@ -50,7 +50,7 @@ list.Set("PlayXProvidersList", "Flash", {"Flash [don't force play]"})
 local FlashMovie = {}
 
 function FlashMovie.Detect(uri)
-    local m = PlayX.FindMatch(uri:gsub("%?.*$", ""), {
+    local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
         "^http://.+%.swf$",
         "^http://.+%.SWF$",
     })

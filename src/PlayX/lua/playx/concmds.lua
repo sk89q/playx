@@ -32,11 +32,11 @@ local function ConCmdOpen(ply, cmd, args)
         MsgN("PlayX: Open media request from " .. ply:GetName())
         
         local uri = args[1]:Trim()
-        local provider = PlayX.ConCmdToString(args[2], ""):Trim()
-        local start = PlayX.ParseTimeString(args[3])
-        local forceLowFramerate = PlayX.ConCmdToBool(args[4], false)
-        local useJW = PlayX.ConCmdToBool(args[5], true)
-        local ignoreLength = PlayX.ConCmdToBool(args[6], false)
+        local provider = playxlib.CastToString(args[2], ""):Trim()
+        local start = playxlib.ParseTimeString(args[3])
+        local forceLowFramerate = playxlib.CastToBool(args[4], false)
+        local useJW = playxlib.CastToBool(args[5], true)
+        local ignoreLength = playxlib.CastToBool(args[6], false)
         
         if uri == "" then
             PlayX.SendError(ply, "A URI is required")

@@ -31,8 +31,63 @@ ENT.InputStartAt = 0
 ENT.InputDisableJW = false
 ENT.InputForceLowFramerate = false
 
+--- Initialize the entity.
+-- @hidden
+function ENT:Initialize()
+    self.Entity:PhysicsInit(SOLID_VPHYSICS)
+    self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
+    self.Entity:SetSolid(SOLID_VPHYSICS)
+    self.Entity:DrawShadow(false)
+    
+    if WireAddon then
+        self.Inputs = Wire_CreateInputs(self.Entity, {
+            "Provider [STRING]",
+            "URI [STRING]",
+            "StartAt",
+            "DisableJW",
+            "ForceLowFramerate",
+            "Open",
+            "Close",
+        })
+        
+        self.Outputs = Wire_CreateOutputs(self.Entity, {
+            "InputError [STRING]",
+            "Provider [STRING]",
+            "Handler [STRING]",
+            "Start",
+            "ActualStartTime",
+            "Length",
+            "URL [STRING]",
+            "Title [STRING]",
+            "Description [STRING]",
+            "Tags [ARRAY]",
+            "DatePublished",
+            "DateModified",
+            "Submitter [STRING]",
+            "SubmitterURL [STRING]",
+            "SubmitterAvatar [STRING]",
+            "Faved",
+            "Views",
+            "Comments",
+            "NormalizedRating",
+            "RatingCount",
+            "Thumbnail [STRING]",
+            "Width",
+            "Height",
+            "IsLive",
+            "ViewerCount",
+        })
+        
+        self:ClearWireOutputs()
+    end
+    
+    for _, ply in pairs(PlayX.GetAutoSubscribers(self)) do
+        self:Subscribe(ply)
+    end
+end
+
 --- Returns play status.
--- @return
+-- @return Boolean
 function ENT:HasMedia()
     return self.Media ~= nil
 end
@@ -40,9 +95,9 @@ end
 --- Subscribes a user to this player. A subscribed user will see the
 -- videos and media playing on this player. If there is already
 -- something playing, then the newly subscribed user will have the media
--- play for him/her. Calling this function for an already subscribed
--- user will have no ill effects, nor will it restart the media for the
--- user.
+-- start for him/her if the media can be resumved. Calling this function for an
+-- already subscribed user will have no ill effects, nor will it restart the
+-- media for the user. Calls to this function trigger the PlayXSubscribe hook.
 -- @param ply
 function ENT:Subscribe(ply)
     if not self.Subscribed[ply] then
@@ -59,7 +114,8 @@ end
 
 --- Unsubscribes a user from this player. The video/media will stop
 -- playing for the user if something is currently playing. This can be
--- safely called for an unsubscribed user.
+-- safely called for an unsubscribed user. Calls to this function trigger
+-- the PlayXUnsubscribe hook.
 -- @param ply
 function ENT:Unsubscribe(ply)
     if self.Subscribed[ply] then
@@ -75,7 +131,8 @@ function ENT:Unsubscribe(ply)
 end
 
 --- Gets a list of subscribers. All returned entities will be valid
--- player entities.
+-- player entities. Modifying the returned table will not change the list of
+-- subscribers.
 -- @return List of subscribers
 function ENT:GetSubscribers()
     local players = {}
@@ -138,21 +195,8 @@ function ENT:OpenMedia(provider, uri, start, lowFramerate, useJW, noTimeout)
     return true
 end
 
---- Stops playing.
-function ENT:CloseMedia()
-    if self.Media then
-        self:EndMedia()
-    
-        return true
-    else
-        return false, "Nothing is playing"
-    end
-end
-
---- Plays something using a handler. This doesn't go through that
--- provider stuff, since you are providing the handler directly. Note
--- that many of the metadata fields must be manually updated if you
--- decide to call this method directly.
+--- Avoid the provider detection and processing and play something using a
+-- selected handler directly.
 -- @param handler
 -- @param arguments
 -- @param start
@@ -205,16 +249,25 @@ function ENT:BeginMedia(handler, arguments, start, resumable,
     
     hook.Call("PlayXMediaBegin", false, self, self.Media)
     
-    if length then
-        self:SetMediaLength(length)
-    end
-    
     self:SendBeginMessage()
     
     -- TODO: Admin timeout
 end
 
+--- Stops playing.
+-- @hidden
+function ENT:CloseMedia()
+    if self.Media then
+        self:EndMedia()
+    
+        return true
+    else
+        return false, "Nothing is playing"
+    end
+end
+
 --- Stops playing. You probably should be calling ENT:CloseMedia()
+-- @hidden
 function ENT:EndMedia()
     self.Media = nil
     
@@ -230,6 +283,7 @@ end
 -- Calling this without updating the entity server-side will put the
 -- client and server out of sync.
 -- @param ply Pass a player to filter the message to just that player
+-- @hidden
 function ENT:SendBeginMessage(ply)
     local filter = nil
     
@@ -253,15 +307,12 @@ function ENT:SendBeginMessage(ply)
     })
 end
 
-function ENT:SetMediaLength(length)
-    -- @TODO: ENT:SetMediaLength()
-end
-
 --- Sends the end message to subscribed clients. This is an
 -- internal method and there is little reason to call it manually.
 -- Calling this without updating the entity server-side will put the
 -- client and server out of sync.
 -- @param ply Pass a player to filter the message to just that player
+-- @hidden
 function ENT:SendEndMessage(ply)
     local filter = RecipientFilter()
     local filter = nil
@@ -281,9 +332,9 @@ function ENT:SendEndMessage(ply)
     umsg.End()
 end
 
---- Updates the current media metadata. This can be called even after the media
--- has begun playing. Calling this when there is no player spawned has
--- no effect or there is no media playing has no effect.
+--- Updates the current media metadata. This can be called after something
+-- has started playing to supplement metdata, and it cna be called multiple
+-- times if there is new information.
 -- @param data Metadata structure
 function ENT:UpdateMetadata(data)    
     if self.Media then
@@ -301,69 +352,22 @@ function ENT:UpdateMetadata(data)
     -- TODO: Length handling, expiration
 end
 
-function ENT:Initialize()
-    self.Entity:PhysicsInit(SOLID_VPHYSICS)
-    self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
-    self.Entity:SetSolid(SOLID_VPHYSICS)
-    self.Entity:DrawShadow(false)
-    
-    if WireAddon then
-        self.Inputs = Wire_CreateInputs(self.Entity, {
-            "Provider [STRING]",
-            "URI [STRING]",
-            "StartAt",
-            "DisableJW",
-            "ForceLowFramerate",
-            "Open",
-            "Close",
-        })
-        
-        self.Outputs = Wire_CreateOutputs(self.Entity, {
-            "InputError [STRING]",
-            "Provider [STRING]",
-            "Handler [STRING]",
-            "Start",
-            "ActualStartTime",
-            "Length",
-            "URL [STRING]",
-            "Title [STRING]",
-            "Description [STRING]",
-            "Tags [ARRAY]",
-            "DatePublished",
-            "DateModified",
-            "Submitter [STRING]",
-            "SubmitterURL [STRING]",
-            "SubmitterAvatar [STRING]",
-            "Faved",
-            "Views",
-            "Comments",
-            "NormalizedRating",
-            "RatingCount",
-            "Thumbnail [STRING]",
-            "Width",
-            "Height",
-            "IsLive",
-            "ViewerCount",
-        })
-        
-        self:ClearWireOutputs()
-    end
-    
-    for _, ply in pairs(PlayX.GetAutoSubscribers(self)) do
-        self:Subscribe(ply)
-    end
-end
-
+--- Returns true if wire input protection would have been triggered.
+-- @return Boolean
 function ENT:WireInputProtectionTriggered()
     return GetConVar("playx_wire_input_delay"):GetFloat() > 0 and 
         self.LastBeginTime and
         (CurTime() - self.LastBeginTime) < GetConVar("playx_wire_input_delay"):GetFloat()
 end
 
+--- Called when a player tries to spawn this player.
+-- @hidden
 function ENT:SpawnFunction(ply, tr)
     PlayX.SendSpawnDialog(ply)
 end
 
+--- Clears the wire outputs. This is an internal method.
+-- @hidden
 function ENT:ClearWireOutputs()
     if WireAddon then
         Wire_TriggerOutput(self.Entity, "Provider", "")
@@ -394,6 +398,9 @@ function ENT:ClearWireOutputs()
     end
 end
 
+--- Sets the wire metadata. This is an internal method.
+-- @param data
+-- @hidden
 function ENT:SetWireMetadata(data)
     if WireAddon then
         Wire_TriggerOutput(self.Entity, "Provider", data.Provider and data.Provider or "")
@@ -424,6 +431,10 @@ function ENT:SetWireMetadata(data)
     end
 end
 
+--- Trigger input from Wiremod.
+-- @param iname
+-- @param value
+-- @hidden
 function ENT:TriggerInput(iname, value)
     if iname == "Close" then
         if value > 0 then
@@ -477,7 +488,7 @@ function ENT:TriggerInput(iname, value)
     elseif iname == "URI" then
         self.InputURI = tostring(value)
     elseif iname == "StartAt" then
-        self.InputStartAt = PlayX.ParseTimeString(tostring(value))
+        self.InputStartAt = playxlib.ParseTimeString(tostring(value))
     elseif iname == "DisableJW" then
         self.InputDisableJW = value > 0
     elseif iname == "ForceLowFramerate" then
@@ -485,6 +496,7 @@ function ENT:TriggerInput(iname, value)
     end
 end
 
+--- Duplicator function.
 local function PlayXEntityDuplicator(ply, model, pos, ang)
     if PlayX.PlayerExists() then
         return nil

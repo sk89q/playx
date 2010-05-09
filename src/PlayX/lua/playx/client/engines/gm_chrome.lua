@@ -34,28 +34,35 @@ if isInstalled then
     end
 end
 
-local ChromeEngine = PlayX.MakeClass()
+local ChromeEngine = playxlib.MakeClass()
 
 --- Returns on the status of this engine's support.
--- @return Boolean indicating statues
+-- @return Boolean indicating status
 function ChromeEngine.IsSupported()
     return isSupported
 end
 
+--- Returns true if the gm_chrome module is installed.
+-- @return Boolean
 function ChromeEngine.IsModuleInstalled()
     return isInstalled
 end
 
+--- Returns true if the materials are installed.
+-- @return Boolean
 function ChromeEngine.AreMaterialsInstalled()
     return mat and matSq and not mat:IsError() and not matSq:IsError()
 end
 
+--- Initialize the object.
 function ChromeEngine:Initialize()
     self.Volume = nil
 end
 
+--- Allocates a display for the provided screen width and height.
+-- @return Width and height
 function ChromeEngine:AllocateScreen(screenWidth, screenHeight)    
-    if PlayX.IsSquare(screenWidth, screenHeight) then
+    if playxlib.IsSquare(screenWidth, screenHeight) then
         self.Material = matSq
         self.Texture = matSq:GetMaterialTexture("$basetexture")
         self.TextureID = surface.GetTextureID("playx/screen_sq")
@@ -75,6 +82,7 @@ function ChromeEngine:AllocateScreen(screenWidth, screenHeight)
 end
 
 --- Loads media.
+-- @param resource WebResource
 function ChromeEngine:Load(resource)
     self.Resource = resource
     
@@ -126,6 +134,7 @@ end
 
 --- Called by gm_chrome when the page has finished loading. We need to do
 -- our dirty work here.
+-- @hidden
 function ChromeEngine:onFinishLoading()
     -- Don't have to do much if it's a URL that we are loading
     if self.Resource:GetURL() then
@@ -143,13 +152,13 @@ document.body.style.overflow = 'hidden';
             self.Browser:Exec([[
 var script = document.createElement('script');
 script.type = 'text/javascript';
-script.src = ']] .. PlayX.JSEncode(self.Resource:GetScriptURL()) .. [[';
+script.src = ']] .. playxlib.JSEscape(self.Resource:GetScriptURL()) .. [[';
 document.body.appendChild(script);
     ]])
         -- Or set the HTML
         else
             self.Browser:Exec([[
-document.body.innerHTML = ']] .. PlayX.JSEncode(self.Resource:GetBody()) .. [[';
+document.body.innerHTML = ']] .. playxlib.JSEscape(self.Resource:GetBody()) .. [[';
     ]])
         end
         
@@ -166,15 +175,17 @@ document.body.style.overflow = 'hidden';
         self.Browser:Exec([[
 var style = document.createElement('style');
 style.type = 'text/css';
-style.styleSheet.cssText = ']] .. PlayX.JSEncode(self.Resource:GetCSS()) .. [[';
+style.styleSheet.cssText = ']] .. playxlib.JSEscape(self.Resource:GetCSS()) .. [[';
 document.getElementsByTagName('head')[0].appendChild(style);
     ]])
     end
 end
 
--- For gm_chrome
+--- @hidden
 function ChromeEngine:onBeginNavigation(url) end
+--- @hidden
 function ChromeEngine:onBeginLoading(url, status) end
+--- @hidden
 function ChromeEngine:onChangeFocus(focus) end
 
 list.Set("PlayXEngines", "ChromeEngine", ChromeEngine)

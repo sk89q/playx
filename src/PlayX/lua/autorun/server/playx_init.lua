@@ -17,13 +17,13 @@
 -- $Id$
 
 AddCSLuaFile("autorun/client/playx_init.lua")
-AddCSLuaFile("playx/functions.lua")
+AddCSLuaFile("playxlib.lua")
 AddCSLuaFile("playx/client/playx.lua")
 AddCSLuaFile("playx/client/bookmarks.lua")
 AddCSLuaFile("playx/client/handlers.lua")
 AddCSLuaFile("playx/client/panel.lua")
-AddCSLuaFile("playx/client/ui.lua")
 AddCSLuaFile("playx/client/engines/html.lua")
 AddCSLuaFile("playx/client/engines/gm_chrome.lua")
 
+include("playxlib.lua")
 include("playx/playx.lua")

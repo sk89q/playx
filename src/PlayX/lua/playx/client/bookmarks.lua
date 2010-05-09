@@ -16,112 +16,39 @@
 -- 
 -- $Id$
 
-PlayX.BookmarksWindow = nil
 PlayX.Bookmarks = {}
 
+local bookmarksWindow = nil
 local bookmarksWindowList = nil
 local advancedView = false
 
-local function ParseCSV(data)
-    local lines = string.Explode("\n", data:gsub("\r", ""))
-    local result = {}
-    
-    for i, line in pairs(lines) do
-        local line = line:Trim()
-        
-        if line ~= "" then
-	        local buffer = ""
-	        local escaped = false
-	        local inQuote = false
-	        local fields = {}
-	        
-	        for c = 1, #line do
-	            local char = line:sub(c, c)
-	            if escaped then
-	                buffer = buffer .. char
-	                escaped = false
-	            else
-	                if char == "\\" then
-	                    escaped = true
-	                elseif char == "\"" then
-	                    inQuote = not inQuote
-	                elseif char == "," then
-	                    if inQuote then
-	                        buffer = buffer .. char
-	                    else
-	                        table.insert(fields, buffer)
-	                        buffer = ""
-	                    end
-	                else
-	                    buffer = buffer .. char
-	                end
-	            end
-	        end
-	        
-	        table.insert(fields, buffer)
-	        table.insert(result, fields)
-	   end
-    end
-    
-    return result
+local Bookmark = playxlib.MakeClass()
+
+--- Construct a new bookmark.
+-- @param title Title of the bookmark
+-- @param provider Provider or an empty string
+-- @param uri URI
+-- @param keyword Keyword or empty string
+-- @param startAt Start at time as a string
+-- @param lowFramerate as a boolean
+-- @hidden
+function Bookmark:Initialize(title, provider, uri, keyword, startAt, lowFramerate)
+    self.Title = title
+    self.Provider = provider
+    self.URI = uri
+    self.Keyword = keyword
+    self.StartAt = startAt
+    self.LowFramerate = lowFramerate
+    self.Deleted = false
 end
 
-local function WriteCSV(data)
-    local output = ""
-    
-    for _, v in pairs(data) do
-        local line = ""
-        for _, p in pairs(v) do
-            if type(p) == 'boolean' then
-                line = line .. ",\"" .. (p and "true" or "false") .. "\""
-            else
-                line = line .. ",\"" .. tostring(p):gsub("[\"\\]", "\\%1") .. "\""
-            end
-        end
-        
-        output = output .. "\n" .. line:sub(2)
-    end
-    
-    return output:sub(2)
-end
-
-local function DoBookmarkDelete(bookmarks, line)
-    local title = line:GetValue(1)
-    
-    Derma_Query("Are you sure you want to delete '" .. title .. "'?",
-                "Delete Bookmark",
-                "Yes", function()
-                    local bookmark = PlayX.GetBookmark(title)
-                    if bookmark then
-                        bookmark:Delete()
-                        PlayX.SaveBookmarks()
-                    end
-                end,
-                "No", function() end)
-end
-
-local function IsTrue(s)
-    local s = s:lower():Trim()
-    return s == "t" or s == "true" or s == "1" or s == "y" or s == "yes"
-end
-
-local Bookmark = {}
-
-function Bookmark:new(title, provider, uri, keyword, startAt, lowFramerate)
-    local instance = {
-        ["Title"] = title,
-        ["Provider"] = provider,
-        ["URI"] = uri,
-        ["Keyword"] = keyword,
-        ["StartAt"] = startAt,
-        ["LowFramerate"] = lowFramerate,
-        ["Deleted"] = false,
-    }
-    setmetatable(instance, self)
-    self.__index = self
-    return instance
-end
-
+--- Updates a bookmark.
+-- @param title Title of the bookmark
+-- @param provider Provider or an empty string
+-- @param uri URI
+-- @param keyword Keyword or empty string
+-- @param startAt Start at time as a string
+-- @param lowFramerate as a boolean
 function Bookmark:Update(title, provider, uri, keyword, startAt, lowFramerate)
     if self.Deleted then
         Error("Operation performed on deleted bookmark")    
@@ -191,6 +118,7 @@ function Bookmark:Update(title, provider, uri, keyword, startAt, lowFramerate)
     return true
 end
 
+--- Deletes a bookmark.
 function Bookmark:Delete()
     self.Deleted = true
     
@@ -227,6 +155,7 @@ function Bookmark:Delete()
     return false
 end
 
+--- Plays a bookmark.
 function Bookmark:Play()
     if self.Deleted then
         Error("Operation performed on deleted bookmark")    
@@ -237,6 +166,24 @@ function Bookmark:Play()
                            GetConVar("playx_ignore_length"):GetBool())
 end
 
+--- Given a line in the bookmarks list view, delete the bookmark.
+-- @param line List view line
+local function ConfirmLineDelete(line)
+    local title = line:GetValue(1)
+    
+    Derma_Query("Are you sure you want to delete '" .. title .. "'?",
+                "Delete Bookmark",
+                "Yes", function()
+                    local bookmark = PlayX.GetBookmark(title)
+                    if bookmark then
+                        bookmark:Delete()
+                        PlayX.SaveBookmarks()
+                    end
+                end,
+                "No", function() end)
+end
+
+--- Loads bookmarks from file.
 function PlayX.LoadBookmarks()
     local data = file.Read("playx/bookmarks.txt")
     
@@ -262,14 +209,14 @@ Bittersweet,,http://youtube.com/watch?v=6ka3PdGdtro,,0:00,1
     
     PlayX.Bookmarks = {}
     
-    local result = ParseCSV(data)
+    local result = playxlib.ParseCSV(data)
     for k, v in pairs(result) do
-        local bookmark = Bookmark:new(v[1] and v[1] or "", -- Title
+        local bookmark = Bookmark(v[1] and v[1] or "", -- Title
                                       v[2] and v[2] or "", -- Provider
                                       v[3] and v[3] or "", -- URI
                                       v[4] and v[4] or "", -- Keyword
                                       v[5] and v[5] or "0:00", -- Start at
-                                      v[6] and IsTrue(v[6]) or false) -- Low framerate
+                                      v[6] and playxlib.IsTrue(v[6]) or false) -- Low framerate
         table.insert(PlayX.Bookmarks, bookmark)
     end
     
@@ -302,6 +249,7 @@ Bittersweet,,http://youtube.com/watch?v=6ka3PdGdtro,,0:00,1
     return true
 end
 
+--- Save bookmarks to file.
 function PlayX.SaveBookmarks()
     local data = {}
     
@@ -311,13 +259,20 @@ function PlayX.SaveBookmarks()
                             bookmark.LowFramerate})
     end
     
-    local output = WriteCSV(data)
+    local output = playxlib.WriteCSV(data)
     
     file.Write("playx/bookmarks.txt", output)
     
     return true
 end
 
+--- Adds a bookmark.
+-- @param title Title of the bookmark
+-- @param provider Provider or an empty string
+-- @param uri URI
+-- @param keyword Keyword or empty string
+-- @param startAt Start at time as a string
+-- @param lowFramerate as a boolean
 function PlayX.AddBookmark(title, provider, uri, keyword, startAt, lowFramerate)
     local title = title:Trim()
     local provider = provider:Trim()
@@ -342,7 +297,7 @@ function PlayX.AddBookmark(title, provider, uri, keyword, startAt, lowFramerate)
         end
     end
     
-    local bookmark = Bookmark:new(title, provider, uri, keyword, startAt, lowFramerate)
+    local bookmark = Bookmark(title, provider, uri, keyword, startAt, lowFramerate)
     table.insert(PlayX.Bookmarks, bookmark)
     
     -- Let's update the bookmarks panel
@@ -363,6 +318,9 @@ function PlayX.AddBookmark(title, provider, uri, keyword, startAt, lowFramerate)
     return true
 end
 
+--- Gets a bookmark by title; returns nil if not found.
+-- @param title Title of bookmark
+-- @return Bookmark object
 function PlayX.GetBookmark(title)
     for i, bookmark in pairs(PlayX.Bookmarks) do
         if title:lower() == bookmark.Title:lower() then
@@ -373,6 +331,9 @@ function PlayX.GetBookmark(title)
     return nil
 end
 
+--- Gets a bookmark by keyword; returns nil if not found.
+-- @param keyword Keyword
+-- @return Bookmark object
 function PlayX.GetBookmarkByKeyword(keyword)
     for i, bookmark in pairs(PlayX.Bookmarks) do
         if bookmark.Keyword ~= "" and 
@@ -384,15 +345,18 @@ function PlayX.GetBookmarkByKeyword(keyword)
     return nil
 end
 
+--- Opens the bookmark window. The title of the bookmark can be passed in
+-- order to have it automatically selected.
+-- @param selectTitle Title of bookmark to select
 function PlayX.OpenBookmarksWindow(selectTitle)
-    if PlayX.BookmarksWindow and PlayX.BookmarksWindow:IsValid() then
+    if PlayX.bookmarksWindow and PlayX.bookmarksWindow:IsValid() then
         return
     end
     
     local bookmarks = nil
     
     local frame = vgui.Create("DFrame")
-    PlayX.BookmarksWindow = frame
+    PlayX.bookmarksWindow = frame
     frame:SetTitle("Local PlayX Bookmarks")
     frame:SetDeleteOnClose(true)
     frame:SetScreenLock(true)
@@ -568,7 +532,7 @@ function PlayX.OpenBookmarksWindow(selectTitle)
     deleteButton.DoClick = function()
         if bookmarks:GetSelectedLine() then
             -- GetSelected() not working
-            DoBookmarkDelete(bookmarks, bookmarks:GetLine(bookmarks:GetSelectedLine()))
+            ConfirmLineDelete(bookmarks:GetLine(bookmarks:GetSelectedLine()))
         else
             Derma_Message("A bookmark is not selected.", "Error", "OK")
         end
@@ -632,7 +596,7 @@ function PlayX.OpenBookmarksWindow(selectTitle)
             frame:Close()
         end)
         menu:AddOption("Delete...", function()
-            DoBookmarkDelete(bookmarks, line)
+            ConfirmLineDelete(line)
         end)
         menu:AddOption("Copy URI", function()
             SetClipboardText(line:GetValue(2))

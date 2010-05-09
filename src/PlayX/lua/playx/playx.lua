@@ -21,7 +21,6 @@ require("datastream")
 local defHostURL = "http://sk89q.github.com/playx/host/host.html"
 local defJWURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
 
--- FCVAR_GAMEDLL makes cvar change detection work
 CreateConVar("playx_jw_url", defJWURL, {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
 CreateConVar("playx_host_url", defHostURL, {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
@@ -38,7 +37,7 @@ include("playx/providers.lua")
 include("playx/concmds.lua")
 
 --- Returns true if there are any PlayX entities.
--- @return
+-- @return Boolean
 function PlayX.PlayerExists()
     return table.Count(ents.FindByClass("gmod_playx")) > 0
 end
@@ -65,43 +64,44 @@ function PlayX.GetInstance(ply)
     return props[1]
 end
 
---- Get all the PlayX entities.
--- @return
+--- Get a table of all the PlayX entities.
+-- @return List of entities
 function PlayX.GetInstances()
     return ents.FindByClass("gmod_playx")
 end
 
 --- Checks whether the JW player is enabled.
--- @return Whether the JW player is enabled
+-- @return Boolean
 function PlayX.IsUsingJW()
     return GetConVar("playx_jw_url"):GetString():Trim():gmatch("^https?://.+") and true or false
 end
 
 --- Gets the URL of the JW player.
--- @return
+-- @return JW URL
 function PlayX.GetJWURL()
     return GetConVar("playx_jw_url"):GetString():Trim()
 end
 
 --- Returns whether the JW player supports YouTube.
--- @return
+-- @return Boolean
 function PlayX.JWPlayerSupportsYouTube()
     return GetConVar("playx_jw_youtube"):GetBool()
 end
 
 --- Gets the URL of the host file.
--- @return
+-- @return Host URL
 function PlayX.GetHostURL()
     return GetConVar("playx_host_url"):GetString():Trim()
 end
 
 --- Checks whether the host URL is valid.
--- @return Whether the host URL is valid
+-- @return Boolean
 function PlayX.HasValidHost()
     return PlayX.GetHostURL():Trim():gmatch("^https?://.+") and true or false
 end
 
---- Returns true if race protection is currently on.
+--- Returns true if something was recently played and race protection would
+-- prevent new media from being played.
 -- @return Boolean
 function PlayX.RaceProtectionTriggered()
     local time = GetConVar("playx_race_protection"):GetFloat()
@@ -121,11 +121,12 @@ end
 
 --- Returns whether a user is permitted to use the player.
 -- You can override this by creating a hook named PlayXPermitPlayer, taking in
--- two argments, a Player and the PlayX entity, and returning true or false.
--- Not that the entity argument may be optional.
+-- two arguments, a Player and the PlayX entity, and returning true or false.
+-- Not that the entity argument may not be passed. By default, this function
+-- only returns true if the user is an administrator or super administrator.
 -- @param ply Player
 -- @param ent Ent
--- @return
+-- @return Boolean
 function PlayX.IsPermitted(ply, ent)
     local r = hook.Call("PlayXPermitPlayer", ply)
     
@@ -136,12 +137,15 @@ function PlayX.IsPermitted(ply, ent)
     end
 end
 
---- Spawns the player at the location that a player is looking at. This
--- function will check whether there is already a player or not. If you are
+--- Spawns the player at the location that a player is looking at.
+-- This function will check whether there is already a player or not. If you are
 -- using this, you can override its behavior with a hook named PlayXSpawnPlayX.
+-- You do not need to use this function in order to spawn PlayX players -- you
+-- can do so by creating gmod_playx entity as you would create any entity
+-- normally.
 -- @param ply Player
 -- @param model Model path
--- @return Success, and error message
+-- @return Boolean indicating success or error and error message if error
 function PlayX.SpawnForPlayer(ply, model)
     if not util.IsValidModel(model) then
         return false, "The server doesn't have the selected model"
@@ -202,7 +206,7 @@ function PlayX.SpawnForPlayer(ply, model)
         end
     -- Error?
     elseif pos == false then
-        return false, ang
+        return false
     -- Custom spawn location
     else
         ent = ents.Create("gmod_playx")
@@ -234,7 +238,7 @@ end
 -- @param provider
 -- @param uri
 -- @param useJW
--- @return Result
+-- @return Result or false on failure, error message, resolved provider name
 function PlayX.ResolveProvider(provider, uri, useJW)
     -- See if there is a hook for resolving providers
     local result = hook.Call("PlayXResolveProvider", false, provider, uri, useJW)
@@ -276,13 +280,21 @@ function PlayX.ResolveProvider(provider, uri, useJW)
     return result, nil, provider
 end
 
+--- Gets a provider by name.
+-- @param id ID of provider
+-- @return Provider function or nil
 function PlayX.GetProvider(id)
     return list.Get("PlayXProviders")[id]
 end
 
-function PlayX.GetAutoSubscribers()
+--- Returns a list of users that should be automatically subscribed to a player.
+-- This function is called when the PlayX entity is created in order to get
+-- the list of initial subscribers. By default, this function will either
+-- return all players or players within the auto-subscribe radius. Override the
+-- behavior of this function using the hook PlayXGetAutoSubscribers.
+function PlayX.GetAutoSubscribers(ent)
     return player.GetAll()
-    -- @TODO: Change
+    -- TODO: Change
 end
 
 --- Sends an error to the client.
