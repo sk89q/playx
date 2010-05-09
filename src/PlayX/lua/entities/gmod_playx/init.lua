@@ -92,6 +92,13 @@ function ENT:HasMedia()
     return self.Media ~= nil
 end
 
+--- Returns true if the current media is resumable. If there is no media, then
+-- this function will return false.
+-- @return Boolean
+function ENT:IsResumable()
+    return self.Media ~= nil and self.Media.Resumable
+end
+
 --- Subscribes a user to this player. A subscribed user will see the
 -- videos and media playing on this player. If there is already
 -- something playing, then the newly subscribed user will have the media
@@ -255,7 +262,6 @@ function ENT:BeginMedia(handler, arguments, start, resumable,
 end
 
 --- Stops playing.
--- @hidden
 function ENT:CloseMedia()
     if self.Media then
         self:EndMedia()
@@ -266,7 +272,8 @@ function ENT:CloseMedia()
     end
 end
 
---- Stops playing. You probably should be calling ENT:CloseMedia()
+--- Internal method to stop playing. You probably should be calling
+-- ENT:CloseMedia().
 -- @hidden
 function ENT:EndMedia()
     self.Media = nil

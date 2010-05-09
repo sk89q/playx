@@ -34,6 +34,7 @@ PlayX = {}
 
 include("playx/functions.lua")
 include("playx/providers.lua")
+include("playx/timers.lua")
 include("playx/concmds.lua")
 
 --- Returns true if there are any PlayX entities.
@@ -98,6 +99,30 @@ end
 -- @return Boolean
 function PlayX.HasValidHost()
     return PlayX.GetHostURL():Trim():gmatch("^https?://.+") and true or false
+end
+
+--- Returns true if any PlayX instance has media playing.
+-- @return Boolean
+function PlayX.HasMedia()
+    for _, instance in pairs(PlayX.GetInstances()) do
+        if instance:HasMedia() then
+            return true
+        end
+    end
+    
+    return false
+end
+
+--- Returns true if any PlayX instance has resumable media.
+-- @return Boolean
+function PlayX.HasResumable()
+    for _, instance in pairs(PlayX.GetInstances()) do
+        if instance:IsResumable() then
+            return true
+        end
+    end
+    
+    return false
 end
 
 --- Returns true if something was recently played and race protection would
@@ -346,7 +371,43 @@ function PlayerInitialSpawn(ply)
     end
 end
 
+--- Called on game mode hook PlayerAuthed.
+function PlayerAuthed(ply, steamID, uniqueID)
+    if PlayX.CurrentMedia and PlayX.AdminTimeoutTimerRunning then
+        if PlayX.IsPermitted(ply) then
+            print("PlayX: Administrator authed (connecting); killing timeout")
+            
+            timer.Stop("PlayXAdminTimeout")
+            PlayX.AdminTimeoutTimerRunning = false
+        end
+    end
+end
+
+--- Called on game mode hook PlayerDisconnected.
+function PlayerDisconnected(ply)
+    if not PlayX.CurrentMedia then return end
+    if PlayX.AdminTimeoutTimerRunning then return end
+    
+    for _, v in pairs(player.GetAll()) do
+        if v ~= ply and PlayX.IsPermitted(v) then return end
+    end
+    
+    -- No timer, no admin, no soup for you
+    local timeout = GetConVar("playx_admin_timeout"):GetFloat()
+    
+    if timeout > 0 then
+        print(string.format("PlayX: No admin on server; setting timeout for %fs", timeout))
+        
+        timer.Adjust("PlayXAdminTimeout", timeout, 1)
+        timer.Start("PlayXAdminTimeout")
+        
+        PlayX.AdminTimeoutTimerRunning = true
+    end
+end
+
 hook.Add("PlayerInitialSpawn", "PlayXPlayerInitialSpawn", PlayerInitialSpawn)
+hook.Add("PlayerAuthed", "PlayXPlayerPlayerAuthed", PlayerAuthed)
+hook.Add("PlayerDisconnected", "PlayXPlayerDisconnected", PlayerDisconnected)
 
 cvars.AddChangeCallback("playx_jw_url", ReplicateVar)
 cvars.AddChangeCallback("playx_host_url", ReplicateVar)
