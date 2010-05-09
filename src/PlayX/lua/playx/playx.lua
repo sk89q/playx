@@ -32,7 +32,6 @@ CreateConVar("playx_wire_input_delay", "2", {FCVAR_ARCHIVE})
 
 PlayX = {}
 
-include("playx/functions.lua")
 include("playx/providers.lua")
 include("playx/timers.lua")
 include("playx/concmds.lua")

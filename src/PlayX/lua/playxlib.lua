@@ -16,6 +16,8 @@
 -- 
 -- $Id$
 
+playxlib = {}
+
 --- Makes a psuedo class. A table is returned that you should extend.
 -- New instances of this class can be created by calling the class table
 -- itself (i.e. SomeClass()). Initialize() will be called and the arguments

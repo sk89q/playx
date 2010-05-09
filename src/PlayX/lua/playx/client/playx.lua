@@ -460,7 +460,7 @@ end
 
 --- Called on playx_volume change.
 local function VolumeChangeCallback(cvar, old, new)
-    hook.Call("PlayXVolumeChanged", nil, {PlayX.GetPlayerVolume()})
+    hook.Call("PlayXVolumeChanged", nil, PlayX.GetPlayerVolume())
     
     for _, instance in pairs(PlayX.GetInstances()) do
         instance:UpdateVolume()
