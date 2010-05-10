@@ -75,7 +75,7 @@ end
 -- @return Time in seconds
 function ENT:GetElapsedTime()
     if self:HasMedia() then
-        return SysTime() - self.Media.StartTime
+        return RealTime() - self.Media.StartTime
     end
 end
 

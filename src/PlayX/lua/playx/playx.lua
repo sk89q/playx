@@ -137,7 +137,7 @@ function PlayX.RaceProtectionTriggered()
     local time = GetConVar("playx_race_protection"):GetFloat()
     
     if time > 0 then
-        local check = SysTime() - time
+        local check = RealTime() - time
         
         for _, v in pairs(PlayX.GetInstances()) do
             if v.LastBeginTime and v.LastBeginTime > check then

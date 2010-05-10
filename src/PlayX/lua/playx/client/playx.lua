@@ -386,7 +386,7 @@ local function HandleBeginMessage(_, id, encoded, decoded)
     local playAge = decoded.PlayAge
     local resumable = decoded.Resumable
     local lowFramerate = decoded.LowFramerate
-    local startTime = SysTime() - playAge
+    local startTime = RealTime() - playAge
     
     MsgN("PlayX: Received PlayXBegin with handler " .. handler)
     
