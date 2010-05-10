@@ -60,7 +60,7 @@ local function PlayerAuthed(ply, steamID, uniqueID)
     -- Timers may not run when there are no players connected, so let's
     -- go through the list of timers and see if any are supposed to be expired
     for u, t in pairs(timers) do
-        if t[1] < os.time() then
+        if t[1] < RealTime() then
 	        AdminTimeoutTimer(t[2], u)
         end
     end
@@ -112,7 +112,7 @@ local function PlayerDisconnected(ply)
     local timerId = "PlayXAdminTimeout" .. ply:UniqueID()
     
     timer.Create(timerId, timeout, 1, AdminTimeoutTimer, hasAccess, ply:UniqueID())
-    timers[ply:UniqueID()] = {os.time() + timeout, hasAccess}
+    timers[ply:UniqueID()] = {RealTime() + timeout, hasAccess}
 end
 
 hook.Add("PlayerAuthed", "PlayXPlayerPlayerAuthed", PlayerAuthed)
