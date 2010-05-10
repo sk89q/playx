@@ -32,7 +32,6 @@ CreateClientConVar("playx_error_windows", 1, true, false)
 
 PlayX = {}
 
-include("playx/functions.lua")
 include("playx/client/bookmarks.lua")
 include("playx/client/handlers.lua")
 include("playx/client/panel.lua")
