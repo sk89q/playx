@@ -175,7 +175,8 @@ end
 -- normally.
 -- @param ply Player
 -- @param model Model path
--- @return Boolean indicating success or error and error message if error
+-- @return Boolean indicating success or error
+-- @return Error message on error and if available
 function PlayX.SpawnForPlayer(ply, model)
     if not util.IsValidModel(model) then
         return false, "The server doesn't have the selected model"
@@ -268,7 +269,9 @@ end
 -- @param provider
 -- @param uri
 -- @param useJW
--- @return Result or false on failure, error message, resolved provider name
+-- @return Provider result table or false on error
+-- @return Error message on error and if available
+-- @return Resolved provider name, if successful
 function PlayX.ResolveProvider(provider, uri, useJW)
     -- See if there is a hook for resolving providers
     local result = hook.Call("PlayXResolveProvider", GAMEMODE, provider, uri, useJW)
