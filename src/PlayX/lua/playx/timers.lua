@@ -70,7 +70,8 @@ end
 local function PlayerDisconnected(ply)
     if not PlayX.HasMedia() then return end
     
-    local timeout = GetConVar("playx_admin_timeout"):GetFloat()
+    local timeout = hook.Call("PlayXGetAdminTimeout", nil) or
+        GetConVar("playx_admin_timeout"):GetFloat()
     
     -- No timer, no admin, no soup for you
     if timeout < 0 then
@@ -90,6 +91,7 @@ local function PlayerDisconnected(ply)
     end
     
     for _, instance in pairs(hasAccess) do
+        if hook.Call("PlayXShouldAdminTimeout", nil, instance) ~= false
         for _, v in pairs(player.GetAll()) do
             -- Does someone else have permission to use this player? If so,
             -- then it doesn't matter if this user has left
