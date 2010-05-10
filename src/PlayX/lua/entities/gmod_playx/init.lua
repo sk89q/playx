@@ -25,6 +25,7 @@ include("shared.lua")
 ENT.Subscribed = {}
 ENT.Media = nil
 ENT.LastBeginTime = nil
+ENT.IsProjector = false
 ENT.InputProvider = ""
 ENT.InputURI = ""
 ENT.InputStartAt = 0
@@ -83,6 +84,70 @@ function ENT:Initialize()
     
     for _, ply in pairs(PlayX.GetAutoSubscribers(self)) do
         self:Subscribe(ply)
+    end
+    
+    self:CalculateScreenBounds()
+end
+
+--- Figures out if the entity is a projector.
+-- @hidden
+function ENT:CalculateScreenBounds()
+    local model = self.Entity:GetModel()
+    local info = PlayXScreens[model:lower()]
+    
+    -- Is this a pre-defined screen?
+    if info then
+        self.IsProjector = info.IsProjector
+    else
+        self.IsProjector = false
+    end
+end
+
+--- Returns the position from which the projector is projecting from if it's
+-- a projector, otherwise it returns the screen position. 
+-- @return Position
+-- @return Normal
+function ENT:GetSourcePos()
+    if self.IsProjector then
+        return self.Entity:GetPos() + self.Entity:OBBCenter()
+    else
+        -- This is not right
+        local p = self.ScreenOffset
+        return self.Entity:LocalToWorld(p)
+    end
+end
+
+--- Gets the projector's screen position, or if it's not a projector, a psuedo
+-- projection line endpoint.
+-- If the entity is not a projector then nil will be returned. 
+-- @return Position
+-- @return Normal
+-- @return Boolean indicating whether a screen is showing
+function ENT:GetProjectionPos()
+    if self.IsProjector then
+        local excludeEntities = player.GetAll()
+        table.insert(excludeEntities, self.Entity)
+        
+        local dir = self.Entity:GetForward() * self.Forward * 4000 +
+                    self.Entity:GetRight() * self.Right * 4000 +
+                    self.Entity:GetUp() * self.Up * 4000
+        local tr = util.QuickTrace(self.Entity:LocalToWorld(self.Entity:OBBCenter()),
+                                   dir, excludeEntities)
+        
+        if tr.Hit then
+            return tr.HitPos, tr.HitNormal, true
+        else
+            return tr.HitPos, tr.HitNormal, false
+        end
+    else
+        local ang = self.Entity:GetAngles()
+        
+        ang:RotateAroundAxis(ang:Right(), self.Right)
+        ang:RotateAroundAxis(ang:Up(), self.Up)
+        ang:RotateAroundAxis(ang:Forward(), self.Forward)
+        
+        return self:GetSourcePos() + ang:Up() *
+            (10 * (self.DrawWidth * self.DrawHeight * self.DrawScale) ^ 0.3)
     end
 end
 
