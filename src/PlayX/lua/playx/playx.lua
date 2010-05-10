@@ -36,6 +36,12 @@ include("playx/providers.lua")
 include("playx/timers.lua")
 include("playx/concmds.lua")
 
+--- Used to log a message to the server console regarding PlayX.
+-- @param msg Message
+function PlayX.Log(msg)
+    MsgN(string.format("PlayX: %s", msg)) 
+end
+
 --- Returns true if there are any PlayX entities.
 -- @return Boolean
 function PlayX.PlayerExists()
@@ -131,7 +137,7 @@ function PlayX.RaceProtectionTriggered()
     local time = GetConVar("playx_race_protection"):GetFloat()
     
     if time > 0 then
-        local check = CurTime() - time
+        local check = SysTime() - time
         
         for _, v in pairs(PlayX.GetInstances()) do
             if v.LastBeginTime and v.LastBeginTime > check then
