@@ -550,6 +550,12 @@ function ENT:TriggerInput(iname, value)
     end
 end
 
+--- Determines the visibility of the entity to the client.
+-- @hidden
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
+end
+
 --- Removes the entity.
 -- @hidden
 function ENT:OnRemove()
