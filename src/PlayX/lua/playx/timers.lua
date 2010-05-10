@@ -24,7 +24,7 @@ local function AdminTimeoutTimer(instances, uniqueId)
     local valid = {}
     
     for _, instance in pairs(instances) do
-        if ValidEntity(instance) and
+        if ValidEntity(instance) and hook.Call("PlayXShouldAdminTimeout", GAMEMODE, instance) ~= false and
             not PlayX.IgnoresAdminTimeout(instance) and
             instance:HasMedia() then
                   
@@ -91,14 +91,15 @@ local function PlayerDisconnected(ply)
     end
     
     for _, instance in pairs(hasAccess) do
-        if hook.Call("PlayXShouldAdminTimeout", GAMEMODE, instance) ~= false
-        for _, v in pairs(player.GetAll()) do
-            -- Does someone else have permission to use this player? If so,
-            -- then it doesn't matter if this user has left
-            if v ~= ply and PlayX.IsPermitted(v, ent) then
-                table.remove(hasAccess, instance)
-            end
-        end
+        if hook.Call("PlayXShouldAdminTimeout", GAMEMODE, instance) ~= false then
+	        for _, v in pairs(player.GetAll()) do
+	            -- Does someone else have permission to use this player? If so,
+	            -- then it doesn't matter if this user has left
+	            if v ~= ply and PlayX.IsPermitted(v, ent) then
+	                table.remove(hasAccess, instance)
+	            end
+	        end
+	    end
     end
     
     if #hasAccess == 0 then
