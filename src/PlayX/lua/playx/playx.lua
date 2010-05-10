@@ -54,7 +54,7 @@ end
 -- @param ply Optional player argument
 -- @return Entity or nil
 function PlayX.GetInstance(ply)
-    local instance = hook.Call("PlayXGetInstance", false, ply)
+    local instance = hook.Call("PlayXGetInstance", GAMEMODE, ply)
     
     if ValidEntity(instance) then
         return instance
@@ -152,7 +152,7 @@ end
 -- @param ent Ent
 -- @return Boolean
 function PlayX.IsPermitted(ply, ent)
-    local r = hook.Call("PlayXPermitPlayer", ply)
+    local r = hook.Call("PlayXPermitPlayer", GAMEMODE)
     
     if r ~= nil then
         return r
@@ -175,7 +175,7 @@ function PlayX.SpawnForPlayer(ply, model)
         return false, "The server doesn't have the selected model"
     end
     
-    local pos, ang = hook.Call("PlayXSpawnPlayX", ply, model)
+    local pos, ang = hook.Call("PlayXSpawnPlayX", GAMEMODE, model)
     local ent
     
     -- No hook?
@@ -265,7 +265,7 @@ end
 -- @return Result or false on failure, error message, resolved provider name
 function PlayX.ResolveProvider(provider, uri, useJW)
     -- See if there is a hook for resolving providers
-    local result = hook.Call("PlayXResolveProvider", false, provider, uri, useJW)
+    local result = hook.Call("PlayXResolveProvider", GAMEMODE, provider, uri, useJW)
     
     if result then
         return result
@@ -364,7 +364,7 @@ function PlayerInitialSpawn(ply)
     local instances = PlayX.GetInstances()
     
     for _, instance in pairs(instances) do
-        if hook.Call("PlayXShouldSubscribe", false, ply, instance) then
+        if hook.Call("PlayXShouldSubscribe", GAMEMODE, ply, instance) then
             instance:Subscribe(ply)
         end
     end

@@ -48,7 +48,7 @@ local function AdminTimeoutTimer(instances, uniqueId)
         MsgN(string.format("PlayX: No administrators of %d instance(s); timing out media",
                            #valid))
         
-        hook.Call("PlayXAdminTimeout", nil, instances)
+        hook.Call("PlayXAdminTimeout", GAMEMODE, instances)
     end
 end
 
@@ -70,7 +70,7 @@ end
 local function PlayerDisconnected(ply)
     if not PlayX.HasMedia() then return end
     
-    local timeout = hook.Call("PlayXGetAdminTimeout", nil) or
+    local timeout = hook.Call("PlayXGetAdminTimeout", GAMEMODE) or
         GetConVar("playx_admin_timeout"):GetFloat()
     
     -- No timer, no admin, no soup for you
@@ -91,7 +91,7 @@ local function PlayerDisconnected(ply)
     end
     
     for _, instance in pairs(hasAccess) do
-        if hook.Call("PlayXShouldAdminTimeout", nil, instance) ~= false
+        if hook.Call("PlayXShouldAdminTimeout", GAMEMODE, instance) ~= false
         for _, v in pairs(player.GetAll()) do
             -- Does someone else have permission to use this player? If so,
             -- then it doesn't matter if this user has left

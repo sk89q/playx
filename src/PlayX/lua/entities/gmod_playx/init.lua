@@ -115,7 +115,7 @@ function ENT:Subscribe(ply)
             self:SendBeginMessage(ply)
         end
         
-        hook.Call("PlayXSubscribe", false, self, ply)
+        hook.Call("PlayXSubscribe", GAMEMODE, self, ply)
     end
 end
 
@@ -133,7 +133,7 @@ function ENT:Unsubscribe(ply)
             self:SendEndMessage(ply)
         end
         
-        hook.Call("PlayXUnsubscribe", false, self, ply)
+        hook.Call("PlayXUnsubscribe", GAMEMODE, self, ply)
     end
 end
 
@@ -254,7 +254,7 @@ function ENT:BeginMedia(handler, arguments, start, resumable,
     
     self:UpdateMetadata() -- Trigger Wiremod outputs
     
-    hook.Call("PlayXMediaBegin", false, self, self.Media)
+    hook.Call("PlayXMediaBegin", GAMEMODE, self, self.Media)
     
     self:SendBeginMessage()
     
@@ -280,7 +280,7 @@ function ENT:EndMedia()
     
     self:UpdateMetadata() -- Trigger Wiremod outputs
     
-    hook.Call("PlayXMediaEnd", false, self)
+    hook.Call("PlayXMediaEnd", GAMEMODE, self)
     
     self:SendEndMessage()
 end
@@ -351,7 +351,7 @@ function ENT:UpdateMetadata(data)
 	    
         self:SetWireMetadata(self.Media)
 	    
-	    hook.Call("PlayXMetadataReceived", false, self, self.Media, data)
+	    hook.Call("PlayXMetadataReceived", GAMEMODE, self, self.Media, data)
     else
         self:ClearWireOutputs()
     end

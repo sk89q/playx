@@ -126,7 +126,7 @@ end
 function PlayX.ResolveHandler(handler, args, screenWidth, screenHeight,
                               start, volume)
     -- See if there is a hook for resolving handlers
-    local result = hook.Call("PlayXResolveHandler", false, handler)
+    local result = hook.Call("PlayXResolveHandler", GAMEMODE, handler)
     
     if result then
         return result
@@ -362,7 +362,7 @@ end
 -- @param err
 function PlayX.ShowError(err)
     -- See if there is a hook for showing errors
-    if hook.Call("PlayXShowError", false, err) ~= nil then
+    if hook.Call("PlayXShowError", GAMEMODE, err) ~= nil then
         return
     end
 
@@ -459,7 +459,7 @@ end
 
 --- Called on playx_volume change.
 local function VolumeChangeCallback(cvar, old, new)
-    hook.Call("PlayXVolumeChanged", nil, PlayX.GetPlayerVolume())
+    hook.Call("PlayXVolumeChanged", GAMEMODE, PlayX.GetPlayerVolume())
     
     for _, instance in pairs(PlayX.GetInstances()) do
         instance:UpdateVolume()
