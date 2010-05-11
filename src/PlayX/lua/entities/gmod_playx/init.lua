@@ -91,6 +91,12 @@ function ENT:Initialize()
     PlayX.HandleEntityChange()
 end
 
+--- Used to log a message to the server console regarding this entity.
+-- @param msg Message
+function ENT:Log(msg)
+    PlayX.Log(string.format("#%d: %s", self.Entity:EntIndex(), msg)) 
+end
+
 --- Returns play status.
 -- @return Boolean
 function ENT:HasMedia()
@@ -212,12 +218,12 @@ function ENT:OpenMedia(provider, uri, start, lowFramerate, useJW, noTimeout)
     
     if result.MetadataFunc then
         local successFunc = function(data)
-            MsgN(Format("PlayX: Received metadata for provider %s", provider)) 
+            self:Log(Format("Received metadata for provider %s", provider)) 
             self:UpdateMetadata(data)
         end
         
         local errorFunc = function(err)
-            MsgN(Format("PlayX: Metadata failed for provider %s: %s", provider, err))
+            self:Log(Format("Metadata failed for provider %s: %s", provider, err))
         end
         
         result.MetadataFunc(successFunc, errorFunc)
@@ -237,6 +243,14 @@ end
 function ENT:BeginMedia(handler, arguments, start, resumable,
                         lowFramerate, length)
     self.LastBeginTime = RealTime()
+    
+    -- No standard here, but let's try URI and URL
+    if arguments.URI or arguments.URL then
+        self:Log("Media beginning with handler " .. handler .. 
+            " (" .. (arguments.URI or arguments.URL) .. ")")
+    else
+        self:Log("Media beginning with handler " .. handler)
+    end
     
     local arguments = arguments or {}
     local start = start or 0
@@ -307,14 +321,20 @@ end
 --- Internal method to stop playing. You probably should be calling
 -- ENT:CloseMedia().
 -- @hidden
-function ENT:EndMedia()
+function ENT:EndMedia(forExpiration, forFinish)
     self.Media = nil
+    
+    self:Log("Media ended")
     
     self:UpdateMetadata() -- Trigger Wiremod outputs
     
     -- Timer killin' time
-    timer.Remove("PlayXMediaFinish" .. self.Entity:EntIndex())
-    timer.Remove("PlayXMediaExpiration" .. self.Entity:EntIndex())
+    if not forFinish then
+        timer.Remove("PlayXMediaFinish" .. self.Entity:EntIndex())
+    end
+    if not forExpiration then
+        timer.Remove("PlayXMediaExpiration" .. self.Entity:EntIndex())
+    end
     
     hook.Call("PlayXMediaEnd", GAMEMODE, self)
     
@@ -422,12 +442,26 @@ function ENT:HandleMediaFinish()
     
     if delay >= 0 then
         if delay == 0 then
-            self:EndMedia()
+            self:Log("Media finished (length was " .. self.Media.Length .. "s); expiring immediately")
+            
+            self:EndMedia(false, true)
         else
+	        self:Log("Media finished (length was " .. self.Media.Length .. "s); expiring in " .. delay .. "s")
+	        
 	        local timerID = "PlayXMediaExpiration" .. self.Entity:EntIndex()
-            timer.Create(timerID, delay, 1, function() self:ExpireMedia() end)
+            timer.Create(timerID, delay, 1, function() self:ExpireMedia(delay) end)
         end
+    else
+	    self:Log("Media finished (length was " .. self.Media.Length .. "s)")
     end
+end
+
+--- Called to expire the media.
+-- @hidden
+function ENT:ExpireMedia()
+    self:EndMedia(true, false)
+    
+    self:Log("Media expired")
 end
 
 --- Set the bounds for non-projector screens.
@@ -567,7 +601,7 @@ function ENT:TriggerInput(iname, value)
                 elseif start < 0 then
                     Wire_TriggerOutput(self.Entity, "InputError", "Non-negative start time is required")
                 else
-                    MsgN(string.format("Video played via wire input: %s", uri))
+                    self:Log(string.format("Video played via wire input: %s", uri))
                     
                     local result, err = self:OpenMedia(provider, uri, start,
                                                        forceLowFramerate, useJW,
@@ -605,8 +639,8 @@ end
 function ENT:OnRemove()
     -- Timer killin' time
     timer.Remove("PlayXMediaFinish" .. self.Entity:EntIndex())
-    timer.Remove("PlayXMediaExpiration" .. self.Entity:EntIndex())
-    
+    timer.Remove("PlayXMediaExpiration" .. self.Entity:EntIndex())  
+      
     PlayX.HandleEntityChange()
 end
 
