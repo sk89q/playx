@@ -82,73 +82,13 @@ function ENT:Initialize()
         self:ClearWireOutputs()
     end
     
+    self:CalculateScreenBounds()
+    
     for _, ply in pairs(PlayX.GetAutoSubscribers(self)) do
         self:Subscribe(ply)
     end
     
-    self:CalculateScreenBounds()
-end
-
---- Figures out if the entity is a projector.
--- @hidden
-function ENT:CalculateScreenBounds()
-    local model = self.Entity:GetModel()
-    local info = PlayXScreens[model:lower()]
-    
-    -- Is this a pre-defined screen?
-    if info then
-        self.IsProjector = info.IsProjector
-    else
-        self.IsProjector = false
-    end
-end
-
---- Returns the position from which the projector is projecting from if it's
--- a projector, otherwise it returns the screen position. 
--- @return Position
--- @return Normal
-function ENT:GetSourcePos()
-    if self.IsProjector then
-        return self.Entity:GetPos() + self.Entity:OBBCenter()
-    else
-        -- This is not right
-        local p = self.ScreenOffset
-        return self.Entity:LocalToWorld(p)
-    end
-end
-
---- Gets the projector's screen position, or if it's not a projector, a psuedo
--- projection line endpoint.
--- If the entity is not a projector then nil will be returned. 
--- @return Position
--- @return Normal
--- @return Boolean indicating whether a screen is showing
-function ENT:GetProjectionPos()
-    if self.IsProjector then
-        local excludeEntities = player.GetAll()
-        table.insert(excludeEntities, self.Entity)
-        
-        local dir = self.Entity:GetForward() * self.Forward * 4000 +
-                    self.Entity:GetRight() * self.Right * 4000 +
-                    self.Entity:GetUp() * self.Up * 4000
-        local tr = util.QuickTrace(self.Entity:LocalToWorld(self.Entity:OBBCenter()),
-                                   dir, excludeEntities)
-        
-        if tr.Hit then
-            return tr.HitPos, tr.HitNormal, true
-        else
-            return tr.HitPos, tr.HitNormal, false
-        end
-    else
-        local ang = self.Entity:GetAngles()
-        
-        ang:RotateAroundAxis(ang:Right(), self.Right)
-        ang:RotateAroundAxis(ang:Up(), self.Up)
-        ang:RotateAroundAxis(ang:Forward(), self.Forward)
-        
-        return self:GetSourcePos() + ang:Up() *
-            (10 * (self.DrawWidth * self.DrawHeight * self.DrawScale) ^ 0.3)
-    end
+    PlayX.HandleEntityChange()
 end
 
 --- Returns play status.
@@ -230,6 +170,12 @@ function ENT:GetSubscribers()
     end
     
     return players
+end
+
+--- Returns whether a player is subscribed.
+-- @return Boolean
+function ENT:IsSubscribed(ply)
+    return self.Subscribed[ply] and true or false
 end
 
 --- Opens a media file to be played, accepting a provider and/or URI.
@@ -484,6 +430,26 @@ function ENT:HandleMediaFinish()
     end
 end
 
+--- Set the bounds for non-projector screens.
+-- @param pos Offset
+-- @param width
+-- @param height
+-- @param right
+-- @param up
+-- @param forward
+-- @hidden
+function ENT:SetScreenBounds(pos, width, height, right, up, forward)
+    self.IsProjector = pos == nil
+    
+    self.ScreenOffset = pos
+    self.ScreenWidth = width
+    self.ScreenHeight = height
+    
+    self.Right = right
+    self.Up = up
+    self.Forward = forward
+end
+
 --- Returns true if wire input protection would have been triggered.
 -- @return Boolean
 function ENT:WireInputProtectionTriggered()
@@ -640,6 +606,8 @@ function ENT:OnRemove()
     -- Timer killin' time
     timer.Remove("PlayXMediaFinish" .. self.Entity:EntIndex())
     timer.Remove("PlayXMediaExpiration" .. self.Entity:EntIndex())
+    
+    PlayX.HandleEntityChange()
 end
 
 --- Duplicator function.

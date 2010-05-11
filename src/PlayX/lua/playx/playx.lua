@@ -24,6 +24,8 @@ local defJWURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
 CreateConVar("playx_jw_url", defJWURL, {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
 CreateConVar("playx_host_url", defHostURL, {FCVAR_ARCHIVE, FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
+CreateConVar("playx_autosubscribe_radius", "3000", {FCVAR_ARCHIVE})
+CreateConVar("playx_autosubscribe_buffer", "1000", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
 CreateConVar("playx_race_protection", "1", {FCVAR_ARCHIVE})
@@ -326,8 +328,29 @@ end
 -- return all players or players within the auto-subscribe radius. Override the
 -- behavior of this function using the hook PlayXGetAutoSubscribers.
 function PlayX.GetAutoSubscribers(ent)
-    return player.GetAll()
-    -- TODO: Change
+    local subscribers = hook.Call("PlayXGetAutoSubscribers", GAMEMODE, ent)
+    
+    if subscribers ~= nil then
+        return subscribers
+    else
+        local radius = GetConVar("playx_autosubscribe_radius"):GetFloat()
+        
+        if radius > 0 then
+            local subscribers = {}
+            
+            for _, ply in pairs(player.GetAll()) do
+                if playxlib.PointLineSegmentDistance(
+                    ent:GetSourcePos(), ent:GetProjectionPos(),
+                    ply:GetPos()) < radius then
+                    table.insert(subscribers, ply)
+                end
+            end
+            
+            return subscribers
+        else
+            return player.GetAll()
+        end
+    end
 end
 
 --- Sends an error to the client.
@@ -351,6 +374,45 @@ function PlayX.SendSpawnDialog(ply)
     else
         umsg.Start("PlayXSpawnDialog", ply)
         umsg.End()
+    end
+end
+
+--- Timer function to subscribe based on radius.
+local function SubscribeRadius()
+    local radius = GetConVar("playx_autosubscribe_radius"):GetFloat()
+    local buffer = GetConVar("playx_autosubscribe_buffer"):GetFloat()
+    
+    for _, instance in pairs(PlayX.GetInstances()) do
+        for _, ply in pairs(player.GetAll()) do
+            local distance = 
+                playxlib.PointLineSegmentDistance(
+                    instance:GetSourcePos(),
+                    instance:GetProjectionPos(),
+                    ply:GetPos()
+                )
+            
+            if distance < radius and not instance:IsSubscribed(ply) then
+                instance:Subscribe(ply)
+            elseif distance > radius + buffer and instance:IsSubscribed(ply) then
+                instance:Unsubscribe(ply)            
+            end
+        end
+    end
+end
+
+--- Internal method to catch PlayX entity creations/removals.
+-- @hidden
+function PlayX.HandleEntityChange()
+    if PlayX.PlayerExists() then
+        local radius = GetConVar("playx_autosubscribe_radius"):GetFloat()
+        
+        if radius > 0 then
+	        timer.Create("PlayXSubscribeRadius", 1, 0, SubscribeRadius)
+	    else
+            timer.Remove("PlayXSubscribeRadius")
+	    end
+    else
+        timer.Remove("PlayXSubscribeRadius")
     end
 end
 
