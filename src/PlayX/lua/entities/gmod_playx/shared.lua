@@ -60,6 +60,9 @@ PlayXScreens = {
         ["Right"] = 0,    
         ["Up"] = 0,
     },
+    ["models/props_lab/citizenradio.mdl"] = {
+        ["NoScreen"] = true,
+    },
 }
 
 cleanup.Register("gmod_playx")

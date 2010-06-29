@@ -38,6 +38,7 @@ function ENT:Initialize()
     self.LowFramerateMode = false
     self.DrawCenter = false
     self.ProcMat = nil
+    self.NoScreen = false
     
     self:UpdateScreenBounds()
 end
@@ -47,7 +48,12 @@ function ENT:UpdateScreenBounds()
     local info = PlayXScreens[model:lower()]
     
     if info then
-        if info.IsProjector then
+        self.NoScreen = false
+        
+        if info.NoScreen then
+            self.NoScreen = true
+            self:SetProjectorBounds(0, 0, 0)
+        elseif info.IsProjector then
             self:SetProjectorBounds(info.Forward, info.Right, info.Up)
         else
             local rotateAroundRight = info.RotateAroundRight
@@ -297,6 +303,8 @@ end
 
 function ENT:Draw()
     self.Entity:DrawModel()
+    
+    if self.NoScreen then return end
     
     if self.DrawScale then
         if not self.UsingChrome and self.Browser and self.Browser:IsValid() and self.Playing then
