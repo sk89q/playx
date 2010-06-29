@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+PlayX SWF Proxy
+Copyright (c) 2010 sk89q <http://www.sk89q.com>
+-->
+<html>
+<head>
+<title>PlayX SWF Proxy</title>
+<style>
+html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden }
+</style>
+</head>
+<body>
+<script>
+var m = window.location.href.match(/\?(.+)$/);
+if (m) {
+    var query = m[1];
+    var m = query.match(/__url=([^&]+)/);
+    if (m) {
+        var baseURL = decodeURIComponent(m[1])
+        if (baseURL.match(/^http:\/\//)) {
+            var url = baseURL + '?' + query.replace(/__url=([^&]+)&?/, "");
+            url = url.replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("&", "&amp;");
+            document.write('<object type="application/x-shockwave-flash" data="' + url + '" width="100%" height="100%"' +
+                'allowscriptaccess="never" allownetworking="none">' +
+                '<param name="movie" value="' + url + '" />' +
+                '<param name="allowscriptaccess" value="never" />' +
+                '<param name="allownetworking" value="internal" />' +
+                '</object>');
+        }
+    }
+}
+</script>
+</body>
+</html>
