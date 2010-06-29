@@ -286,7 +286,7 @@ function PlayX.UpdateMetadata(data)
 	        return
 	    end
 	    
-	    length = length + GetConVar("playx_expire"):GetFloat() -- Pad length
+	    local length = data.Length + GetConVar("playx_expire"):GetFloat() -- Pad length
 	     
 	    PlayX.CurrentMedia.StopTime = PlayX.CurrentMedia.StartTime + length
 	    

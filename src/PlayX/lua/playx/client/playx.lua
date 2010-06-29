@@ -16,7 +16,7 @@
 -- 
 -- $Id$
 
-require("chrome")
+--require("chrome")
 require("datastream")
 
 CreateClientConVar("playx_enabled", 1, true, false)

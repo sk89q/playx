@@ -32,43 +32,31 @@ local function SettingsPanel(panel)
         return
     end
 
-    local chromeCheck = panel:AddControl("CheckBox", {
-        Label = "Use gm_chrome",
-        Command = "playx_use_chrome",
-    })
+    -- local chromeCheck = panel:AddControl("CheckBox", {
+        -- Label = "Use gm_chrome",
+        -- Command = "playx_use_chrome",
+    -- })
 
     panel:AddControl("CheckBox", {
         Label = "Show errors in message boxes",
         Command = "playx_error_windows",
     }):SetTooltip("Uncheck to use hints instead")
     
-    if not PlayX.HasChrome then
-        chromeCheck:SetDisabled(true)
+    -- if not PlayX.HasChrome then
+        -- chromeCheck:SetDisabled(true)
         
-        panel:AddControl("Label", {
-            Text = "Installing gm_chrome provides vast improvements in performance. " ..
-            "Visit http://wiki.github.com/sk89q/playx/gm_chrome for more information."
-        })
-    elseif not PlayX.SupportsChrome then
-        chromeCheck:SetDisabled(true)
+        -- panel:AddControl("Label", {
+            -- Text = "Installing gm_chrome provides vast improvements in performance. " ..
+            -- "Visit http://wiki.github.com/sk89q/playx/gm_chrome for more information."
+        -- })
+    -- elseif not PlayX.SupportsChrome then
+        -- chromeCheck:SetDisabled(true)
         
-        panel:AddControl("Label", {
-            Text = "Some gm_chrome support materials are required. " ..
-            "Visit http://wiki.github.com/sk89q/playx/gm_chrome for more information."
-        })
-    end
-
-    panel:AddControl("Slider", {
-        Label = "Frame rate:",
-        Command = "playx_fps",
-        Type = "Integer",
-        Min = "1",
-        Max = "30",
-    })
-            
-    panel:AddControl("Label", {
-        Text = "Decreasing the frame rate will cause your game to run better, at the cost of video choppiness."
-    })
+        -- panel:AddControl("Label", {
+            -- Text = "Some gm_chrome support materials are required. " ..
+            -- "Visit http://wiki.github.com/sk89q/playx/gm_chrome for more information."
+        -- })
+    -- end
 
     panel:AddControl("Slider", {
         Label = "Volume:",
@@ -200,10 +188,10 @@ local function ControlPanel(panel)
         })
     end
 
-    panel:AddControl("CheckBox", {
-        Label = "Force low frame rate",
-        Command = "playx_force_low_framerate",
-    }):SetTooltip("Use this for music-only videos")
+    -- panel:AddControl("CheckBox", {
+        -- Label = "Force low frame rate",
+        -- Command = "playx_force_low_framerate",
+    -- }):SetTooltip("Use this for music-only videos")
     
     panel:AddControl("CheckBox", {
         Label = "Don't auto stop on finish when applicable",

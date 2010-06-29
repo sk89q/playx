@@ -185,15 +185,10 @@ function ENT:CreateBrowser()
             PlayXBrowser = self.Browser
         end
         
+        self.Browser:SetMouseInputEnabled(false)        
         self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
         self.Browser:SetPaintedManually(true)
         self.Browser:SetVerticalScrollbarEnabled(false)
-        
-        if self.LowFramerateMode then
-            self.Browser:StartAnimate(1000)
-        else
-            self.Browser:StartAnimate(1000 / self.FPS)
-        end
     end
 end
 
