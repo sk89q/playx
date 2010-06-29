@@ -374,6 +374,8 @@ function PlayX.GetBookmark(title)
 end
 
 function PlayX.GetBookmarkByKeyword(keyword)
+    if keyword:Trim() == "" then return end
+    
     for i, bookmark in pairs(PlayX.Bookmarks) do
         if keyword:lower():Trim() == bookmark.Keyword:lower():Trim() then
             return bookmark
