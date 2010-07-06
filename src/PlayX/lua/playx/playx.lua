@@ -102,9 +102,10 @@ end
 -- function will check whether there is already a player or not.
 -- @param ply Player
 -- @param model Model path
+-- @param repeater Spawn repeater
 -- @return Success, and error message
-function PlayX.SpawnForPlayer(ply, model)
-    if PlayX.PlayerExists() then
+function PlayX.SpawnForPlayer(ply, model, repeater)
+    if not repeater and PlayX.PlayerExists() then
         return false, "There is already a PlayX player somewhere on the map"
     end
     
@@ -115,7 +116,7 @@ function PlayX.SpawnForPlayer(ply, model)
     local tr = ply.GetEyeTraceNoCursor and ply:GetEyeTraceNoCursor() or
         ply:GetEyeTrace()
 
-	local ent = ents.Create("gmod_playx")
+	local ent = ents.Create(repeater and "gmod_playx_repeater" or "gmod_playx")
     ent:SetModel(model)
     
 	local info = PlayXScreens[model:lower()]
@@ -166,9 +167,9 @@ function PlayX.SpawnForPlayer(ply, model)
         phys:Sleep()
     end
     
-    ply:AddCleanup("gmod_playx", ent)
+    ply:AddCleanup("gmod_playx" and (repeater and "_repeater" or ""), ent)
     
-    undo.Create("gmod_playx")
+    undo.Create("gmod_playx" and (repeater and "_repeater" or ""))
     undo.AddEntity(ent)
     undo.SetPlayer(ply)
     undo.Finish()
@@ -444,13 +445,15 @@ end
 --- Send the PlayXSpawnDialog umsg to a client, telling the client to
 -- open the spawn dialog.
 -- @param ply Player to send to
-function PlayX.SendSpawnDialogUMsg(ply)
+-- @param forRepeater True if this is for the repeater
+function PlayX.SendSpawnDialogUMsg(ply, forRepeater)
 	if not ply or not ply:IsValid() then
         return
     elseif not PlayX.IsPermitted(ply) then
         PlayX.SendError(ply, "You do not have permission to use the player")
     else
         umsg.Start("PlayXSpawnDialog", ply)
+        umsg.Bool(forRepeater)
         umsg.End()
     end
 end
@@ -527,7 +530,7 @@ function ConCmdSpawn(ply, cmd, args)
             PlayX.SendError(ply, "No model specified")
         else
             local model = args[1]:Trim()
-            local result, err = PlayX.SpawnForPlayer(ply, model)
+            local result, err = PlayX.SpawnForPlayer(ply, model, cmd == "playx_spawn_repeater")
         
             if not result then
                 PlayX.SendError(ply, err)
@@ -550,6 +553,7 @@ end
 concommand.Add("playx_open", ConCmdOpen)
 concommand.Add("playx_close", ConCmdClose)
 concommand.Add("playx_spawn", ConCmdSpawn)
+concommand.Add("playx_spawn_repeater", ConCmdSpawn)
 concommand.Add("playx_update_info", ConCmdUpdateInfo)
 
 --- Called on game mode hook PlayerInitialSpawn.

@@ -250,14 +250,15 @@ function PlayX.RequestCloseMedia()
 end
 
 --- Opens the dialog for choosing a model to spawn the player with.
-function PlayX.OpenSpawnDialog()
+-- @param forRepeater
+function PlayX.OpenSpawnDialog(forRepeater)
     if spawnWindow and spawnWindow:IsValid() then
         return
     end
     
     local frame = vgui.Create("DFrame")
     frame:SetDeleteOnClose(true)
-    frame:SetTitle("Select Model for PlayX Player")
+    frame:SetTitle("Select Model for PlayX " .. (forRepeater and "Repeater" or "Player"))
     frame:SetSize(275, 400)
     frame:SetSizable(true)
     frame:Center()
@@ -275,7 +276,7 @@ function PlayX.OpenSpawnDialog()
         spawnIcon.Model = model
         spawnIcon.DoClick = function()
             surface.PlaySound("ui/buttonclickrelease.wav")
-            RunConsoleCommand("playx_spawn", spawnIcon.Model)
+            RunConsoleCommand("playx_spawn" .. (forRepeater and "_repeater" or ""), spawnIcon.Model)
             frame:Close()
         end
         
@@ -298,7 +299,7 @@ function PlayX.OpenSpawnDialog()
             function(text)
                 local text = text:Trim()
                 if text ~= "" then
-                    RunConsoleCommand("playx_spawn", text)
+                    RunConsoleCommand("playx_spawn" .. (forRepeater and "_repeater" or ""), text)
                     frame:Close()
                 else
                     Derma_Message("You didn't enter a model path.", "Error", "OK")
@@ -490,7 +491,7 @@ end
 local function UMsgSpawnDialog(um)
     Msg("PlayX DEBUG: Spawn dialog request received\n")
     
-    PlayX.OpenSpawnDialog()
+    PlayX.OpenSpawnDialog(um:ReadBool())
 end
 
 --- Called on PlayXJWURL user message.
