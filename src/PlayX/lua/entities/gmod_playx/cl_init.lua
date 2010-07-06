@@ -166,14 +166,11 @@ function ENT:DestructBrowser()
     end
     
     self.Browser = nil
-    timer.Destroy("PlayXInjectPage" .. self:EntIndex())
 end
 
 function ENT:Play(handler, uri, start, volume, handlerArgs)
     local result = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
                                            start, volume, uri, handlerArgs)
-    timer.Destroy("PlayXInjectPage" .. self:EntIndex())
-    
     self.DrawCenter = result.center
     self.CurrentPage = result
     
@@ -185,8 +182,10 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
         self.Browser.OpeningURL = nil
         self.Browser:OpenURL(result.ForceURL)
     else
+        self.Browser.FinishedURL = function()
+            self:InjectPage()
+        end
         self.Browser:OpenURL(PlayX.HostURL)
-        timer.Create("PlayXInjectPage" .. self:EntIndex(), 1, 1, self.InjectPage, self)
     end
     
     self.Playing = true
@@ -286,7 +285,7 @@ function ENT:Draw()
         ang:RotateAroundAxis(ang:Up(), self.RotateAroundUp)
         ang:RotateAroundAxis(ang:Forward(), self.RotateAroundForward)
         
-       -- This makes the screen show all the time
+        -- This makes the screen show all the time
         self:SetRenderBoundsWS(Vector(-1100, -1100, -1100) + self:GetPos(),
                                Vector(1100, 1100, 1100) + self:GetPos())
         
@@ -343,7 +342,6 @@ function ENT:OnRemove()
     timer.Simple(0.2, function()
         if not ValidEntity(ent) then -- Entity is really gone
             if browser and browser:IsValid() then browser:Remove() end
-            timer.Destroy("PlayXInjectPage" .. ent:EntIndex())
         end
     end)
 end
