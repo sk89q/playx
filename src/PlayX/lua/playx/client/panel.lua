@@ -155,10 +155,10 @@ local function ControlPanel(panel)
         })
     end
 
-    -- panel:AddControl("CheckBox", {
-        -- Label = "Force low frame rate",
-        -- Command = "playx_force_low_framerate",
-    -- }):SetTooltip("Use this for music-only videos")
+    panel:AddControl("CheckBox", {
+        Label = "Force low frame rate",
+        Command = "playx_force_low_framerate",
+    }):SetTooltip("Use this for music-only videos")
     
     panel:AddControl("CheckBox", {
         Label = "Don't auto stop on finish when applicable",

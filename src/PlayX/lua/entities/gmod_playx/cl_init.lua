@@ -303,11 +303,18 @@ end
 
 function ENT:DrawScreen(centerX, centerY)
     if self.Browser and self.Browser:IsValid() and self.Playing then
-        render.SetMaterial(self.BrowserMat)
-        -- GC issue here?
-        render.DrawQuad(Vector(0, 0, 0), Vector(self.HTMLWidth, 0, 0),
-                        Vector(self.HTMLWidth, self.HTMLHeight, 0),
-                        Vector(0, self.HTMLHeight, 0)) 
+        if not self.LowFramerateMode then
+            render.SetMaterial(self.BrowserMat)
+            -- GC issue here?
+            render.DrawQuad(Vector(0, 0, 0), Vector(self.HTMLWidth, 0, 0),
+                            Vector(self.HTMLWidth, self.HTMLHeight, 0),
+                            Vector(0, self.HTMLHeight, 0)) 
+        else
+            draw.SimpleText("Low framerate mode disables the display.",
+                            "HUDNumber",
+                            centerX, centerY, Color(255, 255, 255, 255),
+                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        end
     else
         if not PlayX.Enabled then
             draw.SimpleText("Re-enable the player in the tool menu -> Options",
@@ -386,4 +393,28 @@ style.type = 'text/css';
 style.styleSheet.cssText = ']] .. playxlib.JSEscape(self.CurrentPage.CSS) .. [[';
 document.getElementsByTagName('head')[0].appendChild(style);
 ]])
+    
+    if self.LowFramerateMode or self.NoScreen then
+        self.Browser:Exec([[
+var elements = document.getElementsByTagName('*');
+for (var i = 0; i < elements.length; i++) {
+    elements[i].style.position = 'absolute';
+    elements[i].style.top = '-5000px';
+    elements[i].style.left = '-5000px';
+    elements[i].style.width = '1px';
+    elements[i].style.height = '1px';
+}
+var blocker = document.createElement("div")
+with (blocker.style) {
+    position = 'fixed';
+    top = '0';
+    left = '0';
+    width = '5000px;'
+    height = '5000px';
+    zIndex = 9999;
+    background = 'black';
+}
+document.body.appendChild(blocker); 
+]])
+    end
 end
