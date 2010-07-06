@@ -216,7 +216,8 @@ setInterval(function() {
   width="100%" height="100%" id="player">
   <param name="movie" value="]] .. url .. [[">
   <param name="quality" value="high">
-  <param name="allowscriptaccess" value="internal">
+  <param name="allowscriptaccess" value="always">
+  <param name="allownetworking" value="all">
   <param name="allowfullscreen" value="false">
   <param name="FlashVars" value="]] .. flashVars .. [[">
 ]] .. extraParams .. [[

@@ -47,40 +47,7 @@ PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX._UpdateWindow = nil
 
-PlayX.ProcMat = nil
-PlayX.ProcMatSq = nil
-
 local spawnWindow = nil
-
-if PlayX.SupportsChrome then
-    Msg("PlayX DEBUG: gm_chrome detected\n")
-    
-    local mat = Material("playx/screen")
-    local matSq = Material("playx/screen_sq")
-
-    if mat and matSq and not mat:IsError() and not matSq:IsError() then
-        PlayX.ProcMat = {
-            Material = mat,
-            Texture = mat:GetMaterialTexture("$basetexture"),
-            TextureID = surface.GetTextureID("playx/screen"),
-            Width = 1024,
-            Height = 512,
-        }
-        PlayX.ProcMatSq = {
-            Material = matSq,
-            Texture = matSq:GetMaterialTexture("$basetexture"),
-            TextureID = surface.GetTextureID("playx/screen_sq"),
-            Width = 1024,
-            Height = 1024,
-        }
-        
-        Msg("PlayX DEBUG: playx/screen and playx/screen_sq materials detected\n")
-    else
-        PlayX.SupportsChrome = false
-        
-        Msg("PlayX DEBUG: playx/screen and playx/screen_sq materials not detected; gm_chrome is unavailable\n")
-    end
-end
 
 --- Percent encodes a value. This is also in functions.lua.
 -- @param s String

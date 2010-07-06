@@ -64,12 +64,7 @@ local function SettingsPanel(panel)
         Type = "Float",
         Min = "1",
         Max = "100",
-    })
-    
-    panel:AddControl("Label", {
-        Text = "Not all media have adjustable volumes, and the player must be re-initialized " ..
-            "for a change in volume to take effect."
-    })
+    }):SetTooltip("May have no effect, depending on what's playing.")
     
     if PlayX.CurrentMedia then
         if PlayX.CurrentMedia.ResumeSupported then
@@ -102,7 +97,7 @@ local function SettingsPanel(panel)
                 panel:AddControl("Button", {
                     Label = "Stop Play",
                     Command = "playx_hide",
-                })
+                }):SetTooltip("This is a temporary disable.")
             
                 local button = panel:AddControl("Button", {
                     Label = "Re-initialize Player",
@@ -114,7 +109,7 @@ local function SettingsPanel(panel)
                 local button = panel:AddControl("Button", {
                     Label = "Stop Play",
                     Command = "playx_hide",
-                })
+                }):SetTooltip("This is a temporary disable.")
                 
                 if not PlayX.Playing then
                     button:SetDisabled(true)
@@ -135,13 +130,6 @@ local function SettingsPanel(panel)
     else
         panel:AddControl("Label", {
             Text = "No media is playing at the moment."
-        })
-    end
-    
-    if PlayX:GetInstance() and PlayX:GetInstance().IsProjector then
-        panel:AddControl("Button", {
-            Label = "Fix Screen Not Always Appearing",
-            Command = "playx_reset_render_bounds",
         })
     end
 end
