@@ -77,7 +77,7 @@ PlayXScreens = {
         ["RotateAroundUp"] = true,
     },
     ["models/props_lab/monitor01a.mdl"] = {
-        ["Offset"] = Vector(11.7, -6, 11),
+        ["Offset"] = Vector(12.2, -9, 11.3),
         ["Width"] = 18,
         ["Height"] = 15,    
         ["RotateAroundRight"] = -85,
