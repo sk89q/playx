@@ -22,11 +22,6 @@ language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
 
-local function JSEncodeString(str)
-    return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
-        :gsub("\r", "\\r"):gsub("\n", "\\n")
-end
-
 function ENT:Initialize()
     self.Entity:DrawShadow(false)
     
@@ -113,7 +108,7 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
     self.ScreenOffset = pos
     self.ScreenWidth = width
     self.ScreenHeight = height
-    self.IsSquare = math.abs(width / height - 1) < 0.2 -- Uncalibrated number!
+    self.IsSquare = playxlib.IsSquare(width, height) -- Uncalibrated number!
     
     if self.IsSquare then
         self.HTMLWidth = 1024
@@ -346,12 +341,12 @@ document.body.style.overflow = 'hidden';
         self.Browser:Exec([[
 var script = document.createElement('script');
 script.type = 'text/javascript';
-script.src = ']] .. JSEncodeString(self.CurrentPage.JSInclude) .. [[';
+script.src = ']] .. playxlib.JSEscape(self.CurrentPage.JSInclude) .. [[';
 document.body.appendChild(script);
 ]])
     else
         self.Browser:Exec([[
-document.body.innerHTML = ']] .. JSEncodeString(self.CurrentPage.Body) .. [[';
+document.body.innerHTML = ']] .. playxlib.JSEscape(self.CurrentPage.Body) .. [[';
 ]])
     end
     
@@ -366,7 +361,7 @@ document.body.style.overflow = 'hidden';
     self.Browser:Exec([[
 var style = document.createElement('style');
 style.type = 'text/css';
-style.styleSheet.cssText = ']] .. JSEncodeString(self.CurrentPage.CSS) .. [[';
+style.styleSheet.cssText = ']] .. playxlib.JSEscape(self.CurrentPage.CSS) .. [[';
 document.getElementsByTagName('head')[0].appendChild(style);
 ]])
 end

@@ -207,7 +207,7 @@ function ENT:TriggerInput(iname, value)
     elseif iname == "URI" then
         self.InputURI = tostring(value)
     elseif iname == "StartAt" then
-        self.InputStartAt = PlayX.ParseTimeString(tostring(value))
+        self.InputStartAt = playxlib.ParseTimeString(tostring(value))
     elseif iname == "DisableJW" then
         self.InputDisableJW = value > 0
     elseif iname == "ForceLowFramerate" then

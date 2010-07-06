@@ -62,48 +62,6 @@ function HandlerResult:GetHTML()
 ]]
 end
 
---- Percent encodes a value.
--- @param s String
--- @return Encoded
-local function URLEncode(s)
-    s = tostring(s)
-    local new = ""
-    
-    for i = 1, #s do
-        local c = s:sub(i, i)
-        local b = c:byte()
-        if (b >= 65 and b <= 90) or (b >= 97 and b <= 122) or
-            (b >= 48 and b <= 57) or
-            c == "_" or c == "." or c == "~" then
-            new = new .. c
-        else
-            new = new .. string.format("%%%X", b)
-        end
-    end
-    
-    return new
-end
-
---- Percent encodes a table for the query part of a URL.
--- @param vars Table of keys and values
--- @return Encoded string
-local function URLEncodeTable(vars)
-    local str = ""
-    
-    for k, v in pairs(vars) do
-        str = str .. URLEncode(k) .. "=" .. URLEncode(v) .. "&"
-    end
-    
-    return str:sub(1, -2)
-end
-
---- HTML encodes a string.
--- @param str
--- @return Encoded string
-local function HTMLEncode(str)
-    return str:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;"):gsub("\"", "&quot;")
-end
-
 --- Generates the HTML for an IFrame.
 -- @param width
 -- @param height
@@ -120,7 +78,7 @@ end
 -- @param url
 -- @return HTML
 local function GenerateImageViewer(width, height, url)
-    local url = HTMLEncode(url)
+    local url = playxlib.HTMLEscape(url)
     
     -- CSS to center the image
     local css = [[
@@ -180,8 +138,8 @@ end
 -- @return HTML
 local function GenerateFlashPlayer(width, height, url, flashVars, js, forcePlay)
     local extraParams = ""
-    local url = HTMLEncode(url)
-    local flashVars = flashVars and URLEncodeTable(flashVars) or ""
+    local url = playxlib.HTMLEscape(url)
+    local flashVars = flashVars and playxlib.URLEscapeTable(flashVars) or ""
     
     local css = [[
 body {
@@ -273,7 +231,7 @@ end
 -- @param url
 -- @return HTML
 local function GenerateJSEmbed(width, height, url, js)
-    local url = HTMLEncode(url)
+    local url = playxlib.HTMLEscape(url)
     
     local css = [[
 body {

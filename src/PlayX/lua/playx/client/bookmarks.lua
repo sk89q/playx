@@ -22,69 +22,6 @@ PlayX.Bookmarks = {}
 local bookmarksWindowList = nil
 local advancedView = false
 
-local function ParseCSV(data)
-    local lines = string.Explode("\n", data:gsub("\r", ""))
-    local result = {}
-    
-    for i, line in pairs(lines) do
-        local line = line:Trim()
-        
-        if line ~= "" then
-	        local buffer = ""
-	        local escaped = false
-	        local inQuote = false
-	        local fields = {}
-	        
-	        for c = 1, #line do
-	            local char = line:sub(c, c)
-	            if escaped then
-	                buffer = buffer .. char
-	                escaped = false
-	            else
-	                if char == "\\" then
-	                    escaped = true
-	                elseif char == "\"" then
-	                    inQuote = not inQuote
-	                elseif char == "," then
-	                    if inQuote then
-	                        buffer = buffer .. char
-	                    else
-	                        table.insert(fields, buffer)
-	                        buffer = ""
-	                    end
-	                else
-	                    buffer = buffer .. char
-	                end
-	            end
-	        end
-	        
-	        table.insert(fields, buffer)
-	        table.insert(result, fields)
-	   end
-    end
-    
-    return result
-end
-
-local function WriteCSV(data)
-    local output = ""
-    
-    for _, v in pairs(data) do
-        local line = ""
-        for _, p in pairs(v) do
-            if type(p) == 'boolean' then
-                line = line .. ",\"" .. (p and "true" or "false") .. "\""
-            else
-                line = line .. ",\"" .. tostring(p):gsub("[\"\\]", "\\%1") .. "\""
-            end
-        end
-        
-        output = output .. "\n" .. line:sub(2)
-    end
-    
-    return output:sub(2)
-end
-
 local function DoBookmarkDelete(bookmarks, line)
     local title = line:GetValue(1)
     
@@ -262,7 +199,7 @@ Bittersweet,,http://youtube.com/watch?v=6ka3PdGdtro,,0:00,1
     
     PlayX.Bookmarks = {}
     
-    local result = ParseCSV(data)
+    local result = playxlib.ParseCSV(data)
     for k, v in pairs(result) do
         local bookmark = Bookmark:new(v[1] and v[1] or "", -- Title
                                       v[2] and v[2] or "", -- Provider
@@ -311,7 +248,7 @@ function PlayX.SaveBookmarks()
                             bookmark.LowFramerate})
     end
     
-    local output = WriteCSV(data)
+    local output = playxlib.WriteCSV(data)
     
     file.Write("playx/bookmarks.txt", output)
     

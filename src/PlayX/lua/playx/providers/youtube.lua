@@ -22,7 +22,7 @@ local apiKey = "AI39si79-V-ltHhNyYvyTeaiJeexopkZoiUA56Sk-W8Z5alYUkgntdwvkmu1" ..
 local YouTube = {}
 
 function YouTube.Detect(uri)    
-    local m = PlayX.FindMatch(uri, {
+    local m = playxlib.FindMatch(uri, {
         "^http://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^http://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^http://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
@@ -58,7 +58,7 @@ function YouTube.GetPlayer(uri, useJW)
                 ["enablejsapi"] = "1",
             }
             
-            local url = Format("http://www.youtube.com/v/%s&%s", uri, PlayX.URLEncodeTable(vars))
+            local url = Format("http://www.youtube.com/v/%s&%s", uri, playxlib.URLEscapeTable(vars))
             
             return {
                 ["Handler"] = "FlashAPI",
@@ -79,7 +79,7 @@ function YouTube.GetPlayer(uri, useJW)
 end
 
 function YouTube.QueryMetadata(uri, callback, failCallback)
-    local vars = PlayX.URLEncodeTable({
+    local vars = playxlib.URLEscapeTable({
         ["alt"] = "atom",
         ["key"] = apiKey,
         ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
@@ -93,14 +93,14 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
             return
         end
         
-        local title = PlayX.HTMLUnescape(string.match(result, "<title type='text'>([^<]+)</title>"))
-        local desc = PlayX.HTMLUnescape(string.match(result, "<content type='text'>([^<]+)</content>"))
-        local submitter = PlayX.HTMLUnescape(string.match(result, "<author><name>([^<]+)</name>"))
+        local title = playxlib.HTMLUnescape(string.match(result, "<title type='text'>([^<]+)</title>"))
+        local desc = playxlib.HTMLUnescape(string.match(result, "<content type='text'>([^<]+)</content>"))
+        local submitter = playxlib.HTMLUnescape(string.match(result, "<author><name>([^<]+)</name>"))
         
         local publishedDate = nil
         local y, mo, d, h, m, s = string.match(result, "<published>([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z</published>")
         if y then
-            publishedDate = PlayX.UTCTime({year=tonumber(y), month=tonumber(m),
+            publishedDate = playxlib.UTCTime({year=tonumber(y), month=tonumber(m),
                                            day=tonumber(d), hour=tonumber(h),
                                            min=tonumber(m), sec=tonumber(s)})
         end
@@ -108,14 +108,14 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
         local modifiedDate = nil
         local y, mo, d, h, m, s = string.match(result, "<updated>([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z</updated>")
         if y then
-            modifiedDate = PlayX.UTCTime({year=tonumber(y), month=tonumber(mo),
+            modifiedDate = playxlib.UTCTime({year=tonumber(y), month=tonumber(mo),
                                           day=tonumber(d), hour=tonumber(h),
                                           min=tonumber(m), sec=tonumber(s)})
         end
         
         local length = tonumber(string.match(result, "<yt:duration seconds='([0-9]+)'"))
-        local tags = PlayX.ParseTags(PlayX.HTMLUnescape(string.match(result, "<media:keywords>([^<]+)</media:keywords>")), ",")
-        local thumbnail = PlayX.HTMLUnescape(string.match(result, "<media:thumbnail url='([^']+)' height='240' width='320' time='[^']+'/>"))
+        local tags = playxlib.ParseTags(playxlib.HTMLUnescape(string.match(result, "<media:keywords>([^<]+)</media:keywords>")), ",")
+        local thumbnail = playxlib.HTMLUnescape(string.match(result, "<media:thumbnail url='([^']+)' height='240' width='320' time='[^']+'/>"))
         local comments = tonumber(string.match(result, "<gd:comments><gd:feedLink href='[^']+' countHint='([0-9]+)'/>"))
         
         local faves, views = string.match(result, "<yt:statistics favoriteCount='([0-9]+)' viewCount='([0-9]+)'/>")

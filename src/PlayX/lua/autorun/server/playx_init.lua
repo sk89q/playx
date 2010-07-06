@@ -17,6 +17,7 @@
 -- $Id$
 
 AddCSLuaFile("autorun/client/playx_init.lua")
+AddCSLuaFile("playxlib.lua")
 AddCSLuaFile("playx/client/playx.lua")
 AddCSLuaFile("playx/client/providers.lua")
 AddCSLuaFile("playx/client/bookmarks.lua")

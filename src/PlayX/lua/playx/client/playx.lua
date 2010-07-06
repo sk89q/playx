@@ -33,6 +33,7 @@ CreateClientConVar("playx_error_windows", 1, true, false)
 
 PlayX = {}
 
+include("playxlib.lua")
 include("playx/client/bookmarks.lua")
 include("playx/client/providers.lua")
 include("playx/client/panel.lua")
@@ -48,28 +49,6 @@ PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX._UpdateWindow = nil
 
 local spawnWindow = nil
-
---- Percent encodes a value. This is also in functions.lua.
--- @param s String
--- @return Encoded
-function URLEncode(s)
-    s = tostring(s)
-    local new = ""
-    
-    for i = 1, #s do
-        local c = s:sub(i, i)
-        local b = c:byte()
-        if (b >= 65 and b <= 90) or (b >= 97 and b <= 122) or
-            (b >= 48 and b <= 57) or
-            c == "_" or c == "." or c == "~" then
-            new = new .. c
-        else
-            new = new .. string.format("%%%X", b)
-        end
-    end
-    
-    return new
-end
 
 --- Internal function to update the FPS of the current player instance.
 local function DoFPSChange()
@@ -351,7 +330,7 @@ function PlayX.OpenUpdateWindow(ver)
         return
     end
     
-    local url = "http://playx.sk89q.com/update/?version=" .. URLEncode(ver)
+    local url = "http://playx.sk89q.com/update/?version=" .. playxlib.URLEscape(ver)
     
     local frame = vgui.Create("DFrame")
     PlayX._UpdateWindow = frame

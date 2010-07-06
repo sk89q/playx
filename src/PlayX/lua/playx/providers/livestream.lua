@@ -19,7 +19,7 @@
 local Livestream = {}
 
 function Livestream.Detect(uri, useJW)
-    local m = PlayX.FindMatch(uri:gsub("%?.*$", ""), {
+    local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
         "^http://www%.livestream%.com/([a-zA-Z0-9_]+)$",
         "^http://livestream%.com/([a-zA-Z0-9_]+)$",
         "^http://www%.mogulus%.com/([a-zA-Z0-9_]+)$",
@@ -80,7 +80,7 @@ function Livestream.GetPlayer(uri, useJW)
             ["wmode"] = "window",
         }
         
-        local url = "http://cdn.livestream.com/grid/PlayerV2.swf?" .. PlayX.URLEncodeTable(vars)
+        local url = "http://cdn.livestream.com/grid/PlayerV2.swf?" .. playxlib.URLEscapeTable(vars)
         
         return {
             ["Handler"] = "FlashAPI",
@@ -106,11 +106,11 @@ function Livestream.QueryMetadata(uri, callback, failCallback)
             return
         end
         
-        local title = PlayX.HTMLUnescape(string.match(result, "<title>([^<]+)</title>"))
-        local desc = PlayX.HTMLUnescape(string.match(result, "<description>([^<]+)</description>"))
+        local title = playxlib.HTMLUnescape(string.match(result, "<title>([^<]+)</title>"))
+        local desc = playxlib.HTMLUnescape(string.match(result, "<description>([^<]+)</description>"))
         local isLive = string.match(result, "<ls:isLive>([^<]+)</ls:isLive>") == "true"
         local viewerCount = tonumber(string.match(result, "<ls:currentViewerCount>([^<]+)</ls:currentViewerCount>"))
-        local tags = PlayX.ParseTags(PlayX.HTMLUnescape(string.match(result, "<ls:tags>([^<]+)</ls:tags>")), ",")
+        local tags = playxlib.ParseTags(playxlib.HTMLUnescape(string.match(result, "<ls:tags>([^<]+)</ls:tags>")), ",")
         
         if title then
             callback({

@@ -19,7 +19,7 @@
 local Shoutcast = {}
 
 function Shoutcast.Detect(uri)
-    local m = PlayX.FindMatch(uri, {
+    local m = playxlib.FindMatch(uri, {
         "^http://[^:/]+/;stream%.nsv$",
         "^http://[^:/]+:[0-9]+/?$",
     })
@@ -30,7 +30,7 @@ function Shoutcast.Detect(uri)
 end
 
 function Shoutcast.GetPlayer(uri, useJW)
-    local m = PlayX.FindMatch(uri, {
+    local m = playxlib.FindMatch(uri, {
         "^http://[^:/]+$",
         "^http://[^:/]+/$",
         "^http://[^:/]+:[0-9]+$",
@@ -73,7 +73,7 @@ list.Set("PlayXProvidersList", "Shoutcast", {"Shoutcast"})
 local MP3 = {}
 
 function MP3.Detect(uri)
-    local m = PlayX.FindMatch(uri:gsub("%?.*$", ""), {
+    local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
         "^http://.+%.mp3$",
         "^http://.+%.MP3$",
     })
@@ -109,7 +109,7 @@ list.Set("PlayXProvidersList", "MP3", {"MP3"})
 local FlashVideo = {}
 
 function FlashVideo.Detect(uri)
-    local m = PlayX.FindMatch(uri:gsub("%?.*$", ""), {
+    local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
         "^http://.+%.flv$",
         "^http://.+%.FLV$",
         "^http://.+%.mp4$",
@@ -178,7 +178,7 @@ list.Set("PlayXProvidersList", "AnimatedImage", {"Animated image"})
 local Image = {}
 
 function Image.Detect(uri)
-    local m = PlayX.FindMatch(uri:gsub("%?.*$", ""), {
+    local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
         "^http://.+%.jpe?g$",
         "^http://.+%.JPE?G$",
         "^http://.+%.png$",

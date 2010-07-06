@@ -16,10 +16,31 @@
 -- 
 -- $Id$
 
---- Percent encodes a value.
+playxlib = {}
+
+--- Takes a width and height and returns a boolean to indicate whether the shape
+-- is optimally a square. This is used by the engine code to determine
+-- whether a square screen is better than a rectangular screen for a certain
+-- set of screen dimensions.
+-- @param Width
+-- @param Height
+-- @return Boolean
+function playxlib.IsSquare(width, height)
+    return math.abs(width / height - 1) < 0.2
+end
+
+--- Encodes a string to be placed into a JavaScript string.
+-- @param str String to encode
+-- @return Encoded
+function playxlib.JSEscape(str)
+    return str:gsub("\\", "\\\\"):gsub("\"", "\\\""):gsub("\'", "\\'")
+        :gsub("\r", "\\r"):gsub("\n", "\\n")
+end
+
+--- Percent encodes a value for URLs.
 -- @param s String
 -- @return Encoded
-function PlayX.URLEncode(s)
+function playxlib.URLEscape(s)
     s = tostring(s)
     local new = ""
     
@@ -41,34 +62,31 @@ end
 --- Percent encodes a table for the query part of a URL.
 -- @param vars Table of keys and values
 -- @return Encoded string
-function PlayX.URLEncodeTable(vars)
+function playxlib.URLEscapeTable(vars)
     local str = ""
     
     for k, v in pairs(vars) do
-        str = str .. PlayX.URLEncode(k) .. "=" .. PlayX.URLEncode(v) .. "&"
+        str = str .. playxlib.URLEscape(k) .. "=" .. playxlib.URLEscape(v) .. "&"
     end
     
     return str:sub(1, -2)
 end
 
---- Attempts to match a list of patterns against a string, and returns
--- the matches, or nil if there were no matches.
--- @param str The string
--- @param patterns Table of patterns
--- @return Table of results, or bil
-function PlayX.FindMatch(str, patterns)
-    for _, pattern in pairs(patterns) do
-        local m = {str:match(pattern)}
-        if m[1] then return m end
-    end
-    
-    return nil
+--- HTML encodes a string.
+-- @param str
+-- @return Encoded string
+function playxlib.HTMLEscape(str)
+    return str:gsub("&", "&amp;")
+        :gsub("<", "&lt;")
+        :gsub(">", "&gt;")
+        :gsub("\"", "&quot;")
 end
 
---- Unescape HTML. It does not handle all of HTML's named entities.
+--- Unescape HTML. This function fudges the job, and it does not handle all of
+-- HTML's named entities.
 -- @param s The string
 -- @return Unescaped string
-function PlayX.HTMLUnescape(s)
+function playxlib.HTMLUnescape(s)
     if not s then return nil end
     
     s = s:gsub("<br */?>", "\n")
@@ -83,10 +101,24 @@ function PlayX.HTMLUnescape(s)
     return s
 end
 
+--- Attempts to match a list of patterns against a string, and returns
+-- the first match, or nil if there were no matches.
+-- @param str The string
+-- @param patterns Table of patterns
+-- @return Table of results, or bil
+function playxlib.FindMatch(str, patterns)
+    for _, pattern in pairs(patterns) do
+        local m = {str:match(pattern)}
+        if m[1] then return m end
+    end
+    
+    return nil
+end
+
 --- Gets a timestamp in UTC.
 -- @param t Time
--- @return
-function PlayX.UTCTime(t)
+-- @return Time
+function playxlib.UTCTime(t)
 	local tSecs = os.time(t)
 	t = os.date("*t", tSecs)
 	local tUTC = os.date("!*t", tSecs)
@@ -100,7 +132,7 @@ end
 -- @param s
 -- @param delim Delimiter
 -- @return Table
-function PlayX.ParseTags(s, delim)
+function playxlib.ParseTags(s, delim)
     if not s then return nil end
     
     local final = {}
@@ -119,7 +151,8 @@ end
 --- Casts a console command arg to a string.
 -- @param v
 -- @param default
-function PlayX.ConCmdToString(v, default)
+-- @return Boolean
+function playxlib.CastToString(v, default)
     if v == nil then return default end
     return tostring(v)
 end
@@ -127,7 +160,8 @@ end
 --- Casts a console command arg to a number.
 -- @param v
 -- @param default
-function PlayX.ConCmdToNumber(v, default)
+-- @return Boolean
+function playxlib.CastToNumber(v, default)
     v = tonumber(v)
     if v == nil then return default end
     return v
@@ -136,7 +170,8 @@ end
 --- Casts a console command arg to a bool.
 -- @param v
 -- @param default
-function PlayX.ConCmdToBool(v, default)
+-- @return Boolean
+function playxlib.CastToBool(v, default)
     if v == nil then return default end
     if v == "false" then return false end
     v = tonumber(v)
@@ -146,8 +181,9 @@ end
 
 --- Parses a human-readable time string. Returns the number in seconds, or
 -- nil if it cannot detect a format. Blank strings will return 0.
--- @Param str
-function PlayX.ParseTimeString(str)
+-- @param str
+-- @return Time
+function playxlib.ParseTimeString(str)
     if str == "" or str == nil then return 0 end
     
     str = str:Trim()
@@ -205,4 +241,87 @@ function PlayX.ParseTimeString(str)
     end
     
     return nil
+end
+
+--- Parses a string containing data formatted in CSV into a table.
+-- Fields can be quoted with double quotations or be unquoted, and characters
+-- can be escaped with a backslash. This CSV parser is very forgiving. The
+-- return table has each line in a new entry, and each field is then a further
+-- entry in a table. Not all the rows may have the same number of fields in
+-- the returned table.
+-- @param data CSV data
+-- @return Table containg data
+function playxlib.ParseCSV(data)
+    local lines = string.Explode("\n", data:gsub("\r", ""))
+    local result = {}
+    
+    for i, line in pairs(lines) do
+        local line = line:Trim()
+        
+        if line ~= "" then
+	        local buffer = ""
+	        local escaped = false
+	        local inQuote = false
+	        local fields = {}
+	        
+	        for c = 1, #line do
+	            local char = line:sub(c, c)
+	            if escaped then
+	                buffer = buffer .. char
+	                escaped = false
+	            else
+	                if char == "\\" then
+	                    escaped = true
+	                elseif char == "\"" then
+	                    inQuote = not inQuote
+	                elseif char == "," then
+	                    if inQuote then
+	                        buffer = buffer .. char
+	                    else
+	                        table.insert(fields, buffer)
+	                        buffer = ""
+	                    end
+	                else
+	                    buffer = buffer .. char
+	                end
+	            end
+	        end
+	        
+	        table.insert(fields, buffer)
+	        table.insert(result, fields)
+	   end
+    end
+    
+    return result
+end
+
+--- Turns a table into CSV data.
+-- @param data Table to convert
+-- @return CSV data
+function playxlib.WriteCSV(data)
+    local output = ""
+    
+    for _, v in pairs(data) do
+        local line = ""
+        for _, p in pairs(v) do
+            if type(p) == 'boolean' then
+                line = line .. ",\"" .. (p and "true" or "false") .. "\""
+            else
+                line = line .. ",\"" .. tostring(p):gsub("[\"\\]", "\\%1") .. "\""
+            end
+        end
+        
+        output = output .. "\n" .. line:sub(2)
+    end
+    
+    return output:sub(2)
+end
+
+--- Tries to interpret a string as a boolean. "true," "y," etc. are considered
+-- to be true.
+-- @param s String
+-- @return Boolean
+function playxlib.IsTrue(s)
+    local s = s:lower():Trim()
+    return s == "t" or s == "true" or s == "1" or s == "y" or s == "yes"
 end
