@@ -115,8 +115,10 @@ function PlayX.SpawnForPlayer(ply, model, repeater)
     
     local tr = ply.GetEyeTraceNoCursor and ply:GetEyeTraceNoCursor() or
         ply:GetEyeTrace()
+        
+    local cls = "gmod_playx" .. (repeater and "_repeater" or "")
 
-	local ent = ents.Create(repeater and "gmod_playx_repeater" or "gmod_playx")
+	local ent = ents.Create(cls)
     ent:SetModel(model)
     
 	local info = PlayXScreens[model:lower()]
@@ -167,9 +169,10 @@ function PlayX.SpawnForPlayer(ply, model, repeater)
         phys:Sleep()
     end
     
-    ply:AddCleanup("gmod_playx" and (repeater and "_repeater" or ""), ent)
+    ply:AddCleanup(cls, ent)
     
-    undo.Create("gmod_playx" and (repeater and "_repeater" or ""))
+    undo.Create((repeater and "PlayX Repeater" or "PlayX Player") .. 
+        " (" .. model .. ")")
     undo.AddEntity(ent)
     undo.SetPlayer(ply)
     undo.Finish()

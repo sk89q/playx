@@ -18,6 +18,7 @@
 
 include("shared.lua")
 
+language.Add("gmod_playx", "PlayX Player")
 language.Add("Undone_gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
