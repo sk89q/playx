@@ -170,8 +170,8 @@ function ENT:DestructBrowser()
 end
 
 function ENT:Play(handler, uri, start, volume, handlerArgs)
-    local result = PlayX.Handlers[handler](self.HTMLWidth, self.HTMLHeight,
-                                           start, volume, uri, handlerArgs)
+    local h = list.Get("PlayXHandlers")[handler]
+    local result = h(self.HTMLWidth, self.HTMLHeight, start, volume, uri, handlerArgs)
     self.DrawCenter = result.center
     self.CurrentPage = result
     

@@ -328,3 +328,249 @@ function playxlib.IsTrue(s)
     local s = s:lower():Trim()
     return s == "t" or s == "true" or s == "1" or s == "y" or s == "yes"
 end
+
+-- Handler result
+local HandlerResult = {}
+playxlib.HandlerResult = HandlerResult
+
+-- Make callable
+local mt = {}
+mt.__call = function(...)
+    local arg = {...}
+    return HandlerResult.new(unpack(arg))
+end
+setmetatable(HandlerResult, mt)
+
+function HandlerResult:new(css, js, body, jsURL, center, url)
+    local instance = {
+        ["CSS"] = css,
+        ["Body"] = body,
+        ["JS"] = js,
+        ["JSInclude"] = jsURL,
+        ["Center"] = center,
+        ["ForceIE"] = false,
+        ["ForceURL"] = url,
+    }
+    
+    setmetatable(instance, self)
+    self.__index = self
+    return instance
+end
+
+function HandlerResult:GetVolumeChangeJS(volume)
+    return nil
+end
+
+function HandlerResult:AppendJavaScript(js)
+    self.JS = (self.JS and self.JS or "") .. js
+end
+
+function HandlerResult:GetHTML()
+    return [[
+<!DOCTYPE html>
+<html>
+<head>
+<title>PlayX</title>
+<style type="text/css">
+]] .. self.CSS .. [[
+</style>
+<script type="text/javascript">
+]] .. (self.JS and self.JS or "") .. [[
+</script>
+</head>
+<body>
+]] .. self.Body .. [[
+</body>
+</html>
+]]
+end
+
+--- Generates the HTML for an IFrame.
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateIFrame(width, height, url)    
+    return playxlib.HandlerResult("", "", "", "", false, url)
+end
+
+--- Generates the HTML for an image viewer. The image viewer will automatiaclly
+-- center the image (once size information becomes exposed in JavaScript).
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateImageViewer(width, height, url)
+    local url = playxlib.HTMLEscape(url)
+    
+    -- CSS to center the image
+    local css = [[
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #000000;
+  overflow: hidden;
+}
+td {
+  text-align: center;
+  vertical-align: middle;
+}
+]]
+    
+    -- Resizing code
+    local js = [[
+var keepResizing = true;
+function resize(obj) {
+  var ratio = obj.width / obj.height;
+  if (]] .. width .. [[ / ]] .. height .. [[ > ratio) {
+    obj.style.width = (]] .. height .. [[ * ratio) + "px";
+  } else {
+    obj.style.height = (]] .. width .. [[ / ratio) + "px";
+  }
+}
+setInterval(function() {
+  if (keepResizing && document.images[0]) {
+    resize(document.images[0]);
+  }
+}, 1000);
+]]
+    
+    local body = [[
+<div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
+<table border="0" cellpadding="0" cellmargin="0" style="width: ]] .. width .. [[px; height: ]] .. height .. [[px">
+<tr>
+<td style="text-align: center">
+<img src="]] .. url .. [[" alt="" onload="resize(this); keepResizing = false" style="margin: auto" />
+</td>
+</tr>
+</table>
+</div>
+]]
+    
+    return playxlib.HandlerResult(css, js, body)
+end
+
+--- Generates the HTML for a Flash player viewer.
+-- @param width
+-- @param height
+-- @param url
+-- @param flashVars Table
+-- @param js Extra JavaScript to add
+-- @param forcePlay Forces the movie to be 'played' every 1 second, if not playing
+-- @return HTML
+function playxlib.GenerateFlashPlayer(width, height, url, flashVars, js, forcePlay)
+    local extraParams = ""
+    local url = playxlib.HTMLEscape(url)
+    local flashVars = flashVars and playxlib.URLEscapeTable(flashVars) or ""
+    
+    local css = [[
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #000000;
+  overflow: hidden;
+}]]
+    
+    if forcePlay then        
+        js = (js and js or "") .. [[
+setInterval(function() {
+  try {
+    var player = document.getElementById('player');
+    if (player && !player.IsPlaying()) {
+      player.play();
+    }
+  } catch (e) {}
+}, 1000);
+]]
+        extraParams = [[
+<param name="loop" value="false">
+]]
+    end
+    
+    local body = [[
+<div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
+<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" 
+  type="application/x-shockwave-flash"
+  src="]] .. url .. [["
+  width="100%" height="100%" id="player">
+  <param name="movie" value="]] .. url .. [[">
+  <param name="quality" value="high">
+  <param name="allowscriptaccess" value="always">
+  <param name="allownetworking" value="all">
+  <param name="allowfullscreen" value="false">
+  <param name="FlashVars" value="]] .. flashVars .. [[">
+]] .. extraParams .. [[
+</object> 
+</div>
+]]
+    
+    local result = playxlib.HandlerResult(css, js, body)
+    if forcePlay then result.ForceIE = true end
+    return result
+end
+
+--- Generate the HTML page for the JW player.
+-- @param width
+-- @param height
+-- @param start In seconds
+-- @param volume 0-100
+-- @param uri
+-- @param provider JW player provider ("image", "audio", etc.)
+-- @return HTML
+function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
+    local flashURL = PlayX.JWPlayerURL
+    local flashVars = {
+        ["autostart"] = "true",
+        ["backcolor"] = "000000",
+        ["frontcolor"] = "444444",
+        ["start"] = start,
+        ["volume"] = volume,
+        ["file"] = uri,
+        ["playerready"] = "jwInit",
+    }
+    
+    if provider then
+        flashVars["provider"] = provider
+    end
+    
+    local result = playxlib.GenerateFlashPlayer(width, height, flashURL, flashVars)
+    
+    result.GetVolumeChangeJS = function(volume)
+        return [[
+try {
+  document.getElementById('player').sendEvent("VOLUME", "]] .. tostring(volume) .. [[");
+} catch(e) {}
+]]
+    end
+    
+    return result
+end
+
+--- Generates the HTML code for an included JavaScript file.
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateJSEmbed(width, height, url, js)
+    local url = playxlib.HTMLEscape(url)
+    
+    local css = [[
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #000000;
+  overflow: hidden;
+}
+]]
+
+    local body = [[
+<div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
+  <script src="]] .. url .. [[" type="text/javascript"></script>
+</div>
+]]
+    
+    return playxlib.HandlerResult(css, js, body, url)
+end

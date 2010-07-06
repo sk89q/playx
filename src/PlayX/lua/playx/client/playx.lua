@@ -35,7 +35,16 @@ PlayX = {}
 
 include("playxlib.lua")
 include("playx/client/bookmarks.lua")
-include("playx/client/providers.lua")
+
+-- Load handlers
+local p = file.FindInLua("playx/client/handlers/*.lua")
+for _, file in pairs(p) do
+    local status, err = pcall(function() include("playx/client/handlers/" .. file) end)
+    if not status then
+        ErrorNoHalt("Failed to load handler(s) in " .. file .. ": " .. err)
+    end
+end
+
 include("playx/client/panel.lua")
 
 PlayX.Enabled = true
@@ -46,6 +55,7 @@ PlayX.JWPlayerURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
 PlayX.HostURL = "http://sk89q.github.com/playx/host/host.html"
 PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
+PlayX.Providers = {}
 PlayX._UpdateWindow = nil
 
 local spawnWindow = nil
@@ -427,7 +437,7 @@ local function DSBegin(_, id, encoded, decoded)
     PlayX.Playing = true
     PlayX.CurrentMedia = nil
     
-    if PlayX.Handlers[handler] then
+    if list.Get("PlayXHandlers")[handler] then
         if uri:len() > 325 then
             print(string.format("PlayX: Playing %s using handler %s", uri, handler))
         else

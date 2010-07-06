@@ -36,7 +36,15 @@ CreateConVar("playx_wire_input_delay", "2", {FCVAR_ARCHIVE})
 PlayX = {}
 
 include("playxlib.lua")
-include("playx/providers.lua")
+
+-- Load providers
+local p = file.FindInLua("playx/providers/*.lua")
+for _, file in pairs(p) do
+    local status, err = pcall(function() include("playx/providers/" .. file) end)
+    if not status then
+        ErrorNoHalt("Failed to load provider(s) in " .. file .. ": " .. err)
+    end
+end
 
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
