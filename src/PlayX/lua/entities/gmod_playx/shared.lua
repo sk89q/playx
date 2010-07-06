@@ -48,6 +48,41 @@ PlayXScreens = {
         ["RotateAroundRight"] = true,
         ["RotateAroundUp"] = true,
     },
+    ["models/props/cs_office/computer_monitor.mdl"] = {
+        ["Offset"] = Vector(3.3, -10.5, 24.55),
+        ["Width"] = 21,
+        ["Height"] = 15.65,    
+        ["RotateAroundRight"] = true,
+        ["RotateAroundUp"] = true,
+    },
+    ["models/props_wasteland/controlroom_monitor001b.mdl"] = {
+        ["Offset"] = Vector(15, -10.5, 1.4),
+        ["Width"] = 22,
+        ["Height"] = 18,    
+        ["RotateAroundRight"] = -103,
+        ["RotateAroundUp"] = true,
+    },
+    ["models/props_lab/monitor02.mdl"] = {
+        ["Offset"] = Vector(10.8, -9, 22.5),
+        ["Width"] = 17.5,
+        ["Height"] = 14,    
+        ["RotateAroundRight"] = -83,
+        ["RotateAroundUp"] = true,
+    },
+    ["models/props_c17/tv_monitor01.mdl"] = {
+        ["Offset"] = Vector(6, -9, 6),
+        ["Width"] = 14.5,
+        ["Height"] = 10.5,    
+        ["RotateAroundRight"] = -90,
+        ["RotateAroundUp"] = true,
+    },
+    ["models/props_lab/monitor01a.mdl"] = {
+        ["Offset"] = Vector(11.7, -6, 11),
+        ["Width"] = 18,
+        ["Height"] = 15,    
+        ["RotateAroundRight"] = -85,
+        ["RotateAroundUp"] = true,
+    },
     ["models/props/cs_office/projector.mdl"] = {
         ["IsProjector"] = true,
         ["Forward"] = 0,
@@ -61,6 +96,15 @@ PlayXScreens = {
         ["Up"] = 0,
     },
     ["models/props_lab/citizenradio.mdl"] = {
+        ["NoScreen"] = true,
+    },
+    ["models/props/radio_reference.mdl"] = {
+        ["NoScreen"] = true,
+    },
+    ["models/props_misc/german_radio.mdl"] = {
+        ["NoScreen"] = true,
+    },
+    ["models/props/cs_office/radio.mdl"] = {
         ["NoScreen"] = true,
     },
 }
