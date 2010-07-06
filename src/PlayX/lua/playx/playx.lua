@@ -179,8 +179,7 @@ function PlayX.SpawnForPlayer(ply, model, repeater)
     
     ply:AddCleanup(cls, ent)
     
-    undo.Create((repeater and "PlayX Repeater" or "PlayX Player") .. 
-        " (" .. model .. ")")
+    undo.Create("#" .. cls)
     undo.AddEntity(ent)
     undo.SetPlayer(ply)
     undo.Finish()

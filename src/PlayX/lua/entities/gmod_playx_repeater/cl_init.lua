@@ -20,6 +20,7 @@ include("shared.lua")
 
 language.Add("gmod_playx_repeater", "PlayX Repeater")
 language.Add("Undone_gmod_playx_repeater", "Undone PlayX Repeater")
+language.Add("Undone_#gmod_playx_repeater", "Undone PlayX Repeater")
 language.Add("Cleanup_gmod_playx_repeater", "PlayX Repeaters")
 language.Add("Cleaned_gmod_playx_repeater", "Cleaned up PlayX Repeaters")
 
