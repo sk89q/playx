@@ -99,6 +99,8 @@ function ENT:UpdateScreenBounds()
             self:SetScreenBounds(pos, width, height, 0, -90, 0)
         end
     end
+    
+    self:ResetRenderBounds()
 end
 
 function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
@@ -210,6 +212,34 @@ function ENT:SetFPS(fps)
     self.FPS = fps
 end
 
+function ENT:GetProjectorTrace()
+    -- Potential GC bottleneck?
+    local excludeEntities = player.GetAll()
+    table.insert(excludeEntities, self.Entity)
+    
+    local dir = self.Entity:GetForward() * self.Forward * 4000 +
+                self.Entity:GetRight() * self.Right * 4000 +
+                self.Entity:GetUp() * self.Up * 4000
+    local tr = util.QuickTrace(self.Entity:LocalToWorld(self.Entity:OBBCenter()),
+                               dir, excludeEntities)
+    
+    return tr
+end
+
+function ENT:ResetRenderBounds()
+    local tr = self:GetProjectorTrace()
+        
+    if tr.Hit then
+        -- This makes the screen show all the time
+        self:SetRenderBoundsWS(Vector(-1100, -1100, -1100) + tr.HitPos,
+                               Vector(1100, 1100, 1100) + tr.HitPos)
+    else
+       -- This makes the screen show all the time
+        self:SetRenderBoundsWS(Vector(-1100, -1100, -1100) + self:GetPos(),
+                               Vector(1100, 1100, 1100) + self:GetPos())
+    end
+end
+
 function ENT:Draw()
     self.Entity:DrawModel()
     
@@ -219,15 +249,7 @@ function ENT:Draw()
     render.SuppressEngineLighting(true)
     
     if self.IsProjector then
-        -- Potential GC bottleneck?
-        local excludeEntities = player.GetAll()
-        table.insert(excludeEntities, self.Entity)
-        
-        local dir = self.Entity:GetForward() * self.Forward * 4000 +
-                    self.Entity:GetRight() * self.Right * 4000 +
-                    self.Entity:GetUp() * self.Up * 4000
-        local tr = util.QuickTrace(self.Entity:LocalToWorld(self.Entity:OBBCenter()),
-                                   dir, excludeEntities)
+        local tr = self:GetProjectorTrace()
         
         if tr.Hit then
             local ang = tr.HitNormal:Angle()
