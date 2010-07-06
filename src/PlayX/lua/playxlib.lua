@@ -26,7 +26,10 @@ playxlib = {}
 -- @param Height
 -- @return Boolean
 function playxlib.IsSquare(width, height)
-    return math.abs(width / height - 1) < 0.2
+    -- Square screens with the new Webkit materials added by AzuiSleet
+    -- seems to observe some serious problems
+    return false
+    --return math.abs(width / height - 1) < 0.2
 end
 
 --- Encodes a string to be placed into a JavaScript string.
