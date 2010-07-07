@@ -181,12 +181,14 @@ function PlayX.SpawnForPlayer(ply, model, repeater)
         phys:Sleep()
     end
     
-    ply:AddCleanup(cls, ent)
-    
-    undo.Create("#" .. cls)
-    undo.AddEntity(ent)
-    undo.SetPlayer(ply)
-    undo.Finish()
+    if ply.AddCleanup then
+        ply:AddCleanup(cls, ent)
+	    
+	    undo.Create("#" .. cls)
+	    undo.AddEntity(ent)
+	    undo.SetPlayer(ply)
+	    undo.Finish()
+    end
     
     return true
 end

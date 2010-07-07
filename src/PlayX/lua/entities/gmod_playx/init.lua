@@ -231,8 +231,10 @@ local function PlayXEntityDuplicator(ply, model, pos, ang)
     ent:Spawn()
     ent:Activate()
     
-    ply:AddCleanup("gmod_playx", ent)
-
+    if ply.AddCleanup then
+        ply:AddCleanup("gmod_playx", ent)
+    end
+    
     return ent
 end
 

@@ -18,6 +18,8 @@
 
 PlayX._BookmarksPanelList = nil
 
+local hasLoaded = false
+
 --- Draw the settings panel.
 local function SettingsPanel(panel)
     panel:ClearControls()
@@ -249,6 +251,7 @@ end
 
 --- PopulateToolMenu hook.
 local function PopulateToolMenu()
+    hasLoaded = true
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel)
@@ -258,6 +261,7 @@ hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 
 --- Updates the tool panels.
 function PlayX.UpdatePanels()
+    if not hasLoaded then return end
     SettingsPanel(GetControlPanel("PlayXSettings"))
     ControlPanel(GetControlPanel("PlayXControl"))
 end

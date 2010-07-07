@@ -372,8 +372,10 @@ end
 --- Shows a hint.
 -- @param msg
 function PlayX.ShowHint(msg)
-    GAMEMODE:AddNotify(msg, NOTIFY_GENERIC, 10);
-    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+    if GAMEMODE and GAMEMODE.AddNotify then
+	    GAMEMODE:AddNotify(msg, NOTIFY_GENERIC, 10);
+	    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+	end
 end
 
 --- Shows an error message.

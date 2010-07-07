@@ -52,8 +52,10 @@ local function PlayXRepeaterEntityDuplicator(ply, model, pos, ang)
     ent:Spawn()
     ent:Activate()
     
-    ply:AddCleanup("gmod_playx_repeater", ent)
-
+    if ply.AddCleanup then
+        ply:AddCleanup("gmod_playx_repeater", ent)
+    end
+    
     return ent
 end
 
