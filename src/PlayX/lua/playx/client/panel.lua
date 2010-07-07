@@ -142,7 +142,8 @@ local function ControlPanel(panel)
         Label = "URI:",
         Command = "playx_uri",
         WaitForEnter = false,
-    }):SetTooltip("Example: http://www.youtube.com/watch?v=NWdTcxv4V-g")
+    })
+    textbox:SetTooltip("Example: http://www.youtube.com/watch?v=NWdTcxv4V-g")
 
     panel:AddControl("TextBox", {
         Label = "Start At:",
@@ -165,10 +166,6 @@ local function ControlPanel(panel)
     panel:AddControl("CheckBox", {
         Label = "Don't auto stop on finish when applicable",
         Command = "playx_ignore_length",
-    })
-    
-    panel:AddControl("Label", {
-        Text = "READ: Press ENTER in the textboxes above before clicking the buttons below."
     })
     
     panel:AddControl("Button", {
