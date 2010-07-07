@@ -395,6 +395,54 @@ function PlayX.OpenUpdateWindow(ver)
     frame:InvalidateLayout(true, true)
 end
 
+--- Begins media.
+-- @param handler
+-- @param uri
+-- @param playAge
+-- @param resumeSupported
+-- @param lowFramerate
+-- @param handlerArgs
+function PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, handlerArgs)
+    if not PlayX.PlayerExists() then -- This should not happen
+        ErrorNoHalt("Undefined state DS_BEGIN_NO_PLAYER; please report error")
+        return
+    end
+    
+    PlayX.Playing = true
+    PlayX.CurrentMedia = nil
+    
+    if list.Get("PlayXHandlers")[handler] then
+        if uri:len() > 325 then
+            print(string.format("PlayX: Playing %s using handler %s", uri, handler))
+        else
+            Msg(string.format("PlayX: Playing %s using handler %s\n", uri, handler))
+        end
+        
+        PlayX.CurrentMedia = {
+            ["Handler"] = handler,
+            ["URI"] = uri,
+            ["StartTime"] = CurTime() - playAge,
+            ["ResumeSupported"] = resumeSupported,
+            ["LowFramerate"] = lowFramerate,
+            ["HandlerArgs"] = handlerArgs,
+        }
+        
+        if PlayX.Enabled then
+            BeginPlay()
+        else
+            PlayX.UpdatePanels() -- This matters for the admin, as the "End Media" button needs to be updated
+            
+            if resumeSupported then
+                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see it.") 
+            else
+                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see the next thing that gets played.") 
+            end
+        end
+    else
+        Msg(string.format("PlayX: No such handler named %s, can't play %s\n", handler, uri))
+    end
+end
+
 --- Shows a hint.
 -- @param msg
 function PlayX.ShowHint(msg)
@@ -448,13 +496,8 @@ cvars.AddChangeCallback("playx_volume", VolumeChangeCallback)
 
 PlayX.Enabled = GetConVar("playx_enabled"):GetBool()
 
---- Called on PlayXBegin user message.
+--- Called on PlayXBegin datastream.
 local function DSBegin(_, id, encoded, decoded)
-    if not PlayX.PlayerExists() then -- This should not happen
-        ErrorNoHalt("Undefined state DS_BEGIN_NO_PLAYER; please report error")
-        return
-    end
-    
     local handler = decoded.Handler
     local uri = decoded.URI
     local playAge = decoded.PlayAge
@@ -462,39 +505,18 @@ local function DSBegin(_, id, encoded, decoded)
     local lowFramerate = decoded.LowFramerate
     local handlerArgs = decoded.HandlerArgs
     
-    PlayX.Playing = true
-    PlayX.CurrentMedia = nil
+    PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, handlerArgs)
+end
+
+--- Called on PlayXBegin usermessage.
+local function UMsgBegin(um)
+    local handler = um:ReadString()
+    local uri = um:ReadString()
+    local playAge = um:ReadLong()
+    local resumeSupported = um:ReadBool()
+    local lowFramerate = um:ReadBool()
     
-    if list.Get("PlayXHandlers")[handler] then
-        if uri:len() > 325 then
-            print(string.format("PlayX: Playing %s using handler %s", uri, handler))
-        else
-            Msg(string.format("PlayX: Playing %s using handler %s\n", uri, handler))
-        end
-        
-        PlayX.CurrentMedia = {
-            ["Handler"] = handler,
-            ["URI"] = uri,
-            ["StartTime"] = CurTime() - playAge,
-            ["ResumeSupported"] = resumeSupported,
-            ["LowFramerate"] = lowFramerate,
-            ["HandlerArgs"] = handlerArgs,
-        }
-        
-        if PlayX.Enabled then
-            BeginPlay()
-        else
-            PlayX.UpdatePanels() -- This matters for the admin, as the "End Media" button needs to be updated
-            
-            if resumeSupported then
-                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see it.") 
-            else
-                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see the next thing that gets played.") 
-            end
-        end
-    else
-        Msg(string.format("PlayX: No such handler named %s, can't play %s\n", handler, uri))
-    end
+    PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, {})
 end
 
 --- Called on PlayXProvidersList user message.
@@ -562,6 +584,7 @@ end
 
 datastream.Hook("PlayXBegin", DSBegin)
 datastream.Hook("PlayXProvidersList", DSProvidersList)
+usermessage.Hook("PlayXBegin", UMsgBegin)
 usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
 usermessage.Hook("PlayXJWURL", UMsgJWURL)

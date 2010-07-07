@@ -432,18 +432,34 @@ function PlayX.SendBeginDStream(ply)
     if ply then
         filter = ply
     else
-        filter = RecipientFilter()
-        filter:AddAllPlayers()
+        --filter = RecipientFilter()
+        --filter:AddAllPlayers()
+        
+        -- PCMod is a piece of crap
+        filter = player.GetHumans()
     end
     
-    datastream.StreamToClients(filter, "PlayXBegin", {
-        ["Handler"] = PlayX.CurrentMedia.Handler,
-        ["URI"] = PlayX.CurrentMedia.URI,
-        ["PlayAge"] = CurTime() - PlayX.CurrentMedia.StartTime,
-        ["ResumeSupported"] = PlayX.CurrentMedia.ResumeSupported,
-        ["LowFramerate"] = PlayX.CurrentMedia.LowFramerate,
-        ["HandlerArgs"] = PlayX.CurrentMedia.HandlerArgs,
-    })
+    local strLength = string.len(PlayX.CurrentMedia.Handler) +
+                      string.len(PlayX.CurrentMedia.URI)
+    
+    if next(PlayX.CurrentMedia.HandlerArgs) == nil and strLength <= 200 then
+        umsg.Start("PlayXBegin", filter)
+        umsg.String(PlayX.CurrentMedia.Handler)
+        umsg.String(PlayX.CurrentMedia.URI)
+        umsg.Long(CurTime() - PlayX.CurrentMedia.StartTime) -- To be safe
+        umsg.Bool(PlayX.CurrentMedia.ResumeSupported)
+        umsg.Bool(PlayX.CurrentMedia.LowFramerate)
+        umsg.End()
+    else
+	    datastream.StreamToClients(filter, "PlayXBegin", {
+	        ["Handler"] = PlayX.CurrentMedia.Handler,
+	        ["URI"] = PlayX.CurrentMedia.URI,
+	        ["PlayAge"] = CurTime() - PlayX.CurrentMedia.StartTime,
+	        ["ResumeSupported"] = PlayX.CurrentMedia.ResumeSupported,
+	        ["LowFramerate"] = PlayX.CurrentMedia.LowFramerate,
+	        ["HandlerArgs"] = PlayX.CurrentMedia.HandlerArgs,
+	    })
+	end
 end
 
 --- Send the PlayXEnd umsg to clients. You should not have much of a
