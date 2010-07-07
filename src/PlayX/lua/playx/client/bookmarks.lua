@@ -174,6 +174,17 @@ function Bookmark:Play()
                            GetConVar("playx_ignore_length"):GetBool())
 end
 
+function Bookmark:CopyToPanel()
+    if self.Deleted then
+        Error("Operation performed on deleted bookmark")    
+    end
+    
+    RunConsoleCommand("playx_provider", self.Provider)
+    RunConsoleCommand("playx_uri", self.URI)
+    RunConsoleCommand("playx_start_time", self.StartAt)
+    RunConsoleCommand("playx_force_low_framerate", self.LowFramerate and "1" or "0")
+end
+
 function PlayX.LoadBookmarks()
     local data = file.Read("playx/bookmarks.txt")
     
@@ -574,6 +585,10 @@ function PlayX.OpenBookmarksWindow(selectTitle)
         end)
         menu:AddOption("Copy URI", function()
             SetClipboardText(line:GetValue(2))
+        end)
+        menu:AddOption("Copy to 'Administrate'", function()
+            PlayX.GetBookmark(line:GetValue(1):Trim()):CopyToPanel()
+            frame:Close()
         end)
         menu:Open() 
     end

@@ -220,6 +220,9 @@ local function BookmarksPanel(panel)
         menu:AddOption("Copy URI", function()
             SetClipboardText(line:GetValue(2))
         end)
+        menu:AddOption("Copy to 'Administrate'", function()
+            PlayX.GetBookmark(line:GetValue(1):Trim()):CopyToPanel()
+        end)
         menu:Open()
     end
     
