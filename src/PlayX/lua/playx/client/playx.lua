@@ -350,20 +350,46 @@ function PlayX.OpenUpdateWindow(ver)
     frame:SetTitle("PlayX Update News")
     frame:SetDeleteOnClose(true)
     frame:SetScreenLock(true)
-    frame:SetSize(math.min(780, ScrW() - 0), ScrH() * 4/5)
+    frame:SetSize(600, 400)
     frame:SetSizable(true)
     frame:Center()
     frame:MakePopup()
     
+    local close = vgui.Create("DButton", frame)
+    close:SetSize(90, 25)
+    close:SetText("Close")
+    close.DoClick = function(button)
+        frame:Close()
+    end
+    
     local browser = vgui.Create("HTML", frame)
-    browser:SetVerticalScrollbarEnabled(false)
+    browser:SetVerticalScrollbarEnabled(true)
+	browser.OpeningURL = function(panel, url)
+	    if not url:find("^http://[%.a-zA-Z0-9%-]*playx%.sk89q%.com") then
+	       gui.OpenURL(url)
+	       frame:Close()
+	    end
+	end
+	browser.Paint = function(self)
+	    local skin = derma.GetDefaultSkin()
+        if not skin then return end
+	    local c = skin.bg_color_dark
+	    local fg = skin.text_normal
+	    surface.SetDrawColor(c.r, c.g, c.b, 255)
+	    surface.DrawRect(0, 0, self:GetWide() - 22, self:GetTall())
+	    surface.SetFont(skin.fontFrame)
+	    surface.SetTextColor(fg.r, fg.g, fg.b, 255)
+	    surface.SetTextPos(10, 10) 
+	    surface.DrawText("Loading" .. string.rep(".", (CurTime() * 2) % 3))
+	end
     browser:OpenURL(url)
 
     -- Layout
     local oldPerform = frame.PerformLayout
     frame.PerformLayout = function()
         oldPerform(frame)
-        browser:StretchToParent(10, 28, 10, 10)
+        browser:StretchToParent(10, 28, 10, 40)
+        close:SetPos(frame:GetWide() - close:GetWide() - 8, frame:GetTall() - close:GetTall() - 8)
     end
     
     frame:InvalidateLayout(true, true)
