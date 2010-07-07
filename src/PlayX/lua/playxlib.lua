@@ -329,6 +329,11 @@ function playxlib.IsTrue(s)
     return s == "t" or s == "true" or s == "1" or s == "y" or s == "yes"
 end
 
+function playxlib.EmptyToNil(s)
+    if s == "" then return nil end
+    return s
+end
+
 -- Handler result
 local HandlerResult = {}
 playxlib.HandlerResult = HandlerResult
@@ -341,16 +346,38 @@ mt.__call = function(...)
 end
 setmetatable(HandlerResult, mt)
 
-function HandlerResult:new(css, js, body, jsURL, center, url)
+function HandlerResult:new(t, js, body, jsURL, center, url)
+    local css, volumeFunc
+    
+    if type(t) == 'table' then
+        css = t.css
+        js = t.js
+        body = t.body
+        jsURL = t.jsURL
+        center = t.center
+        url = t.url
+        volumeFunc = t.volumeFunc
+    else
+        css = t
+    end
+    
+    css = playxlib.EmptyToNil(css)
+    js = playxlib.EmptyToNil(js)
+    jsURL = playxlib.EmptyToNil(jsURL)
+    url = playxlib.EmptyToNil(url)
+    
     local instance = {
-        ["CSS"] = css,
-        ["Body"] = body,
-        ["JS"] = js,
-        ["JSInclude"] = jsURL,
-        ["Center"] = center,
-        ["ForceIE"] = false,
-        ["ForceURL"] = url,
+        CSS = css,
+        Body = body,
+        JS = js,
+        JSInclude = jsURL,
+        Center = center,
+        ForceURL = url,
     }
+    
+    if volumeFunc then
+        instance.GetVolumeChangeJS = volumeFunc
+    end
     
     setmetatable(instance, self)
     self.__index = self

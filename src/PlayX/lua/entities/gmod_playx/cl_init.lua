@@ -79,11 +79,11 @@ function ENT:UpdateScreenBounds()
         local maxArea = math.max(rightArea, forwardArea, topArea)
         
         if maxArea == rightArea then
-	        local width = maxs.y - mins.y
-	        local height = maxs.z - mins.z
-	        local pos = Vector(center.x + (maxs.x - mins.x) / 2 + 0.5,
-	                           center.y - width / 2,
-	                           center.z + height / 2)
+            local width = maxs.y - mins.y
+            local height = maxs.z - mins.z
+            local pos = Vector(center.x + (maxs.x - mins.x) / 2 + 0.5,
+                               center.y - width / 2,
+                               center.z + height / 2)
             self:SetScreenBounds(pos, width, height, -90, 90, 0)
         elseif maxArea == forwardArea then
             local width = maxs.x - mins.x
@@ -173,20 +173,21 @@ end
 function ENT:Play(handler, uri, start, volume, handlerArgs)
     local h = list.Get("PlayXHandlers")[handler]
     local result = h(self.HTMLWidth, self.HTMLHeight, start, volume, uri, handlerArgs)
-    self.DrawCenter = result.center
+    self.DrawCenter = result.Center
     self.CurrentPage = result
     
     if not self.Browser then
         self:CreateBrowser()
     end
     
+    self.Browser.FinishedURL = function()
+        MsgN("PlayX DEBUG: FinishedURL callback, preparing to inject")
+        self:InjectPage()
+    end
+    
     if result.ForceURL then
-        self.Browser.OpeningURL = nil
         self.Browser:OpenURL(result.ForceURL)
     else
-        self.Browser.FinishedURL = function()
-            self:InjectPage()
-        end
         self.Browser:OpenURL(PlayX.HostURL)
     end
     
@@ -353,13 +354,10 @@ function ENT:InjectPage()
         return
     end
     
-    -- Don't have to do much if it's a URL that we are loading
     if self.CurrentPage.ForceURL then
-        -- But let's remove the scrollbar
         self.Browser:Exec([[
 document.body.style.overflow = 'hidden';
 ]])
-        return
     end
     
     if self.CurrentPage.JS then
@@ -373,28 +371,32 @@ script.type = 'text/javascript';
 script.src = ']] .. playxlib.JSEscape(self.CurrentPage.JSInclude) .. [[';
 document.body.appendChild(script);
 ]])
-    else
+    elseif self.CurrentPage.Body then
         self.Browser:Exec([[
 document.body.innerHTML = ']] .. playxlib.JSEscape(self.CurrentPage.Body) .. [[';
 ]])
     end
     
-    self.Browser:Exec([[
+    if not self.CurrentPage.ForceURL then
+        self.Browser:Exec([[
 document.body.style.margin = '0';
 document.body.style.padding = '0';
 document.body.style.border = '0';
 document.body.style.background = '#000000';
 document.body.style.overflow = 'hidden';
 ]])
+    end
 
-    self.Browser:Exec([[
+    if self.CurrentPage.CSS then
+        self.Browser:Exec([[
 var style = document.createElement('style');
 style.type = 'text/css';
 style.styleSheet.cssText = ']] .. playxlib.JSEscape(self.CurrentPage.CSS) .. [[';
 document.getElementsByTagName('head')[0].appendChild(style);
 ]])
+    end
     
-    if self.LowFramerateMode or self.NoScreen then
+    if not self.CurrentPage.ForceURL and (self.LowFramerateMode or self.NoScreen) then
         self.Browser:Exec([[
 var elements = document.getElementsByTagName('*');
 for (var i = 0; i < elements.length; i++) {

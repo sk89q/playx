@@ -146,35 +146,6 @@ end
 list.Set("PlayXProviders", "FlashVideo", FlashVideo)
 list.Set("PlayXProvidersList", "FlashVideo", {"FLV/MP4/AAC"})
 
-local AnimatedImage = {}
-
-function AnimatedImage.Detect(uri)
-    return nil
-end
-
-function AnimatedImage.GetPlayer(uri, useJW)
-    if uri:lower():find("^http://") then
-        return {
-            ["Handler"] = "Image",
-            ["URI"] = uri,
-            ["ResumeSupported"] = true,
-            ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
-                AnimatedImage.QueryMetadata(uri, callback, failCallback)
-            end,
-        }
-    end
-end
-
-function AnimatedImage.QueryMetadata(uri, callback, failCallback)
-    callback({
-        ["URL"] = uri,
-    })
-end
-
-list.Set("PlayXProviders", "AnimatedImage", AnimatedImage)
-list.Set("PlayXProvidersList", "AnimatedImage", {"Animated image"})
-
 local Image = {}
 
 function Image.Detect(uri)
@@ -198,7 +169,7 @@ function Image.GetPlayer(uri, useJW)
             ["Handler"] = "Image",
             ["URI"] = uri,
             ["ResumeSupported"] = true,
-            ["LowFramerate"] = true,
+            ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
                 Image.QueryMetadata(uri, callback, failCallback)
             end,
@@ -214,3 +185,4 @@ end
 
 list.Set("PlayXProviders", "Image", Image)
 list.Set("PlayXProvidersList", "Image", {"Image"})
+list.Set("PlayXProviders", "AnimatedImage", Image) -- Legacy

@@ -43,7 +43,7 @@ function Flash.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "Flash", Flash)
-list.Set("PlayXProvidersList", "Flash", {"Flash [don't force play]"})
+list.Set("PlayXProvidersList", "Flash", {"Flash"})
 
 local FlashMovie = {}
 
@@ -82,4 +82,4 @@ function FlashMovie.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "FlashMovie", FlashMovie)
-list.Set("PlayXProvidersList", "FlashMovie", {"Flash movie [force play buttons]"})
+--list.Set("PlayXProvidersList", "FlashMovie", {"Flash movie [force play buttons]"})

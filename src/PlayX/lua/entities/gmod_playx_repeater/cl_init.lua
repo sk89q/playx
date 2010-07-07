@@ -35,7 +35,7 @@ end
 
 function ENT:DrawScreen(centerX, centerY)
     if ValidEntity(self.SourceInstance) then
-        self.BaseClass.DrawScreen(self.SourceInstance, centerX, centerY)
+        self.SourceInstance:DrawScreen(centerX, centerY)
     else
         draw.SimpleText("PlayX source is required for repeater",
                         "HUDNumber",
@@ -49,6 +49,9 @@ function ENT:Think()
         self.SourceInstance = PlayX.GetInstance()
     end
     
+    if ValidEntity(self.SourceInstance) then
+        self.DrawCenter = self.SourceInstance.DrawCenter
+    end
     self:NextThink(CurTime() + 0.1)  
 end  
 
