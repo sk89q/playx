@@ -8,21 +8,21 @@ Introduction
 
 PlayX is a versatile media player for Gmod that is capable of playing
 several different types of media, ranging from YouTube videos to images.
+
 Support
 -------
 
 - YouTube: auto-detect, resume / seek, volume control, length detection
 - Flash: auto-detect
-- MP3*: auto-detect, resume / seek (not really), volume control
-- FLV*: auto-detect, volume control
-- MP4*: auto-detect, volume control
-- AAC*: auto-detect, volume control
+- MP3: auto-detect, resume / seek (not really), volume control
+- FLV: auto-detect, volume control
+- MP4: auto-detect, volume control
+- AAC: auto-detect, volume control
 - Image: auto-detect, resume, volume N/A, length N/A
 - Livestream: auto-detect, resume, volume control, length N/A
 - Vimeo: auto-detect, volume control
-
-* Requires that the playx_jw_url cvar be pointed to a valid URL of a
-  hosted copy of the JW Player.
+- Hulu: auto-detect, resume
+- justin.tv: auto-detect, resume, volume control, length N/A
 
 Usage
 -----
