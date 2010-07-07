@@ -1,2 +1,0 @@
-For the API, please see:
-http://wiki.github.com/sk89q/playx/api
