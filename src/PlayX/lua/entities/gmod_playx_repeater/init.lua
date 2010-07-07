@@ -41,10 +41,6 @@ function ENT:OnRemove()
 end
 
 local function PlayXRepeaterEntityDuplicator(ply, model, pos, ang)
-    if PlayX.PlayerExists() then
-        return nil
-    end
-    
     if not PlayX.IsPermitted(ply) then
         return nil
     end
