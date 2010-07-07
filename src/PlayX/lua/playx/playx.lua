@@ -187,6 +187,43 @@ function PlayX.SpawnForPlayer(ply, model, repeater)
     return true
 end
 
+--- Resolves a provider.
+-- @param provider Name of provider, leave blank to auto-detect
+-- @param uri URI to play
+-- @param useJW True to allow the use of the JW player, false for otherwise, nil to default true
+-- @return Provider name (detected) or nil
+-- @return Result or error message
+function PlayX.ResolveProvider(provider, uri, useJW)
+    if provider ~= "" then -- Provider detected
+        if not list.Get("PlayXProviders")[provider] then
+            return nil, "Unknown provider specified"
+        end
+        
+        local newURI = list.Get("PlayXProviders")[provider].Detect(uri)
+        result = list.Get("PlayXProviders")[provider].GetPlayer(newURI and newURI or uri, useJW)
+        
+        if not result then
+            return nil, "The provider did not recognize the media URI"
+        end
+    else -- Time to detect the provider
+        for id, p in pairs(list.Get("PlayXProviders")) do
+            local newURI = p.Detect(uri)
+            
+            if newURI then
+                provider = id
+                result = p.GetPlayer(newURI, useJW)
+                break
+            end
+        end
+        
+        if not result then
+            return nil, "No provider was auto-detected"
+        end
+    end
+    
+    return provider, result
+end
+
 --- Opens a media file to be played. Clients will be informed of the new
 -- media. This is the typical function that you would call to play a
 -- certain video.
@@ -215,33 +252,10 @@ function PlayX.OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreL
         return false, "No URI provided"
     end
     
-    local result = nil
+    local provider, result = PlayX.ResolveProvider(provider, uri, useJW)
     
-    if provider ~= "" then -- Provider detected
-        if not list.Get("PlayXProviders")[provider] then
-            return false, "Unknown provider specified"
-        end
-        
-        local newURI = list.Get("PlayXProviders")[provider].Detect(uri)
-        result = list.Get("PlayXProviders")[provider].GetPlayer(newURI and newURI or uri, useJW)
-        
-        if not result then
-            return false, "The provider did not recognize the media URI"
-        end
-    else -- Time to detect the provider
-        for id, p in pairs(list.Get("PlayXProviders")) do
-            local newURI = p.Detect(uri)
-            
-            if newURI then
-                provider = id
-                result = p.GetPlayer(newURI, useJW)
-                break
-            end
-        end
-        
-        if not result then
-            return false, "No provider was auto-detected"
-        end
+    if provider == nil then
+        return false, result    
     end
     
     local useLowFramerate = result.LowFramerate
