@@ -178,6 +178,11 @@ local function ControlPanel(panel)
         Command = "playx_gui_close",
     })
     
+    panel:AddControl("Button", {
+        Label = "Add as Bookmark",
+        Command = "playx_gui_bookmark",
+    })
+    
     if not PlayX.CurrentMedia then
         button:SetDisabled(true)
     end

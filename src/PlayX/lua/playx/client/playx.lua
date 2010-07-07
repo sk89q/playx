@@ -631,6 +631,35 @@ local function ConCmdGUIClose()
     PlayX.RequestCloseMedia()
 end
 
+--- Called for concmd playx_update_window.
+local function ConCmdGUIBookmark()
+    local provider = GetConVar("playx_provider"):GetString():Trim()
+    local uri = GetConVar("playx_uri"):GetString():Trim()
+    local startAt = GetConVar("playx_start_time"):GetString():Trim()
+    local lowFramerate = GetConVar("playx_force_low_framerate"):GetBool()
+    
+    if uri == "" then
+        Derma_Message("No URI is entered.", "Error", "OK")
+    else
+        Derma_StringRequest("Add Bookmark", "Enter a name for the bookmark", "",
+            function(title)
+                local title = title:Trim()
+                if title ~= "" then
+			        local result, err = PlayX.AddBookmark(title, provider, uri, "",
+			                                              startAt, lowFramerate)
+			        
+			        if result then
+                        Derma_Message("Bookmark added.", "Bookmark Added", "OK")
+			            
+			            PlayX.SaveBookmarks()
+			        else
+			            Derma_Message(err, "Error", "OK")
+			        end
+                end
+            end)
+    end
+end
+
 --- Called for concmd playx_dump_html.
 local function ConCmdDumpHTML()
     print(PlayX.GetHTML())
@@ -646,5 +675,6 @@ concommand.Add("playx_hide", ConCmdHide)
 concommand.Add("playx_reset_render_bounds", ConCmdResetRenderBounds)
 concommand.Add("playx_gui_open", ConCmdGUIOpen)
 concommand.Add("playx_gui_close", ConCmdGUIClose)
+concommand.Add("playx_gui_bookmark", ConCmdGUIBookmark)
 concommand.Add("playx_dump_html", ConCmdDumpHTML) -- Debug function
 concommand.Add("playx_update_window", ConCmdUpdateWindow)
