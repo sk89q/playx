@@ -279,18 +279,20 @@ function PlayX.OpenSpawnDialog(forRepeater)
     modelList:EnableHorizontal(true)
     modelList:SetPadding(5)
     
-    for model, _ in pairs(PlayXScreens) do
-        local spawnIcon = vgui.Create("SpawnIcon", modelList)
-        
-        spawnIcon:SetModel(model)
-        spawnIcon.Model = model
-        spawnIcon.DoClick = function()
-            surface.PlaySound("ui/buttonclickrelease.wav")
-            RunConsoleCommand("playx_spawn" .. (forRepeater and "_repeater" or ""), spawnIcon.Model)
-            frame:Close()
+    for model, info in pairs(PlayXScreens) do
+        if not forRepeater or not info.NoScreen then
+	        local spawnIcon = vgui.Create("SpawnIcon", modelList)
+	        
+	        spawnIcon:SetModel(model)
+	        spawnIcon.Model = model
+	        spawnIcon.DoClick = function()
+	            surface.PlaySound("ui/buttonclickrelease.wav")
+	            RunConsoleCommand("playx_spawn" .. (forRepeater and "_repeater" or ""), spawnIcon.Model)
+	            frame:Close()
+	        end
+	        
+	        modelList:AddItem(spawnIcon)
         end
-        
-        modelList:AddItem(spawnIcon)
     end
     
     local cancelButton = vgui.Create("DButton", frame)
