@@ -420,8 +420,6 @@ PlayX.Enabled = GetConVar("playx_enabled"):GetBool()
 
 --- Called on PlayXBegin user message.
 local function DSBegin(_, id, encoded, decoded)
-    Msg("PlayX DEBUG: Begin media message received\n")
-    
     if not PlayX.PlayerExists() then -- This should not happen
         ErrorNoHalt("Undefined state DS_BEGIN_NO_PLAYER; please report error")
         return
@@ -486,8 +484,6 @@ end
 
 --- Called on PlayXEnd user message.
 local function UMsgEnd(um)
-    Msg("PlayX DEBUG: Eng umsg received\n")
-    
     PlayX.CurrentMedia = nil
     
     if PlayX.PlayerExists() and PlayX.Playing and PlayX.Enabled then
@@ -499,8 +495,6 @@ end
 
 --- Called on PlayXSpawnDialog user message.
 local function UMsgSpawnDialog(um)
-    Msg("PlayX DEBUG: Spawn dialog request received\n")
-    
     PlayX.OpenSpawnDialog(um:ReadBool())
 end
 

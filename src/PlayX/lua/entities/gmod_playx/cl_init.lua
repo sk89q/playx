@@ -181,7 +181,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     end
     
     self.Browser.FinishedURL = function()
-        MsgN("PlayX DEBUG: FinishedURL callback, preparing to inject")
+        MsgN("PlayX DEBUG: Page loaded, preparing to inject")
         self:InjectPage()
     end
     
