@@ -99,7 +99,11 @@ end
 -- @param ply Player
 -- @return
 function PlayX.IsPermitted(ply)
-    if PlayXIsPermittedHandler then
+    local result = hook.Call("PlayXIsPermitted", GAMEMODE, ply)
+    
+    if result ~= nil then
+        return result
+    elseif PlayXIsPermittedHandler then
         return PlayXIsPermittedHook(ply)
     else
         return ply:IsAdmin() or ply:IsSuperAdmin()
