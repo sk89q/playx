@@ -306,6 +306,8 @@ end
 function ENT:DrawScreen(centerX, centerY)
     if self.Browser and self.Browser:IsValid() and self.Playing then
         if not self.LowFramerateMode then
+            if not self.BrowserMat then return end
+            
             render.SetMaterial(self.BrowserMat)
             -- GC issue here?
             render.DrawQuad(Vector(0, 0, 0), Vector(self.HTMLWidth, 0, 0),
@@ -327,7 +329,11 @@ function ENT:DrawScreen(centerX, centerY)
     end
 end
 
-function ENT:Think()  
+function ENT:Think()
+    if self.LowFramerateMode or self.NoScreen then
+        self.BrowserMat = nil
+    end
+    
     if not self.Browser then
         self.BrowserMat = nil
     else

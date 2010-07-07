@@ -35,7 +35,14 @@ end
 
 function ENT:DrawScreen(centerX, centerY)
     if ValidEntity(self.SourceInstance) then
-        self.SourceInstance:DrawScreen(centerX, centerY)
+        if not self.SourceInstance.NoScreen then
+            self.SourceInstance:DrawScreen(centerX, centerY)
+        else
+        draw.SimpleText("PlayX source has no screen",
+                        "HUDNumber",
+                        centerX, centerY, Color(255, 255, 255, 255),
+                        TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        end
     else
         draw.SimpleText("PlayX source is required for repeater",
                         "HUDNumber",
