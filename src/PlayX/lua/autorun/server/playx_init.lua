@@ -25,7 +25,6 @@ AddCSLuaFile("playx/client/panel.lua")
 -- Add handlers
 local p = file.FindInLua("playx/client/handlers/*.lua")
 for _, file in pairs(p) do
-    print("AddCSLuaFile(\"playx/client/handlers/\" .. " .. file .. ")")
     AddCSLuaFile("playx/client/handlers/" .. file)
 end
 
