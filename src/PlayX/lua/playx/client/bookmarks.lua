@@ -191,20 +191,23 @@ function PlayX.LoadBookmarks()
     if data == nil then
         -- Default data
         data = [[
-Hold On (feat. Lazee),,http://youtube.com/watch?v=4uWZ0KD1A4M,,0:00,
-Black Black Heart,,http://youtube.com/watch?v=8U4C-zYrFUg,,0:00,
-8-bit Dr. Horrible's Sing Along Blog,,http://youtube.com/watch?v=9_9x9m8F1b4,,0:00,
-"Jupiter, the Bringer of Jollity",,http://youtube.com/watch?v=Nz0b4STz1lo,,0:00,1
-Libera Me From Hell,,http://youtube.com/watch?v=oAlztMvvNkk,,0:00,1
-Bye Bye Blackbird,,http://youtube.com/watch?v=qzpSIJpq11c,,0:00,1
-Life in Haiti,,http://vimeo.com/10282740,,0:00,
-Ancient Temple,,http://youtube.com/watch?v=CAyKxQM7jHM,,0:00,
-REACH,,http://youtube.com/watch?v=tzg2jjH2z8E,,0:00,
-More Today Than Yesterday,,http://youtube.com/watch?v=j45ezAAeMDw,,0:00,
-I Still Haven't Found What I'm Looking For,,http://youtube.com/watch?v=Pb1XXs7e7ac,,0:00,
-Pirates,,http://youtube.com/watch?v=rIn5cS2eVbg,,0:00,
-Do You Want To,,http://youtube.com/watch?v=4Oy3nzfA3Qk,,0:00,
-Bittersweet,,http://youtube.com/watch?v=6ka3PdGdtro,,0:00,1
+Believe,,http://youtube.com/watch?v=7fyTugLAjtk,,0:00,
+This Is Halloween,,http://youtube.com/watch?v=i_zYrYkbrGY,,0:00,
+Inspiring Video,,http://youtube.com/watch?v=VuvT0I9KWQA,,0:00,1
+Google Chrome Speed Tests,,http://youtube.com/watch?v=nCgQDjiotG0,,0:00,
+Making of the Google Chrome Speed Tests,,http://youtube.com/watch?v=_oarMXGq3gI,,0:00,
+No One Sleeps When I'm Awake,,http://youtube.com/watch?v=3Muci-5Yt0o,,0:00,
+Tengen Toppa Gurren Lagann,,http://youtube.com/watch?v=RN63L89nJeA,,0:00,
+Mr. Brightside,,http://youtube.com/watch?v=XhMSKdCgVYQ,,0:00,
+What Is Love? (Dance mix),,http://youtube.com/watch?v=JzzaIeVtQ0s,,0:00,1
+Hold On (remix),,http://youtube.com/watch?v=ShJmz29HQY4,,0:00,1
+The Likelihood of Flying Saucers,,http://youtube.com/watch?v=wLaRXYai19A,,0:00,
+"Umm, Cool Animation",,http://youtube.com/watch?v=v2H4l9RpkwM,,0:00,
+Divenire,,http://youtube.com/watch?v=_RyPFwAWSKM,,0:00,
+Come Sei Veramente,,http://youtube.com/watch?v=qKMZ2H_a0z8,,0:00,1
+Mistakes We Knew We Were Making,,http://youtube.com/watch?v=ahj6XRONd3s,,0:00,1
+I Wish to Report a Burglary,,http://youtube.com/watch?v=L57-vQvo34E,,0:00,
+Abe Lincoln (WKUK),,http://youtube.com/watch?v=B4Uf9rsBbhc,,0:00,
 ]]
     end
     
