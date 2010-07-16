@@ -314,25 +314,29 @@ function PlayX.UpdateMetadata(data)
     if data.Length then
 	    if GetConVar("playx_expire"):GetFloat() <= -1 then
 	        timer.Stop("PlayXMediaExpire")
-	        return
+	    else
+	        local length = data.Length + GetConVar("playx_expire"):GetFloat() -- Pad length
+	         
+	        PlayX.CurrentMedia.StopTime = PlayX.CurrentMedia.StartTime + length
+	        
+	        local timeLeft = PlayX.CurrentMedia.StopTime - PlayX.CurrentMedia.StartTime
+	        
+	        print("PlayX: Length of current media set to " .. tostring(length) ..
+	              " (grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
+	        
+	        if timeLeft > 0 then
+	            timer.Adjust("PlayXMediaExpire", timeLeft, 1)
+	            timer.Start("PlayXMediaExpire")
+	        else -- Looks like it ended already!
+	            print("PlayX: Media has already expired")
+	            PlayX.EndMedia()
+	        end
 	    end
-	    
-	    local length = data.Length + GetConVar("playx_expire"):GetFloat() -- Pad length
-	     
-	    PlayX.CurrentMedia.StopTime = PlayX.CurrentMedia.StartTime + length
-	    
-	    local timeLeft = PlayX.CurrentMedia.StopTime - PlayX.CurrentMedia.StartTime
-	    
-	    print("PlayX: Length of current media set to " .. tostring(length) ..
-	          " (grace 10 seconds), time left: " .. tostring(timeLeft) .. " seconds")
-	    
-	    if timeLeft > 0 then
-	        timer.Adjust("PlayXMediaExpire", timeLeft, 1)
-	        timer.Start("PlayXMediaExpire")
-	    else -- Looks like it ended already!
-	        print("PlayX: Media has already expired")
-	        PlayX.EndMedia()
-	    end
+    end
+    
+    -- Send off data information
+    if data.Title then
+        SendUserMessage("PlayXMetadata", nil, tostring(data.Title):sub(1, 200))
     end
 end
 

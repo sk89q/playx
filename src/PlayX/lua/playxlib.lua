@@ -104,6 +104,38 @@ function playxlib.HTMLUnescape(s)
     return s
 end
 
+--- URL unescapes a string. Doesn't handle %####
+-- @param str String
+-- @return Unescaped string
+function playxlib.URLUnescape(str)
+    -- Probably should de-anonymize this...
+    return str:gsub("%%([A-Fa-f0-9][A-Fa-f0-9])", function(m)
+        local n = tonumber(m, 16)
+        if not n then return "" end -- Not technically required
+        return string.char(n)
+    end)
+end
+
+--- Parses a query.
+-- @param str String to parse
+-- @return Table with keys and values
+function playxlib.ParseQuery(str)
+    local str = str:gsub("^%?", "")
+    local parts = string.Explode("&", str)
+    local out = {}
+    
+    for _, part in pairs(parts) do
+        local key, value = part:match("^([^=]+)=([^=]+)$")
+        if key then
+            out[playxlib.URLUnescape(key)] = playxlib.URLUnescape(value)
+        elseif part:Trim() ~= "" then
+            out[playxlib.URLUnescape(part)] = ""
+        end
+    end
+    
+    return out
+end
+
 --- Attempts to match a list of patterns against a string, and returns
 -- the first match, or nil if there were no matches.
 -- @param str The string
@@ -130,6 +162,12 @@ function playxlib.UTCTime(t)
 	return tSecs + os.difftime(tSecs, utcSecs)
 end
 
+--- Turns seconds into minutes and seconds.
+-- @param t Time
+-- @return String
+function playxlib.ReadableTime(t)
+    return string.format("%s:%02s", math.floor(t / 60), math.floor(t) % 60)
+end
 
 --- Gets the tags out of a string.
 -- @param s
@@ -563,11 +601,37 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
         ["playerready"] = "jwInit",
     }
     
+    local js = [[
+var knownState = "";
+
+function sendPlayerData(data) {
+    var str = "";
+    for (var key in data) {
+        str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
+    }
+    window.location = "http://playx.sktransport/?" + str;
+}
+
+function handleState(a) {;
+    var msg = a.newstate
+    knownState = a.newstate;
+    sendPlayerData({ State: msg });
+}
+function handleTime(a) {
+    sendPlayerData({ State: knownState, Position: a.position, Duration: a.duration });
+}
+
+function jwInit() {
+    player.addModelListener("STATE", "handleState");
+    player.addModelListener("TIME", "handleTime");
+}
+]]
+    
     if provider then
         flashVars["provider"] = provider
     end
     
-    local result = playxlib.GenerateFlashPlayer(width, height, flashURL, flashVars)
+    local result = playxlib.GenerateFlashPlayer(width, height, flashURL, flashVars, js)
     
     result.GetVolumeChangeJS = function(volume)
         return [[

@@ -33,6 +33,7 @@ function ENT:Initialize()
     self.LowFramerateMode = false
     self.DrawCenter = false
     self.NoScreen = false
+    self.PlayerData = {}
     
     self:UpdateScreenBounds()
 end
@@ -41,12 +42,20 @@ function ENT:UpdateScreenBounds()
     local model = self.Entity:GetModel()
     local info = PlayXScreens[model:lower()]
     
+    pcall(hook.Remove, "HUDPaint", "PlayXInfo" .. self:EntIndex())
+    
     if info then
         self.NoScreen = false
         
         if info.NoScreen then
             self.NoScreen = true
             self:SetProjectorBounds(0, 0, 0)
+            
+            hook.Add("HUDPaint", "PlayXInfo" .. self:EntIndex(), function()
+                if ValidEntity(self) then
+                    self:HUDPaint()
+                end
+            end)
         elseif info.IsProjector then
             self:SetProjectorBounds(info.Forward, info.Right, info.Up)
         else
@@ -181,9 +190,22 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     local result = h(self.HTMLWidth, self.HTMLHeight, start, volume, uri, handlerArgs)
     self.DrawCenter = result.Center
     self.CurrentPage = result
+    self.PlayerData = {}
     
     if not self.Browser then
         self:CreateBrowser()
+    end
+    
+    self.Browser.OpeningURL = function(_, url, target, postdata)
+        local query = url:match("^http://playx.sktransport/%?(.*)$")
+        
+        if query then
+            -- Unavailable on entity removal
+            if self.ProcessPlayerData then
+                self:ProcessPlayerData(playxlib.ParseQuery(query))
+            end
+            return true
+        end
     end
     
     self.Browser.FinishedURL = function()
@@ -206,6 +228,7 @@ end
 function ENT:Stop()
     self:DestructBrowser()
     self.Playing = false
+    self.PlayerData = {}
 end
 
 function ENT:ChangeVolume(volume)
@@ -323,10 +346,65 @@ function ENT:DrawScreen(centerX, centerY)
                             Vector(self.HTMLWidth, self.HTMLHeight, 0),
                             Vector(0, self.HTMLHeight, 0)) 
         else
-            draw.SimpleText("Video started in low framerate mode.",
-                            "HUDNumber",
-                            centerX, centerY, Color(255, 255, 255, 255),
-                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+            local text = "Video started in low framerate mode."
+            
+            if self.PlayerData.State then
+                text = self.PlayerData.State
+                
+                if text == "BUFFERING" then
+                    text = "Buffering" .. string.rep(".", CurTime() % 3)
+                elseif text == "PLAYING" then
+                    text = "Playing"
+                elseif text == "ERROR" then
+                    text = "(ERROR)"
+                elseif text == "COMPLETED" then
+                    text = "(Ended)"
+                elseif text == "STOPPED" then
+                    text = "(Stopped)"
+                elseif text == "PAUSED" then
+                    text = "(Paused)"
+                end
+            end
+            
+            if PlayX.CurrentMedia.Title then
+                draw.SimpleText(text,
+                                "MenuLarge",
+                                centerX, centerY + 20, Color(255, 255, 255, 255),
+                                TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+                
+	            draw.SimpleText(PlayX.CurrentMedia.Title:sub(1, 50),
+	                            "HUDNumber",
+	                            centerX, centerY - 50, Color(255, 255, 255, 255),
+	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
+            else
+	            draw.SimpleText(text,
+	                            "HUDNumber",
+	                            centerX, centerY, Color(255, 255, 255, 255),
+	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+            end
+            
+            if self.PlayerData.Duration or self.PlayerData.Position then
+                local pct = self.PlayerData.Duration and 
+                    self.PlayerData.Position / self.PlayerData.Duration or 0
+                surface.SetDrawColor(255, 255, 255, 255)
+                surface.DrawOutlinedRect(centerX - 200, centerY + 5, 400, 10)
+                if self.PlayerData.Position and self.PlayerData.Duration then
+	                surface.SetDrawColor(255, 0, 0, 255)
+	                surface.DrawRect(centerX - 199, centerY + 6, 398 * pct, 8)
+                end
+                
+                if self.PlayerData.Position then
+	                draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Position),
+	                    "MenuLarge", centerX - 200, centerY + 20,
+	                    Color(255, 255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                end
+                
+		        if self.PlayerData.Duration then
+	                draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Duration),
+	                    "MenuLarge", centerX + 200, centerY + 20,
+	                    Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
+	            end
+            end
         end
     else
         if PlayX.CrashDetected then
@@ -340,6 +418,78 @@ function ENT:DrawScreen(centerX, centerY)
                             centerX, centerY, Color(255, 255, 255, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
+    end
+end
+
+function ENT:HUDPaint()
+    if not self.DrawScale then return end
+    if not self.NoScreen then return end
+    if not self.Playing then return end
+    if not PlayX.ShowRadioHUD then return end
+
+    local text = nil
+    
+    if self.PlayerData.State then
+        text = self.PlayerData.State
+        
+        if text == "BUFFERING" then
+            text = "Buffering" .. string.rep(".", CurTime() % 3)
+        elseif text == "PLAYING" then
+            text = "Playing"
+        elseif text == "ERROR" then
+            text = "(ERROR)"
+        elseif text == "COMPLETED" then
+            text = "(Ended)"
+        elseif text == "STOPPED" then
+            text = "(Stopped)"
+        elseif text == "PAUSED" then
+            text = "(Paused)"
+        end
+    end
+    
+    local hasBottomBar = text or self.PlayerData.Duration or self.PlayerData.Position
+    local bw = 320
+    local bh = hasBottomBar and 65 or 34
+    local bx = ScrW() / 2 - bw / 2
+    local by = 15
+    
+    draw.RoundedBox(6, bx, by, bw, bh, Color(0, 0, 0, 150))
+        
+    local titleText = PlayX.CurrentMedia.Title and PlayX.CurrentMedia.Title:sub(1, 50) 
+        or "Title Unavailable"
+    draw.SimpleText(titleText,
+                    "DefaultBold",
+                    ScrW() / 2, 25, Color(255, 255, 255, 255),
+                    TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
+    
+    if text then
+        draw.SimpleText(text,
+                        "Default",
+                        ScrW() / 2, by + 40, Color(255, 255, 255, 255),
+                        TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+    end
+    
+    if self.PlayerData.Duration or self.PlayerData.Position then
+        local pct = self.PlayerData.Duration and 
+            self.PlayerData.Position / self.PlayerData.Duration or 0
+        surface.SetDrawColor(255, 255, 255, 255)
+        surface.DrawOutlinedRect(bx + 10, by + 30, bw - 20, 6)
+        if self.PlayerData.Position and self.PlayerData.Duration then
+	        surface.SetDrawColor(255, 0, 0, 255)
+	        surface.DrawRect(bx + 11, by + 31, (bw - 22) * pct, 4)
+        end
+        
+        if self.PlayerData.Position then
+	        draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Position),
+	            "DefaultBold", bx + 10, by + 40,
+	            Color(255, 255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+        end
+        
+        if self.PlayerData.Duration then
+	        draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Duration),
+	            "DefaultBold`", bx + bw - 10, by + 40,
+	            Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
+	    end
     end
 end
 
@@ -364,14 +514,26 @@ function ENT:OnRemove()
     end
     
     local ent = self
+    local entIndex = self:EntIndex()
     local browser = self.Browser
     
     -- Give Gmod 200ms to really delete the entity
     timer.Simple(0.2, function()
         if not ValidEntity(ent) then -- Entity is really gone
             if browser and browser:IsValid() then browser:Remove() end
+            pcall(hook.Remove, "HUDPaint", "PlayXInfo" .. entIndex)
         end
     end)
+end
+
+function ENT:ProcessPlayerData(data)
+    for k, v in pairs(data) do
+        if k == "State" then
+            self.PlayerData[k] = v
+        elseif k == "Position" or k == "Duration" then
+            self.PlayerData[k] = tonumber(v)
+        end
+    end
 end
 
 function ENT:InjectPage()

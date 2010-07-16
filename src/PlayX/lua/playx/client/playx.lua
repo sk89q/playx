@@ -53,6 +53,7 @@ PlayX.CurrentMedia = nil
 PlayX.SeenNotice = false
 PlayX.JWPlayerURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
 PlayX.HostURL = "http://sk89q.github.com/playx/host/host.html"
+PlayX.ShowRadioHUD = true
 PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.Providers = {}
@@ -629,6 +630,18 @@ local function UMsgError(um)
     PlayX.ShowError(err)
 end
 
+--- Called on PlayXMetadata user message, which gets sent on standard metadata
+-- information (title).
+local function UMsgMetadata(um)
+    Msg("PlayX DEBUG: Metadata received\n")
+    
+    local title = um:ReadString()
+    
+    if PlayX.CurrentMedia then
+        PlayX.CurrentMedia.Title = title
+    end 
+end
+
 datastream.Hook("PlayXBegin", DSBegin)
 datastream.Hook("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
@@ -638,6 +651,7 @@ usermessage.Hook("PlayXJWURL", UMsgJWURL)
 usermessage.Hook("PlayXHostURL", UMsgHostURL)
 usermessage.Hook("PlayXUpdateInfo", UMsgUpdateInfo)
 usermessage.Hook("PlayXError", UMsgError)
+usermessage.Hook("PlayXMetadata", UMsgMetadata)
 
 --- Called for concmd playx_resume.
 local function ConCmdResume()
@@ -733,4 +747,4 @@ local function DetectCrash()
     end
 end
 
-hook.Add("InitPostEntity", "PlayX.CrashDetection", DetectCrash)
+hook.Add("InitPostEntity", "PlayXCrashDetection", DetectCrash)
