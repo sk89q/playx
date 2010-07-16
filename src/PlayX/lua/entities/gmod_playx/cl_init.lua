@@ -323,7 +323,7 @@ function ENT:DrawScreen(centerX, centerY)
                             Vector(self.HTMLWidth, self.HTMLHeight, 0),
                             Vector(0, self.HTMLHeight, 0)) 
         else
-            draw.SimpleText("Video is in low framerate mode.",
+            draw.SimpleText("Video started in low framerate mode.",
                             "HUDNumber",
                             centerX, centerY, Color(255, 255, 255, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
