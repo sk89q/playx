@@ -529,6 +529,11 @@ setInterval(function() {
   <param name="allowfullscreen" value="false">
   <param name="FlashVars" value="]] .. flashVars .. [[">
 ]] .. extraParams .. [[
+<div style="background: red; color: white; font: 20pt Arial, sans-serif; padding: 10px">
+    Adobe Flash Player <strong style="text-decoration: underline">for other browsers</strong>
+    is not installed. Please visit http://get.adobe.com/flashplayer/otherversions/
+    and select "Other Browsers." Garry's Mod must be restarted after installing.
+</div>
 </object> 
 </div>
 ]]
