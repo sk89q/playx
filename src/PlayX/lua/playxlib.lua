@@ -417,8 +417,8 @@ end
 -- @param height
 -- @param url
 -- @return HTML
-function playxlib.GenerateIFrame(width, height, url)    
-    return playxlib.HandlerResult("", "", "", "", false, url)
+function playxlib.GenerateIFrame(width, height, url)
+    return playxlib.HandlerResult(nil, nil, nil, nil, false, url)
 end
 
 --- Generates the HTML for an image viewer. The image viewer will automatiaclly
