@@ -608,7 +608,6 @@ concommand.Add("playx_update_info", ConCmdUpdateInfo)
 
 --- Called on game mode hook PlayerInitialSpawn.
 function PlayerInitialSpawn(ply)
-    -- Do our own cvar replication
     SendUserMessage("PlayXJWURL", ply, GetConVar("playx_jw_url"):GetString())
     SendUserMessage("PlayXHostURL", ply, GetConVar("playx_host_url"):GetString())
     
@@ -617,17 +616,24 @@ function PlayerInitialSpawn(ply)
         ["List"] = list.Get("PlayXProvidersList"),
     })
     
+    local origMedia = PlayX.CurrentMedia
+    
+    -- Tell the user the playing media in three seconds
     timer.Simple(3, function()
-        if PlayX.CurrentMedia and PlayX.CurrentMedia.ResumeSupported then
-            if PlayX.CurrentMedia.StopTime and PlayX.CurrentMedia.StopTime < CurTime() then
-                print("PlayX: Media expired, not sending begin UMSG")
-                
-                PlayX.EndMedia()
-            else
-                print("PlayX: Sending begin UMSG " .. ply:GetName())
-                
-                PlayX.SendBeginDStream(ply)
-            end
+        local media = PlayX.CurrentMedia
+        if not media or not media.ResumeSupported then return end
+        if media ~= origMedia then return end -- In case the media changes
+        
+        if media.StopTime and media.StopTime < CurTime() then
+            PlayX.EndMedia()
+        else
+            PlayX.SendBeginDStream(ply)
+		    
+            -- Send off metadata information
+		    if media.Title then
+		        SendUserMessage("PlayXMetadata", ply,
+		            tostring(media.Title):sub(1, 200))
+		    end
         end
     end)
 end
