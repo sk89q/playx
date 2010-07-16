@@ -57,6 +57,7 @@ PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.Providers = {}
 PlayX._UpdateWindow = nil
+PlayX.CrashDetected = file.Read("_playx_crash_detection.txt") == "BEGIN"
 
 local spawnWindow = nil
 
@@ -105,6 +106,11 @@ end
 --- Enables the player.
 local function DoEnable()
     if PlayX.Enabled then return end
+    
+    if PlayX.CrashDetected then
+        file.Write("_playx_crash_detection.txt", "CLEAR")
+        PlayX.CrashDetected = false
+    end
     
     PlayX.Enabled = true
     
@@ -426,21 +432,62 @@ function PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, 
             ["LowFramerate"] = lowFramerate,
             ["HandlerArgs"] = handlerArgs,
         }
-        
-        if PlayX.Enabled then
+		
+		-- Disable PlayX!
+		if PlayX.CrashDetected and PlayX.Enabled then
+		    PlayX.TriggerCrashProtection()
+		    
+            -- Panels will be updated because the enabled cvar was changed
+		elseif PlayX.Enabled then
             BeginPlay()
         else
-            PlayX.UpdatePanels() -- This matters for the admin, as the "End Media" button needs to be updated
+            -- This matters for the admin, as the "End Media"
+            -- button needs to be updated
+            PlayX.UpdatePanels()
             
             if resumeSupported then
-                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see it.") 
+                LocalPlayer():ChatPrint(
+                    "PlayX: A video or something just started playing! Enable " ..
+                    "the player to see it."
+                ) 
             else
-                LocalPlayer():ChatPrint("PlayX: A video or something just started playing! Enable the player to see the next thing that gets played.") 
+                LocalPlayer():ChatPrint(
+                    "PlayX: A video or something just started playing! Enable " ..
+                    "the player to see the next thing that gets played."
+                ) 
             end
         end
     else
         Msg(string.format("PlayX: No such handler named %s, can't play %s\n", handler, uri))
     end
+end
+
+--- Starts the window of crash detection. Called right when something is being
+-- played by the entity.
+function PlayX.CrashDetectionBegin()
+    file.Write("_playx_crash_detection.txt", "BEGIN")
+    
+    timer.Destroy("PlayXCrashDetection")
+    timer.Create("PlayXCrashDetection", 8, 1, PlayX.CrashDetectionEnd)
+end
+
+--- Ends the window of crash detection. Called by the entity after it has been
+-- stopped or after a timeout after something had started playing.
+function PlayX.CrashDetectionEnd()
+    timer.Destroy("PlayXCrashDetection")
+    file.Write("_playx_crash_detection.txt", "OK")
+end
+
+--- Called when a crash was detected and PlayX now needs to be disabled. A
+-- message to the user will be printed to the console.
+function PlayX.TriggerCrashProtection()
+    chat.AddText(
+        Color(255, 255, 0, 255),
+        "PlayX has disabled itself following a detection of a crash in a previous " ..
+        "session. Re-enable PlayX via your tool menu under the \"Options\" tab."
+    )
+    
+    RunConsoleCommand("playx_enabled", "0")
 end
 
 --- Shows a hint.
@@ -678,3 +725,12 @@ concommand.Add("playx_gui_close", ConCmdGUIClose)
 concommand.Add("playx_gui_bookmark", ConCmdGUIBookmark)
 concommand.Add("playx_dump_html", ConCmdDumpHTML) -- Debug function
 concommand.Add("playx_update_window", ConCmdUpdateWindow)
+
+--- Detect a crash.
+local function DetectCrash()
+    if PlayX.CrashDetected and PlayX.Enabled then
+        PlayX.TriggerCrashProtection()
+    end
+end
+
+hook.Add("InitPostEntity", "PlayX.CrashDetection", DetectCrash)

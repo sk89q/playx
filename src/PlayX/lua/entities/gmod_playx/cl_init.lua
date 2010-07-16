@@ -27,6 +27,7 @@ language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
 function ENT:Initialize()
     self.Entity:DrawShadow(false)
     
+    self.HadStarted = false
     self.CurrentPage = nil
     self.Playing = false
     self.LowFramerateMode = false
@@ -163,6 +164,11 @@ function ENT:CreateBrowser()
 end
 
 function ENT:DestructBrowser()
+    if self.HadStarted then
+        self.HadStarted = false
+        PlayX.CrashDetectionEnd()
+    end
+    
     if self.Browser and self.Browser:IsValid() then
         self.Browser:Remove()
     end
@@ -184,6 +190,9 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
         MsgN("PlayX DEBUG: Page loaded, preparing to inject")
         self:InjectPage()
     end
+    
+    PlayX.CrashDetectionBegin()
+    self.HadStarted = true
     
     if result.ForceURL then
         self.Browser:OpenURL(result.ForceURL)
@@ -320,7 +329,12 @@ function ENT:DrawScreen(centerX, centerY)
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
     else
-        if not PlayX.Enabled then
+        if PlayX.CrashDetected then
+            draw.SimpleText("Disabled due to detected crash (see tool menu -> Options)",
+                            "HUDNumber",
+                            centerX, centerY, Color(255, 255, 0, 255),
+                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        elseif not PlayX.Enabled then
             draw.SimpleText("Re-enable the player in the tool menu -> Options",
                             "HUDNumber",
                             centerX, centerY, Color(255, 255, 255, 255),
@@ -344,6 +358,11 @@ function ENT:Think()
 end  
 
 function ENT:OnRemove()
+    if self.HadStarted then
+        self.HadStarted = false
+        PlayX.CrashDetectionEnd()
+    end
+    
     local ent = self
     local browser = self.Browser
     
