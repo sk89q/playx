@@ -385,7 +385,7 @@ function ENT:DrawScreen(centerX, centerY)
             
             if self.PlayerData.Duration or self.PlayerData.Position then
                 local pct = self.PlayerData.Duration and 
-                    self.PlayerData.Position / self.PlayerData.Duration or 0
+                    math.Clamp(self.PlayerData.Position / self.PlayerData.Duration, 0, 1) or 0
                 surface.SetDrawColor(255, 255, 255, 255)
                 surface.DrawOutlinedRect(centerX - 200, centerY + 5, 400, 10)
                 if self.PlayerData.Position and self.PlayerData.Duration then
@@ -437,13 +437,13 @@ function ENT:HUDPaint()
         elseif text == "PLAYING" then
             text = "Playing"
         elseif text == "ERROR" then
-            text = "(ERROR)"
+            text = "ERROR"
         elseif text == "COMPLETED" then
-            text = "(Ended)"
+            text = "Ended"
         elseif text == "STOPPED" then
-            text = "(Stopped)"
+            text = "Stopped"
         elseif text == "PAUSED" then
-            text = "(Paused)"
+            text = "Paused"
         end
     end
     
@@ -471,7 +471,7 @@ function ENT:HUDPaint()
     
     if self.PlayerData.Duration or self.PlayerData.Position then
         local pct = self.PlayerData.Duration and 
-            self.PlayerData.Position / self.PlayerData.Duration or 0
+            math.Clamp(self.PlayerData.Position / self.PlayerData.Duration, 0, 1) or 0
         surface.SetDrawColor(255, 255, 255, 255)
         surface.DrawOutlinedRect(bx + 10, by + 30, bw - 20, 6)
         if self.PlayerData.Position and self.PlayerData.Duration then
