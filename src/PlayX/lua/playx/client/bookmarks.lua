@@ -191,23 +191,15 @@ function PlayX.LoadBookmarks()
     if data == nil then
         -- Default data
         data = [[
-Believe,,http://youtube.com/watch?v=7fyTugLAjtk,,0:00,
-This Is Halloween,,http://youtube.com/watch?v=i_zYrYkbrGY,,0:00,
-Inspiring Video,,http://youtube.com/watch?v=VuvT0I9KWQA,,0:00,1
-Google Chrome Speed Tests,,http://youtube.com/watch?v=nCgQDjiotG0,,0:00,
-Making of the Google Chrome Speed Tests,,http://youtube.com/watch?v=_oarMXGq3gI,,0:00,
 No One Sleeps When I'm Awake,,http://youtube.com/watch?v=3Muci-5Yt0o,,0:00,
-Tengen Toppa Gurren Lagann,,http://youtube.com/watch?v=RN63L89nJeA,,0:00,
-Mr. Brightside,,http://youtube.com/watch?v=XhMSKdCgVYQ,,0:00,
-What Is Love? (Dance mix),,http://youtube.com/watch?v=JzzaIeVtQ0s,,0:00,1
-Hold On (remix),,http://youtube.com/watch?v=ShJmz29HQY4,,0:00,1
-The Likelihood of Flying Saucers,,http://youtube.com/watch?v=wLaRXYai19A,,0:00,
-"Umm, Cool Animation",,http://youtube.com/watch?v=v2H4l9RpkwM,,0:00,
+What Is Love?,,http://www.youtube.com/watch?v=0YXuq25BMVI,,0:00,1
 Divenire,,http://youtube.com/watch?v=_RyPFwAWSKM,,0:00,
 Come Sei Veramente,,http://youtube.com/watch?v=qKMZ2H_a0z8,,0:00,1
-Mistakes We Knew We Were Making,,http://youtube.com/watch?v=ahj6XRONd3s,,0:00,1
-I Wish to Report a Burglary,,http://youtube.com/watch?v=L57-vQvo34E,,0:00,
-Abe Lincoln (WKUK),,http://youtube.com/watch?v=B4Uf9rsBbhc,,0:00,
+Frozen Grand Central,,http://www.youtube.com/watch?v=jwMj3PJDxuo,,0:00,
+Sound of Music,,http://www.youtube.com/watch?v=7EYAUazLI9k,,0:00,
+Google Chrome Speed Tests,,http://youtube.com/watch?v=nCgQDjiotG0,,0:00,
+Phoenix,,http://www.youtube.com/watch?v=w0BPaY6_9hs,,0:00
+This Is Halloween,,http://youtube.com/watch?v=i_zYrYkbrGY,,0:00,
 ]]
     end
     
