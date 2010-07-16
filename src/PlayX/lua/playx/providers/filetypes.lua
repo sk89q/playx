@@ -31,13 +31,7 @@ end
 
 function Shoutcast.GetPlayer(uri, useJW)
     local m = playxlib.FindMatch(uri, {
-        "^http://[^:/]+$",
-        "^http://[^:/]+/$",
-        "^http://[^:/]+:[0-9]+$",
-        "^http://[^:/]+:[0-9]+/$",
-        
-        "^http://[^:/]+/;stream%.nsv$",
-        "^http://[^:/]+:[0-9]+/;stream%.nsv$",
+        "^http://.+$",
     })
     
     if m then
