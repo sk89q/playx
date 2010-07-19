@@ -148,22 +148,6 @@ function PlayX.UnsubscribeAll(ply)
     end
 end
 
---- Returns true if the user should be automatically subscribed to the
--- instance. By default this returns true, but you can override the behavior
--- by defining a hook called PlayXShouldAutoSubscribe. You can manually
--- subscribe and unsubscribe users without having this function matching.
--- This function is only called when a PlayX entity is created and when a
--- player joins but it is never called to "check" subscriptions.
--- @param ply Player
--- @param instance Entity instance to check against
-function PlayX.ShouldAutoSubscribe(ply, instance)
-    local result = hook.Call("PlayXShouldAutoSubscribe", GAMEMODE, ply, instance)
-    if result ~= nil then return result end
-    local result = instance:ShouldAutoSubscribe(ply)
-    if result ~= nil then return result end
-    return true
-end
-
 --- Spawns the player at the location that a player is looking at. This
 -- function will check whether there is already a player or not.
 -- @param ply Player
@@ -374,7 +358,7 @@ hook.Add("PlayerInitialSpawn", "PlayXPlayerInitialSpawn", function(ply)
         ply.PlayXReady = true
         
         for _, instance in pairs(PlayX.GetInstances()) do
-            if PlayX.ShouldAutoSubscribe(ply, instance) then
+            if instance:ShouldAutoSubscribe(ply) then
                 instance:Subscribe(ply)
             end
         end

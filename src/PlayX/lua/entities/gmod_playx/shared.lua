@@ -250,11 +250,6 @@ function ENT:GetProjectedDistance(pos)
         self:GetProjectionPos(), pos)
 end
 
---- For DTVars.
--- @hidden
-function ENT:SetupDataTables()
-end
-
 -- Model names MUST be lowercase
 PlayXScreens = {
     ["models/props/cs_assault/billboard.mdl"] = {
