@@ -58,7 +58,7 @@ function PlayX.GetHostURL()
 end
 
 --- Returns whether a player is permitted to use the player. The
--- PlayXIsPermitted hook allows this function to be overrided.
+-- PlayXIsPermitted hook allows this function to be overridden.
 -- @param ply Player
 -- @param instance Instance to check against (may be nil)
 -- @return
