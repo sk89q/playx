@@ -208,7 +208,7 @@ local function ProcessSound()
         if mult then instance:SetVolume(mult) end
     end
     
-    nextSoundThink = RealTime() + 0.1
+    nextSoundThink = RealTime() + 0.05
 end
 
 --- Register the sound processor if there is a player otherwise deregister
