@@ -159,6 +159,12 @@ function ENT:IsSubscribed(ply)
     return self.Subscribers[ply] and true or false
 end
 
+--- Overridable function that does the same as the hook. The hook can
+-- override this function.
+-- @param ply Player
+function ENT:ShouldAutoSubscribe(ply)
+end
+
 --- Plays something as if you had typed it in the tool panel. It will attempt
 -- to guess the handler frrom the provided provider and URI. If you've already
 -- got a handler to play, look into BeginMedia(). You can manually detect
@@ -327,7 +333,11 @@ end
 -- @param ply
 -- @hidden
 function ENT:SendBeginMessage(ply)
-    local filter = ply or self:GetSubscribers()
+    local filter = ply
+    if not filter then
+        filter = self:GetSubscribers()
+        if #filter == 0 then return end
+    end
     
     -- See if we can fit it in a usermessage
     local strLength = string.len(self.Media.Handler) +
@@ -401,7 +411,11 @@ end
 -- @param ply User to send the message to
 -- @hidden
 function ENT:SendEndMessage(ply)
-    local filter = ply or self:GetSubscribers()
+    local filter = ply
+    if not filter then
+        filter = self:GetSubscribers()
+        if #filter == 0 then return end
+    end
     
     umsg.Start("PlayXEnd", filter)
     umsg.Entity(self)
@@ -413,8 +427,13 @@ end
 -- @param ply User to send the message to
 -- @hidden
 function ENT:SendStdMetadataMessage(ply)
-    local filter = ply or self:GetSubscribers()
     if not self.Media.Title then return end
+    
+    local filter = ply
+    if not filter then
+        filter = self:GetSubscribers()
+        if #filter == 0 then return end
+    end
     
     umsg.Start("PlayXMetadataStd", filter)
     umsg.Entity(self)

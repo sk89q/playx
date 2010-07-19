@@ -159,6 +159,8 @@ end
 function PlayX.ShouldAutoSubscribe(ply, instance)
     local result = hook.Call("PlayXShouldAutoSubscribe", GAMEMODE, ply, instance)
     if result ~= nil then return result end
+    local result = instance:ShouldAutoSubscribe(ply)
+    if result ~= nil then return result end
     return true
 end
 
