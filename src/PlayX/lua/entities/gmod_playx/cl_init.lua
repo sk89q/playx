@@ -71,6 +71,8 @@ end
 -- @param handler
 -- @param uri
 -- @param start
+-- @param resumeSupported
+-- @param lowFramerate
 -- @param handlerArgs
 function ENT:BeginMedia(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
     if not PlayX.GetHandler(handler) then
@@ -108,10 +110,21 @@ function ENT:BeginMedia(handler, uri, start, resumeSupported, lowFramerate, hand
         end
     end
     
-    hook.Call("PlayXMediaBegan", GAMEMODE, self, handler, uri, start,
-        resumeSupported, lowFramerate, handlerArgs)
+    self:MediaBegan(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
     
     PlayX.UpdatePanels()
+end
+
+--- Called when media has begun.
+-- @param handler
+-- @param uri
+-- @param start
+-- @param resumeSupported
+-- @param lowFramerate
+-- @param handlerArgs
+function ENT:MediaBegan(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
+    hook.Call("PlayXMediaBegan", GAMEMODE, self, handler, uri, start,
+        resumeSupported, lowFramerate, handlerArgs)
 end
 
 --- Stop what's playing.
@@ -122,9 +135,13 @@ function ENT:EndMedia()
         self:Stop()
     end
     
-    hook.Call("PlayXMediaEnded", GAMEMODE, self)
+    self:MediaEnded()
     
     PlayX.UpdatePanels()
+end
+
+function ENT:MediaEnded()
+    hook.Call("PlayXMediaEnded", GAMEMODE, self)
 end
 
 --- Starts playing. This will only work if the entity has media assigned
@@ -187,9 +204,14 @@ function ENT:Play()
         self.Browser:OpenURL(PlayX.HostURL)
     end
     
-    hook.Call("PlayXPlayed", GAMEMODE, self)
+    self:Played()
     
     PlayX.UpdatePanels()
+end
+
+--- Called when media has started playing.
+function ENT:Played()
+    hook.Call("PlayXPlayed", GAMEMODE, self)
 end
 
 --- Stop playing. The play can be resumed at any time (until EndMedia() is
@@ -203,9 +225,14 @@ function ENT:Stop()
     self.PlayerData = {}
     self:DestructBrowser()
     
-    hook.Call("PlayXStopped", GAMEMODE, self)
+    self:Stopped()
     
     PlayX.UpdatePanels()
+end
+
+--- Called on stop.
+function ENT:Stopped()
+    hook.Call("PlayXStopped", GAMEMODE, self)
 end
 
 --- Get the volume of this individual player. Volume is 0 to 100.
@@ -250,10 +277,18 @@ function ENT:UpdateMetadata(data)
     if not self.Media then return end
     
     -- Allow a hook to override the data
-    local res = hook.Call("PlayXMetadataReceive", GAMEMODE, self, self.Media, data)
+    local res = self.MetadataReceive(self.Media, data)
     if res then data = res end
     
     table.Merge(self.Media, data)
+end
+
+--- Overridable function that works the same as the hook.
+-- @param existingMedia Also accessible as self.Media
+-- @param newData Incoming data
+-- @return Nil or the new data
+function ENT:MetadataReceive(existingMedia, newData)
+    return hook.Call("PlayXMetadataReceive", GAMEMODE, self, existingMedia, newData)
 end
 
 --- Create the browser.

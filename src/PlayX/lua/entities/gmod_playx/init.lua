@@ -166,6 +166,8 @@ end
 -- subscribe and unsubscribe users without having this function matching.
 -- This function is only called when a PlayX entity is created and when a
 -- player joins but it is never called to "check" subscriptions.
+-- @param ply
+-- @return False to deny
 function ENT:ShouldAutoSubscribe(ply)
     local result = hook.Call("PlayXShouldAutoSubscribe", GAMEMODE, ply, self)
     if result ~= nil then return result end
