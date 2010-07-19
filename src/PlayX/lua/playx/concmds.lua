@@ -43,14 +43,14 @@ end
 local function ConCmdOpen(ply, cmd, args)
     if not ply or not ply:IsValid() then return end
     
-    local instance = PlayX.GetInstance(ply)
+    local instance, err = PlayX.GetInstance(ply)
     
-    -- Is the user permitted to use the player?
-    if not PlayX.IsPermitted(ply, instance) then
-        PlayX.SendError(ply, "You do not have permission to use the player")
     -- Is there a PlayX entity out?
-    elseif not instance then
-        PlayX.SendError(ply, "There is no player spawned! Go to the spawn menu > Entities")
+    if not instance then
+        PlayX.SendError(ply, err or "There is no player spawned! Go to the spawn menu > Entities")
+    -- Is the user permitted to use the player?
+    elseif not PlayX.IsPermitted(ply, instance) then
+        PlayX.SendError(ply, "You do not have permission to use the player")
     -- Invalid arguments?
     elseif not args[1] then
         ply:PrintMessage(HUD_PRINTCONSOLE, "playx_open requires a URI")
@@ -73,6 +73,8 @@ local function ConCmdOpen(ply, cmd, args)
             
             if not result then
                 PlayX.SendError(ply, err)
+            else
+                hook.Call("PlayXConCmdOpened", GAMEMODE, instance, ply)
             end
         end
     end
@@ -80,16 +82,17 @@ end
 
 --- Called for concmd playx_close.
 function ConCmdClose(ply, cmd, args)
-    local instance = PlayX.GetInstance(ply)
+    local instance, err = PlayX.GetInstance(ply)
     
 	if not ply or not ply:IsValid() then
         return
+    elseif not instance then
+        PlayX.SendError(ply, err or "There is no player spawned!")
     elseif not PlayX.IsPermitted(ply, instance) then
         PlayX.SendError(ply, "You do not have permission to use the player")
-    elseif not instance then
-        PlayX.SendError(ply, "There is no player spawned!")
     else
         instance:CloseMedia()
+        hook.Call("PlayXConCmdClosed", GAMEMODE, instance, ply)
     end
 end
 

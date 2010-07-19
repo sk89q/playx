@@ -73,16 +73,28 @@ function PlayX.IsPermitted(ply, instance)
 end
 
 --- Gets the player instance entity. When there are multiple instances out,
--- the behavior is undefined. A hook named PlayXSelectInstance can be
--- defined to return a specific entity. This function may return nil.
+-- default behavior is to get the closest one to the player (if a player is
+-- provided). If no player is provided, the behavior is undefined.
+-- A hook named PlayXSelectInstance can be -- defined to return a specific
+-- entity. This function may return nil. An error message can be returned
+-- to indicate why an instance could not be found.
 -- @param ply Player that can be passed to specify a user
 -- @return Entity or nil
+-- @return Error message (optional)
 function PlayX.GetInstance(ply)
     -- First try the hook
-    local result = hook.Call("PlayXSelectInstance", GAMEMODE, ply)
-    if result then return result end
+    local result, err, a, b, c = hook.Call("PlayXSelectInstance", GAMEMODE, ply)
+    if result ~= nil then return result, err end
+    if result == false then return false, err end
     
-    return PlayX.GetInstances()[1]
+    local instances = PlayX.GetInstances()
+    if #instances <= 1 or not ply then return instances[1] end
+    
+    local plyPos = ply:GetPos()
+    table.sort(instances, function(a, b)
+        return a:GetPos():Distance(plyPos) < b:GetPos():Distance(plyPos)
+    end)
+    return instances[1]
 end
 
 --- Gets a list of instances.
