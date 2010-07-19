@@ -17,7 +17,7 @@
 -- $Id$
 
 function HUDPaint()
-    local instance = ents.FindByClass("gmod_playx")[1]
+    local instance = PlayX.GetInstance()
     local ply = LocalPlayer()
     
     if not instance then
