@@ -30,6 +30,8 @@ ENT.AdminSpawnable = true
 
 ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
 
+list.Add("PlayXRepeaterClasses", "gmod_playx")
+
 --- For DTVars.
 -- @hidden
 function ENT:SetupDataTables()

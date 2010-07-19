@@ -50,6 +50,8 @@ ENT.RotateAroundRight = nil
 ENT.RotateAroundUp = nil
 ENT.RotateAroundForward = nil
 
+list.Add("PlayXScreenClasses", "gmod_playx")
+
 --- Get key value.
 -- @hidden
 function ENT:KeyValue(key, value)
@@ -246,6 +248,11 @@ end
 function ENT:GetProjectedDistance(pos)
     return playxlib.PointLineSegmentDistance(self:GetSourcePos(), 
         self:GetProjectionPos(), pos)
+end
+
+--- For DTVars.
+-- @hidden
+function ENT:SetupDataTables()
 end
 
 -- Model names MUST be lowercase

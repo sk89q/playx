@@ -72,12 +72,6 @@ function PlayX.IsPermitted(ply, instance)
     end
 end
 
---- Checks if a player instance exists in the game.
--- @return Whether a player exists
-function PlayX.PlayerExists()
-    return #ents.FindByClass("gmod_playx") > 0
-end
-
 --- Gets the player instance entity. When there are multiple instances out,
 -- the behavior is undefined. A hook named PlayXSelectInstance can be
 -- defined to return a specific entity. This function may return nil.
@@ -88,14 +82,30 @@ function PlayX.GetInstance(ply)
     local result = hook.Call("PlayXSelectInstance", GAMEMODE, ply)
     if result then return result end
     
-    local props = ents.FindByClass("gmod_playx")
-    return props[1]
+    return PlayX.GetInstances()[1]
 end
 
 --- Gets a list of instances.
 -- @return List of entities
 function PlayX.GetInstances()
-    return ents.FindByClass("gmod_playx")
+    local classes = list.Get("PlayXScreenClasses")
+    
+    if #classes == 1 then
+        return ents.FindByClass(classes[1])
+    end
+    
+    -- Time to build a list
+    local props = {}
+    for _, cls in pairs(classes) do
+        table.Add(props, ents.FindByClass(cls))
+    end
+    return props
+end
+
+--- Checks if a player instance exists in the game.
+-- @return Whether a player exists
+function PlayX.PlayerExists()
+    return #PlayX.GetInstances() > 0
 end
 
 --- Gets a list of instances that a player has subscribed to.

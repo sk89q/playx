@@ -63,25 +63,35 @@ end
 -- defined to return a specific entity. This function may return nil.
 -- @param ply Player that can be passed to specify a user
 -- @return Entity or nil
-function PlayX.GetInstance()
+function PlayX.GetInstance(ply)
     -- First try the hook
-    local result = hook.Call("PlayXSelectInstance", GAMEMODE)
+    local result = hook.Call("PlayXSelectInstance", GAMEMODE, ply)
     if result then return result end
     
-    local props = ents.FindByClass("gmod_playx")
-    return props[1]
+    return PlayX.GetInstances()[1]
 end
 
 --- Gets a list of instances.
 -- @return List of entities
 function PlayX.GetInstances()
-    return ents.FindByClass("gmod_playx")
+    local classes = list.Get("PlayXScreenClasses")
+    
+    if #classes == 1 then
+        return ents.FindByClass(classes[1])
+    end
+    
+    -- Time to build a list
+    local props = {}
+    for _, cls in pairs(classes) do
+        table.Add(props, ents.FindByClass(cls))
+    end
+    return props
 end
 
 --- Checks whether a player is spawned.
 -- @return
 function PlayX.PlayerExists()
-    return #ents.FindByClass("gmod_playx") > 0
+    return #PlayX.GetInstances() > 0
 end
 
 --- Returns counts of instances having media, having resumable media, and
@@ -311,7 +321,7 @@ datastream.Hook("PlayXBegin", function(_, id, encoded, decoded)
     
     if not ValidEntity(instance) then
         Error("PlayX: PlayXBegin referenced non-existent entity (did you call BeginMedia() too early?)")
-    elseif instance:GetClass() ~= "gmod_playx" then
+    elseif not table.HasValue(list.Get("PlayXScreenClasses"), instance:GetClass()) then
         Error("PlayX: PlayXBegin referenced non-PlayX entity (did you call BeginMedia() too early?)")
     end
     
@@ -330,7 +340,7 @@ usermessage.Hook("PlayXBegin", function(um)
     
     if not ValidEntity(instance) then
         Error("PlayX: PlayXBegin referenced non-existent entity (did you call BeginMedia() too early?)")
-    elseif instance:GetClass() ~= "gmod_playx" then
+    elseif not table.HasValue(list.Get("PlayXScreenClasses"), instance:GetClass()) then
         Error("PlayX: PlayXBegin referenced non-PlayX entity (did you call BeginMedia() too early?)")
     end
     
@@ -344,7 +354,7 @@ usermessage.Hook("PlayXEnd", function(um)
     
     if not ValidEntity(instance) then
         Error("PlayX: PlayXEnd referenced non-existent entity")
-    elseif instance:GetClass() ~= "gmod_playx" then
+    elseif not table.HasValue(list.Get("PlayXScreenClasses"), instance:GetClass()) then
         Error("PlayX: PlayXEnd referenced non-PlayX entity")
     end
     
@@ -399,7 +409,8 @@ usermessage.Hook("PlayXMetadataStd", function(um)
     PlayX.Debug("Got PlayXMetadataStd umsg for %s", tostring(instance))
     
     -- We can just ignore the usermessage in this situation
-    if not ValidEntity(instance) or instance:GetClass() ~= "gmod_playx" then
+    if not ValidEntity(instance) or not 
+        table.HasValue(list.Get("PlayXScreenClasses"), instance:GetClass()) then
         return
     end
     
