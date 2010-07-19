@@ -83,9 +83,8 @@ end
 -- @return Error message (optional)
 function PlayX.GetInstance(ply)
     -- First try the hook
-    local result, err, a, b, c = hook.Call("PlayXSelectInstance", GAMEMODE, ply)
+    local result, err = hook.Call("PlayXSelectInstance", GAMEMODE, ply)
     if result ~= nil then return result, err end
-    if result == false then return false, err end
     
     local instances = PlayX.GetInstances()
     if #instances <= 1 or not ply then return instances[1] end

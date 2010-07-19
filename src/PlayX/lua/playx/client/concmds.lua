@@ -77,8 +77,7 @@ local function ConCmdGUIOpen()
                            GetConVar("playx_uri"):GetString(),
                            GetConVar("playx_start_time"):GetString(),
                            GetConVar("playx_force_low_framerate"):GetBool(),
-                           GetConVar("playx_use_jw"):GetBool(),
-                           GetConVar("playx_ignore_length"):GetBool())
+                           GetConVar("playx_use_jw"):GetBool())
 end
 
 --- Called for concmd playx_gui_close.
