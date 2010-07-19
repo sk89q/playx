@@ -63,24 +63,11 @@ end
 -- defined to return a specific entity. This function may return nil.
 -- @param ply Player that can be passed to specify a user
 -- @return Entity or nil
-function PlayX.GetInstance(ply)
+function PlayX.GetInstance()
     -- First try the hook
-    local result = hook.Call("PlayXSelectInstance", GAMEMODE, ply)
+    local result = hook.Call("PlayXSelectInstance", GAMEMODE)
     if result then return result end
     
-    local props = ents.FindByClass("gmod_playx")
-    return props[1]
-end
-
---- Checks whether the player is spawned.
--- @return
-function PlayX.PlayerExists()
-    return #ents.FindByClass("gmod_playx") > 0
-end
-
---- Gets the player instance entity
--- @return Entity or nil
-function PlayX.GetInstance()
     local props = ents.FindByClass("gmod_playx")
     return props[1]
 end
@@ -89,6 +76,12 @@ end
 -- @return List of entities
 function PlayX.GetInstances()
     return ents.FindByClass("gmod_playx")
+end
+
+--- Checks whether a player is spawned.
+-- @return
+function PlayX.PlayerExists()
+    return #ents.FindByClass("gmod_playx") > 0
 end
 
 --- Returns counts of instances having media, having resumable media, and
@@ -148,13 +141,10 @@ function PlayX.SetVolume(vol)
     RunConsoleCommand("playx_volume", vol)
 end
 
---- Resolves a handler by name. May return nil if the handler doesn't exist.
--- This function's behavior can be overrided with the PlayXResolveHandler hook.
+--- Gets a handler by name. May return nil if the handler doesn't exist.
 -- @param handler Handler name
 -- @return Handler function or nil
-function PlayX.ResolveHandler(handler)
-    local res = hook.Call("PlayXResolveHandler", GAMEMODE, handler)
-    if res then return res end
+function PlayX.GetHandler(handler)
     return list.Get("PlayXHandlers")[handler]
 end
 
@@ -188,6 +178,7 @@ function PlayX.ResetRenderBounds()
 end
 
 --- Load the handlers. This is already done on PlayX load.
+-- @hidden
 function PlayX.LoadHandlers()
     -- Load handlers
     local p = file.FindInLua("playx/client/handlers/*.lua")

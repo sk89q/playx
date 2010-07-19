@@ -38,6 +38,7 @@ ENT.LastFinalVolume = -1
 --- Prints a debugging message about this entity.
 -- @param msg Message
 -- @param ... Args for springf
+-- @hidden
 function ENT:Debug(msg, ...)
     local args = {...}
     PlayX.Debug(tostring(self) .. ": " .. msg, unpack(args))
@@ -69,7 +70,7 @@ end
 -- @param start
 -- @param handlerArgs
 function ENT:BeginMedia(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
-    if not PlayX.ResolveHandler(handler) then
+    if not PlayX.GetHandler(handler) then
         Error(Format("PlayX: No such handler named %s, can't play %s\n", handler, uri:sub(1, 200)))
     end
     
@@ -131,7 +132,7 @@ function ENT:Play()
     PlayX.ShowNotice()
     PlayX.RegisterSoundProcessor()
     
-    local handlerF = PlayX.ResolveHandler(self.Media.Handler)
+    local handlerF = PlayX.GetHandler(self.Media.Handler)
     
     -- Get a handler result that contains information on how to play the media
     local result = handlerF(self.HTMLWidth, self.HTMLHeight,

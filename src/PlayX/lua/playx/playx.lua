@@ -112,14 +112,14 @@ end
 
 --- Returns true if the user should be automatically subscribed to the
 -- instance. By default this returns true, but you can override the behavior
--- by defining a hook called PlayXShouldSubscribe. You can manually
+-- by defining a hook called PlayXShouldAutoSubscribe. You can manually
 -- subscribe and unsubscribe users without having this function matching.
 -- This function is only called when a PlayX entity is created and when a
 -- player joins but it is never called to "check" subscriptions.
 -- @param ply Player
 -- @param instance Entity instance to check against
-function PlayX.ShouldSubscribe(ply, instance)
-    local result = hook.Call("PlayXShouldSubscribe", GAMEMODE, ply, instance)
+function PlayX.ShouldAutoSubscribe(ply, instance)
+    local result = hook.Call("PlayXShouldAutoSubscribe", GAMEMODE, ply, instance)
     if result ~= nil then return result end
     return true
 end
@@ -221,7 +221,7 @@ function PlayX.SpawnForPlayer(ply, model, repeater)
     return true
 end
 
---- Resolves a provider.
+--- Resolves a provider to a handler.
 -- @param provider Name of provider, leave blank to auto-detect
 -- @param uri URI to play
 -- @param useJW True to allow the use of the JW player, false for otherwise, nil to default true
@@ -281,6 +281,7 @@ function PlayX.SendError(ply, err)
 end
 
 --- Attempt to detect the PlayX version and put it in PlayX.Version.
+-- @hidden
 function PlayX.DetectVersion()
     local version = ""
     local folderName = string.match(debug.getinfo(1, "S").short_src, "addons[/\\]([^/\\]+)")
@@ -297,6 +298,7 @@ function PlayX.DetectVersion()
 end
 
 --- Load the providers.
+-- @hidden
 function PlayX.LoadProviders()
     local p = file.FindInLua("playx/providers/*.lua")
     for _, file in pairs(p) do
@@ -309,6 +311,7 @@ end
 
 --- Used to replicate a cvar using a custom method (that doesn't cause
 -- overflow issues).
+-- @hidden
 function PlayX.ReplicateVar(cvar, old, new, ply)
     new = new or GetConVar(cvar):GetString()
     SendUserMessage("PlayXReplicate", ply, cvar, new)
@@ -331,7 +334,7 @@ hook.Add("PlayerInitialSpawn", "PlayXPlayerInitialSpawn", function(ply)
         ply.PlayXReady = true
         
         for _, instance in pairs(PlayX.GetInstances()) do
-            if PlayX.ShouldSubscribe(ply, instance) then
+            if PlayX.ShouldAutoSubscribe(ply, instance) then
                 instance:Subscribe(ply)
             end
         end

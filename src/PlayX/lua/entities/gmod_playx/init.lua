@@ -85,7 +85,7 @@ function ENT:Initialize()
     
     -- Auto-subscribe
     for _, ply in pairs(player.GetHumans()) do
-        if PlayX.ShouldSubscribe(ply, self) then
+        if PlayX.ShouldAutoSubscribe(ply, self) then
             self:Subscribe(ply)
         end
     end
@@ -148,7 +148,7 @@ function ENT:GetSubscribers()
     return subscribers
 end
 
---- Returns true if the passed player has subscribed to this player.
+--- Returns true if the passed player has subscribed to this instance.
 -- @return Boolean
 function ENT:IsSubscribed(ply)
     return self.Subscribers[ply] and true or false
@@ -180,10 +180,10 @@ function ENT:OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreLen
     end
     
     local r, err = hook.Call("PlayXMediaOpen", GAMEMODE, self, 
-        provider, uri, start, forceLowFramerate, useJW, ignoreLength)
+        provider, uri, start, forceLowFramerate, useJW, ignoreLength, provider, result)
     if r == false then
         return false, err
-    elseif r ~= nil then
+    elseif r ~= nil and r ~= true then
         result = r
     end
     
@@ -273,6 +273,9 @@ function ENT:BeginMedia(handler, uri, start, resumeSupported, lowFramerate, hand
         ViewerCount = nil,
     }
     
+    hook.Call("PlayXMediaBegan", GAMEMODE, self, handler, uri, start,
+        resumeSupported, lowFramerate, handlerArgs)
+    
     -- Tell all subscribers of the media
     self:SendBeginMessage()
     
@@ -284,6 +287,7 @@ end
 -- called by PlayX automatically on video start and when a player is 
 -- subscribed, so there is no need to call this on your own.
 -- @param ply
+-- @hidden
 function ENT:SendBeginMessage(ply)
     local filter = ply or self:GetSubscribers()
     
@@ -322,6 +326,7 @@ function ENT:CloseMedia()
 end
 
 --- Ends the media. Only call if something is playing.
+-- @hidden
 function ENT:EndMedia()
     if hook.Call("PlayXMediaEnd", GAMEMODE, self) == false then
         return
@@ -340,6 +345,7 @@ end
 -- one client that. There should be no need to call this method. Unsubscribe
 -- the user if you want the user to no longer view the media.
 -- @param ply User to send the message to
+-- @hidden
 function ENT:SendEndMessage(ply)
     local filter = ply or self:GetSubscribers()
     
@@ -351,6 +357,7 @@ end
 --- Tell standard metadata to clients. This is mostly used for the radio HUD
 -- overlay and it cannot be extended.
 -- @param ply User to send the message to
+-- @hidden
 function ENT:SendStdMetadataMessage(ply)
     local filter = ply or self:GetSubscribers()
     if not self.Media.Title then return end
@@ -382,6 +389,7 @@ end
 
 --- Called on a metadata fetch error.
 -- @param err Error message
+-- @hidden
 function ENT:OnMetadataError(err)
     MsgN("Metadata failed: " .. err)
 end

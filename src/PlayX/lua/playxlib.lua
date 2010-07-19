@@ -367,6 +367,9 @@ function playxlib.IsTrue(s)
     return s == "t" or s == "true" or s == "1" or s == "y" or s == "yes"
 end
 
+--- Returns nil if a string is empty, otherwise it will return the string.
+-- @param s String
+-- @return Value
 function playxlib.EmptyToNil(s)
     if s == "" then return nil end
     return s
@@ -455,6 +458,7 @@ end
 -- @param height
 -- @param url
 -- @return HTML
+-- @hidden
 function playxlib.GenerateIFrame(width, height, url)
     return playxlib.HandlerResult(nil, nil, nil, nil, false, url)
 end
@@ -465,6 +469,7 @@ end
 -- @param height
 -- @param url
 -- @return HTML
+-- @hidden
 function playxlib.GenerateImageViewer(width, height, url)
     local url = playxlib.HTMLEscape(url)
     
@@ -524,6 +529,7 @@ end
 -- @param js Extra JavaScript to add
 -- @param forcePlay Forces the movie to be 'played' every 1 second, if not playing
 -- @return HTML
+-- @hidden
 function playxlib.GenerateFlashPlayer(width, height, url, flashVars, js, forcePlay)
     local extraParams = ""
     local url = playxlib.HTMLEscape(url)
@@ -589,6 +595,7 @@ end
 -- @param uri
 -- @param provider JW player provider ("image", "audio", etc.)
 -- @return HTML
+-- @hidden
 function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
     local flashURL = PlayX.JWPlayerURL
     local flashVars = {
@@ -649,6 +656,7 @@ end
 -- @param height
 -- @param url
 -- @return HTML
+-- @hidden
 function playxlib.GenerateJSEmbed(width, height, url, js)
     local url = playxlib.HTMLEscape(url)
     

@@ -29,6 +29,8 @@ function ENT:Initialize()
     self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
     self.Entity:SetSolid(SOLID_VPHYSICS)
     self.Entity:DrawShadow(false)
+    
+    self:SetUseType(SIMPLE_USE)
 end
 
 --- Set the PlayX entity to be the source. Pass nil or NULL to clear.
@@ -53,12 +55,15 @@ end
 --- Spawn function.
 -- @hidden
 function ENT:SpawnFunction(ply, tr)
+    if hook.Call("PlayXRepeaterSpawnFunction", GAMEMODE, ply, tr) == false then return end
+    
     PlayX.SendSpawnDialog(ply, true)
 end
 
 --- When the entity is used.
 -- @hidden
 function ENT:OnUse(activator, caller)
+    hook.Call("PlayXRepeaterUse", GAMEMODE, self, activator, caller) 
 end
 
 --- Removal function.

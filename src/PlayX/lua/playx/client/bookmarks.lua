@@ -145,7 +145,7 @@ function Bookmark:Update(title, provider, uri, keyword, startAt, lowFramerate)
     return true
 end
 
--- Delete the bookmark.
+--- Delete the bookmark.
 -- @return Success (true/false)
 function Bookmark:Delete()
     self.Deleted = true
@@ -368,6 +368,9 @@ function PlayX.GetBookmarkByKeyword(keyword)
     return nil
 end
 
+--- Opens the bookmark management window. A bookmark title can be provided
+-- so that the bookmark is automatically selected when the window is opened.
+-- @param selectTitle Optional bookmark title to select.
 function PlayX.OpenBookmarksWindow(selectTitle)
     if PlayX.BookmarksWindow and PlayX.BookmarksWindow:IsValid() then
         return
