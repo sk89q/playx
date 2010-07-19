@@ -29,7 +29,7 @@ function StaticWeb.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 StaticWeb.QueryMetadata(uri, callback, failCallback)
             end,
         }

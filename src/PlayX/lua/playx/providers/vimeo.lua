@@ -36,7 +36,7 @@ function Vimeo.GetPlayer(uri, useJW)
             ["URI"] = "http://vimeo.com/moogaloop.swf?clip_id=" .. uri .. "&autoplay=1&js_api=1",
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 Vimeo.QueryMetadata(uri, callback, failCallback)
             end,
             ["HandlerArgs"] = {

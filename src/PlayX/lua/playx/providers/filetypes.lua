@@ -48,7 +48,7 @@ function Shoutcast.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = true,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 Shoutcast.QueryMetadata(uri, callback, failCallback)
             end,
         }
@@ -84,7 +84,7 @@ function MP3.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = true,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 MP3.QueryMetadata(uri, callback, failCallback)
             end,
         }
@@ -124,7 +124,7 @@ function FlashVideo.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 FlashVideo.QueryMetadata(uri, callback, failCallback)
             end,
         }
@@ -164,7 +164,7 @@ function Image.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 Image.QueryMetadata(uri, callback, failCallback)
             end,
         }

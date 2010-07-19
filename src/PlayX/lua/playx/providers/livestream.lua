@@ -87,7 +87,7 @@ function Livestream.GetPlayer(uri, useJW)
             ["URI"] = url,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 Livestream.QueryMetadata(uri, callback, failCallback)
             end,
             ["HandlerArgs"] = {

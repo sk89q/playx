@@ -29,7 +29,7 @@ function Flash.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 Flash.QueryMetadata(uri, callback, failCallback)
             end,
         }
@@ -65,7 +65,7 @@ function FlashMovie.GetPlayer(uri, useJW)
             ["URI"] = uri,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
-            ["MetadataFunc"] = function(callback, failCallback)
+            ["QueryMetadata"] = function(callback, failCallback)
                 FlashMovie.QueryMetadata(uri, callback, failCallback)
             end,
             ["HandlerArgs"] = {

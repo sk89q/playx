@@ -43,7 +43,7 @@ function YouTube.GetPlayer(uri, useJW)
                 ["URI"] = "http://www.youtube.com/watch?v=" .. uri,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
-                ["MetadataFunc"] = function(callback, failCallback)
+                ["QueryMetadata"] = function(callback, failCallback)
                     YouTube.QueryMetadata(uri, callback, failCallback)
                 end,
             }
@@ -65,7 +65,7 @@ function YouTube.GetPlayer(uri, useJW)
                 ["URI"] = url,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
-                ["MetadataFunc"] = function(callback, failCallback)
+                ["QueryMetadata"] = function(callback, failCallback)
                     YouTube.QueryMetadata(uri, callback, failCallback)
                 end,
                 ["HandlerArgs"] = {

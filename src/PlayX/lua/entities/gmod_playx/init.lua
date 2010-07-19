@@ -198,8 +198,8 @@ function ENT:OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreLen
     self:UpdateMetadata({ Provider = provider })
     
     -- Fetch metadata information
-    if result.MetadataFunc then
-        result.MetadataFunc(function(data)
+    if result.QueryMetadata then
+        result.QueryMetadata(function(data)
             if ValidEntity(self) then self:UpdateMetadata(data) end
         end,
         function(err)
