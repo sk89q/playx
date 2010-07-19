@@ -471,7 +471,7 @@ function ENT:UpdateMetadata(data)
     -- Handle media expiration
     if data.Length then
         if not self.MediaExpired then
-            local timeout = RealTime() - self.Media.StartTime + self.Media.Length + 4
+            local timeout = RealTime() - self.Media.StartTime + self.Media.Length
             if timeout <= 0 then
                 self:ExpireMedia()
             else
