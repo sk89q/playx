@@ -120,6 +120,34 @@ function PlayX.GetSubscribed(ply)
     return subscribed
 end
 
+--- Subscribe a user to only one instance. The user will be unsubscribed from
+-- all other players. If the user is already only subscribed to the instance,
+-- then nothing will happen.
+-- @param ply Player
+-- @param instance Instance to subscribe to
+function PlayX.SubscribeOnly(ply, instance)
+    local subscribed = PlayX.GetSubscribed(ply)
+    local alreadySubscribed = false
+    for _, ent in pairs(subscribed) do
+        if ent == instance then
+            alreadySubscribed = true
+        else
+            ent:Unsubscribe(ply)
+        end
+    end
+    if not alreadySubscribed then
+        instance:Subscribe(ply)
+    end
+end
+
+--- Unsubscribes a user from all players.
+-- @param ply Player
+function PlayX.UnsubscribeAll(ply)
+    for _, instance in pairs(PlayX.GetSubscribed(ply)) do
+        instance:Unsubscribe(ply)
+    end
+end
+
 --- Returns true if the user should be automatically subscribed to the
 -- instance. By default this returns true, but you can override the behavior
 -- by defining a hook called PlayXShouldAutoSubscribe. You can manually
