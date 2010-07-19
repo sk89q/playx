@@ -185,7 +185,15 @@ function ENT:OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreLen
     end
     
     local r, err = hook.Call("PlayXMediaOpen", GAMEMODE, self, 
-        provider, uri, start, forceLowFramerate, useJW, ignoreLength, provider, result)
+        provider, uri, start, forceLowFramerate, useJW, ignoreLength, result)
+    if r == false then
+        return false, err
+    elseif r ~= nil and r ~= true then
+        result = r
+    end
+    
+    local r, err = self:MediaOpen(provider, uri, start, forceLowFramerate,
+        useJW, ignoreLength, result)
     if r == false then
         return false, err
     elseif r ~= nil and r ~= true then
@@ -213,6 +221,18 @@ function ENT:OpenMedia(provider, uri, start, forceLowFramerate, useJW, ignoreLen
     end
     
     return result
+end
+
+--- Function for overriding. Called like PlayXMediaOpen, after PlayXMediaOpen.
+-- @param handler
+-- @param uri
+-- @param start
+-- @param resumeSupported
+-- @param lowFramerate
+-- @param length Length of the media in seconds, can be nil
+-- @param handlerArgs Arguments for the handler, can be nil
+function ENT:MediaOpen(provider, uri, start, forceLowFramerate, useJW,
+    ignoreLength, provider, result)
 end
 
 --- This directly processes media given as a handler. Use OpenMedia() if
@@ -284,7 +304,20 @@ function ENT:BeginMedia(handler, uri, start, resumeSupported, lowFramerate, hand
     -- Tell all subscribers of the media
     self:SendBeginMessage()
     
+    self:MediaBegan(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
+    
     return true
+end
+
+--- Function for overriding. Called after media has begun.
+-- @param handler
+-- @param uri
+-- @param start
+-- @param resumeSupported
+-- @param lowFramerate
+-- @param length Length of the media in seconds, can be nil
+-- @param handlerArgs Arguments for the handler, can be nil
+function ENT:MediaBegan(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
 end
 
 --- Send a play begin message to clients. If no argument is provided, the
@@ -337,6 +370,10 @@ function ENT:EndMedia()
         return
     end
     
+    if self:MediaEnd() == false then
+        return
+    end
+    
     self:ClearWireOutputs()
     
     self.Media = nil
@@ -344,6 +381,18 @@ function ENT:EndMedia()
     hook.Call("PlayXMediaEnded", GAMEMODE, self)
     
     self:SendEndMessage()
+    
+    self:MediaEnded()
+end
+
+--- Function for overriding. Called like PlayXMediaEnd after PlayXMediaEnd.
+-- @hidden
+function ENT:MediaEnd()
+end
+
+--- Function for overriding. Called after media has ended.
+-- @hidden
+function ENT:MediaEnded()
 end
 
 --- Tell subscribed clients that the media has ended, or choose to tell only
@@ -424,7 +473,7 @@ end
 
 --- When the entity is used.
 -- @hidden
-function ENT:OnUse(activator, caller)
+function ENT:Use(activator, caller)
     hook.Call("PlayXUse", GAMEMODE, self, activator, caller) 
 end
 

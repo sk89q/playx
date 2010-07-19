@@ -66,7 +66,7 @@ end
 
 --- When the entity is used.
 -- @hidden
-function ENT:OnUse(activator, caller)
+function ENT:Use(activator, caller)
     hook.Call("PlayXRepeaterUse", GAMEMODE, self, activator, caller) 
 end
 

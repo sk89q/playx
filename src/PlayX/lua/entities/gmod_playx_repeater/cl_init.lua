@@ -71,11 +71,15 @@ end
 -- a 3D2D context has been created.
 -- @param centerX Center X
 -- @param centerY Center Y
+-- @param x Top left position
+-- @param y Top left position
+-- @param width Width of screen
+-- @param height Height of screen
 -- @hidden
-function ENT:DrawScreen(centerX, centerY)
+function ENT:DrawScreen(centerX, centerY, x, y, width, height)
     if ValidEntity(self.SourceInstance) then
         if not self.SourceInstance.NoScreen then
-            self.SourceInstance:DrawScreen(centerX, centerY)
+            self.SourceInstance:DrawScreen(centerX, centerY, x, y, width, height)
         else
         draw.SimpleText("PlayX source has no screen",
                         "HUDNumber",

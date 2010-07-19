@@ -345,7 +345,7 @@ function ENT:Draw()
             cam.Start3D2D(pos, ang, width)
             surface.SetDrawColor(0, 0, 0, 255)
             surface.DrawRect(0, 0, 1024, 512)
-            self:DrawScreen(1024 / 2, 512 / 2)
+            self:DrawScreen(1024 / 2, 512 / 2, 0, 0, 1024, 512)
             cam.End3D2D()
         end
     else
@@ -370,7 +370,9 @@ function ENT:Draw()
         surface.SetDrawColor(0, 0, 0, 255)
         surface.DrawRect(-self.DrawShiftX, -self.DrawShiftY * shiftMultiplier, self.DrawWidth, self.DrawHeight)
         self:DrawScreen(self.DrawWidth / 2 - self.DrawShiftX,
-                        self.DrawHeight / 2 - self.DrawShiftY * shiftMultiplier)
+                        self.DrawHeight / 2 - self.DrawShiftY * shiftMultiplier,
+                        -self.DrawShiftX, -self.DrawShiftY * shiftMultiplier,
+                        self.DrawWidth, self.DrawHeight)
         cam.End3D2D()
     end
 
@@ -412,8 +414,12 @@ end
 -- a 3D2D context has been created.
 -- @param centerX Center X
 -- @param centerY Center Y
+-- @param x Top left position
+-- @param y Top left position
+-- @param width Width of screen
+-- @param height Height of screen
 -- @hidden
-function ENT:DrawScreen(centerX, centerY)
+function ENT:DrawScreen(centerX, centerY, x, y, width, height)
     if self.Browser and self.Browser:IsValid() and self.Media then
         if not self.LowFramerateMode then
             if not self.BrowserMat then return end
