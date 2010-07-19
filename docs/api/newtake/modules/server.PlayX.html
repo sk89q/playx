@@ -192,14 +192,20 @@
                 
                     <tr>
                         <td class="function-prop"><code>static </code></td>
-                        <td><code><a href="#ShouldAutoSubscribe">ShouldAutoSubscribe</a>(ply, instance)</code>
-                            <div class="summary-inset"> Returns true if the user should be automatically subscribed to the instance.</div></td>
+                        <td><code><a href="#SpawnForPlayer">SpawnForPlayer</a>(ply, model, repeater)</code>
+                            <div class="summary-inset"> Spawns the player at the location that a player is looking at.</div></td>
                     </tr>
                 
                     <tr>
                         <td class="function-prop"><code>static </code></td>
-                        <td><code><a href="#SpawnForPlayer">SpawnForPlayer</a>(ply, model, repeater)</code>
-                            <div class="summary-inset"> Spawns the player at the location that a player is looking at.</div></td>
+                        <td><code><a href="#SubscribeOnly">SubscribeOnly</a>(ply, instance)</code>
+                            <div class="summary-inset"> Subscribe a user to only one instance.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#UnsubscribeAll">UnsubscribeAll</a>(ply)</code>
+                            <div class="summary-inset"> Unsubscribes a user from all players.</div></td>
                     </tr>
                 
             </table>
@@ -671,42 +677,6 @@
             
                 
 
-<h3><a id="ShouldAutoSubscribe">ShouldAutoSubscribe</a></h3>
-
-<p><code><strong>PlayX.ShouldAutoSubscribe</strong>(ply, instance)</code></p>
-
-<blockquote class="function-body">
-    
-        <p> Returns true if the user should be automatically subscribed to the instance. By default this returns true, but you can override the behavior by defining a hook called PlayXShouldAutoSubscribe. You can manually subscribe and unsubscribe users without having this function matching. This function is only called when a PlayX entity is created and when a player joins but it is never called to "check" subscriptions.</p>
-    
-
-    
-    <h4>Parameters:</h4>
-    <ul>
-        
-        <li>
-          <code><em>ply</em></code> - Player
-        </li>
-        
-        <li>
-          <code><em>instance</em></code> - Entity instance to check against
-        </li>
-        
-    </ul>
-    
-
-
-    
-
-    
-
-    
-</blockquote>
-
-<hr />
-            
-                
-
 <h3><a id="SpawnForPlayer">SpawnForPlayer</a></h3>
 
 <p><code><strong>PlayX.SpawnForPlayer</strong>(ply, model, repeater)</code></p>
@@ -743,6 +713,74 @@
         <ul>
             <li>Success, and error message</li>
         </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SubscribeOnly">SubscribeOnly</a></h3>
+
+<p><code><strong>PlayX.SubscribeOnly</strong>(ply, instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Subscribe a user to only one instance. The user will be unsubscribed from all other players. If the user is already only subscribed to the instance, then nothing will happen.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>instance</em></code> - Instance to subscribe to
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="UnsubscribeAll">UnsubscribeAll</a></h3>
+
+<p><code><strong>PlayX.UnsubscribeAll</strong>(ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Unsubscribes a user from all players.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+    </ul>
+    
+
+
+    
+
     
 
     

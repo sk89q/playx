@@ -129,7 +129,7 @@
                     </tr>
                 
                     <tr>
-                        <td><code><a href="#PlayXMediaOpen">PlayXMediaOpen</a>(instance, provider, uri, start, forceLowFramerate, useJW, ignoreLength, provider, result)</code>
+                        <td><code><a href="#PlayXMediaOpen">PlayXMediaOpen</a>(instance, provider, uri, start, forceLowFramerate, useJW, result)</code>
                             <div class="summary-inset"> Called when OpenMedia() has been called on an entity.</div></td>
                     </tr>
                 
@@ -180,11 +180,11 @@
                 
                     <tr>
                         <td><code><a href="#PlayXSubscribe">PlayXSubscribe</a>(instance, ply)</code>
-                            <div class="summary-inset"> Called when a player is being unsubscribed from an instance.</div></td>
+                            <div class="summary-inset"> Called when a player is being subscribed to an instance.</div></td>
                     </tr>
                 
                     <tr>
-                        <td><code><a href="#PlayXSubscribe">PlayXSubscribe</a>(instance, ply)</code>
+                        <td><code><a href="#PlayXUnsubscribe">PlayXUnsubscribe</a>(instance, ply)</code>
                             <div class="summary-inset"> Called when a player is being unsubscribed from an instance.</div></td>
                     </tr>
                 
@@ -440,7 +440,7 @@
 
 <h3><a id="PlayXMediaOpen">PlayXMediaOpen</a></h3>
 
-<p><code><strong>PlayXMediaOpen</strong>(instance, provider, uri, start, forceLowFramerate, useJW, ignoreLength, provider, result)</code></p>
+<p><code><strong>PlayXMediaOpen</strong>(instance, provider, uri, start, forceLowFramerate, useJW, result)</code></p>
 
 <blockquote class="function-body">
     
@@ -456,7 +456,7 @@
         </li>
         
         <li>
-          <code><em>provider</em></code> - Detect provider
+          <code><em>provider</em></code> - Name of provider, leave blank to auto-detect
         </li>
         
         <li>
@@ -473,14 +473,6 @@
         
         <li>
           <code><em>useJW</em></code> - True to allow the use of the JW player, false for otherwise, nil to default true
-        </li>
-        
-        <li>
-          <code><em>ignoreLength</em></code> - True to not check the length of the video (for auto-close)
-        </li>
-        
-        <li>
-          <code><em>provider</em></code> - Detect provider
         </li>
         
         <li>
@@ -892,7 +884,7 @@
 
 <blockquote class="function-body">
     
-        <p> Called when a player is being unsubscribed from an instance. Return false in order to prevent the unsubscription from happening.</p>
+        <p> Called when a player is being subscribed to an instance. Return false in order to prevent the subscription from happening.</p>
     
 
     
@@ -916,7 +908,7 @@
     
         <h4>Return value:</h4>
         <ul>
-            <li>Nil to pass or false to prevent</li>
+            <li>Nil to pass through or false to prevent</li>
         </ul>
     
 
@@ -927,9 +919,9 @@
             
                 
 
-<h3><a id="PlayXSubscribe">PlayXSubscribe</a></h3>
+<h3><a id="PlayXUnsubscribe">PlayXUnsubscribe</a></h3>
 
-<p><code><strong>PlayXSubscribe</strong>(instance, ply)</code></p>
+<p><code><strong>PlayXUnsubscribe</strong>(instance, ply)</code></p>
 
 <blockquote class="function-body">
     

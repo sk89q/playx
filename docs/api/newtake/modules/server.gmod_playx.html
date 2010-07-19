@@ -150,7 +150,43 @@
                 
                     <tr>
                         <td class="function-prop"><code></code></td>
-                        <td><code><a href="#OpenMedia">OpenMedia</a>(provider, uri, start, forceLowFramerate, useJW, ignoreLength)</code>
+                        <td><code><a href="#MediaBegan">MediaBegan</a>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code>
+                            <div class="summary-inset">Function for overriding.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MediaBegin">MediaBegin</a>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code>
+                            <div class="summary-inset">Function for overriding.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MediaEnd">MediaEnd</a>()</code>
+                            <div class="summary-inset">Function for overriding.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MediaEnded">MediaEnded</a>()</code>
+                            <div class="summary-inset">Function for overriding.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MediaOpen">MediaOpen</a>(provider, uri, start, forceLowFramerate, useJW, result)</code>
+                            <div class="summary-inset">Function for overriding.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MetadataReceive">MetadataReceive</a>(existingMedia, newData)</code>
+                            <div class="summary-inset">Overridable function that works the same as the hook.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#OpenMedia">OpenMedia</a>(provider, uri, start, forceLowFramerate, useJW)</code>
                             <div class="summary-inset">Plays something as if you had typed it in the tool panel.</div></td>
                     </tr>
                 
@@ -158,6 +194,12 @@
                         <td class="function-prop"><code></code></td>
                         <td><code><a href="#RaceProtectionTriggered">RaceProtectionTriggered</a>()</code>
                             <div class="summary-inset">Returns true if race protection is still wearing off.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#ShouldAutoSubscribe">ShouldAutoSubscribe</a>(ply)</code>
+                            <div class="summary-inset">Returns true if the user should be automatically subscribed to the instance.</div></td>
                     </tr>
                 
                     <tr>
@@ -437,9 +479,275 @@
             
                 
 
+<h3><a id="MediaBegan">MediaBegan</a></h3>
+
+<p><code><strong>gmod_playx:MediaBegan</strong>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Function for overriding. Called after media has begun.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>handler</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code>
+        </li>
+        
+        <li>
+          <code><em>resumeSupported</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+        <li>
+          <code><em>handlerArgs</em></code> - Arguments for the handler, can be nil
+        </li>
+        
+        <li>
+          <code><em>length</em></code> - Length of the media in seconds, can be nil
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="MediaBegin">MediaBegin</a></h3>
+
+<p><code><strong>gmod_playx:MediaBegin</strong>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Function for overriding. Called after media has begun.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>handler</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code>
+        </li>
+        
+        <li>
+          <code><em>resumeSupported</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+        <li>
+          <code><em>handlerArgs</em></code> - Arguments for the handler, can be nil
+        </li>
+        
+        <li>
+          <code><em>length</em></code> - Length of the media in seconds, can be nil
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to deny</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="MediaEnd">MediaEnd</a></h3>
+
+<p><code><strong>gmod_playx:MediaEnd</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Function for overriding. Called like PlayXMediaEnd after PlayXMediaEnd.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to deny</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="MediaEnded">MediaEnded</a></h3>
+
+<p><code><strong>gmod_playx:MediaEnded</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Function for overriding. Called after media has ended.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="MediaOpen">MediaOpen</a></h3>
+
+<p><code><strong>gmod_playx:MediaOpen</strong>(provider, uri, start, forceLowFramerate, useJW, result)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Function for overriding. Called like the PlayXMediaOpen hook. Overriding this function will not call the hook unless you call BaseClass.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>provider</em></code> - Name of provider (detected or provided, but it will exist)
+        </li>
+        
+        <li>
+          <code><em>uri</em></code> - URI to play
+        </li>
+        
+        <li>
+          <code><em>start</em></code> - Time to start the video at, in seconds
+        </li>
+        
+        <li>
+          <code><em>forceLowFramerate</em></code> - Force the client side players to play at 1 FPS
+        </li>
+        
+        <li>
+          <code><em>useJW</em></code> - True to allow the use of the JW player, false for otherwise, nil to default true
+        </li>
+        
+        <li>
+          <code><em>result</em></code> - Handler information
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to deny, table to override</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="MetadataReceive">MetadataReceive</a></h3>
+
+<p><code><strong>gmod_playx:MetadataReceive</strong>(existingMedia, newData)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Overridable function that works the same as the hook.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>existingMedia</em></code> - Also accessible as self.Media
+        </li>
+        
+        <li>
+          <code><em>newData</em></code> - Incoming data
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Nil or the new data</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
 <h3><a id="OpenMedia">OpenMedia</a></h3>
 
-<p><code><strong>gmod_playx:OpenMedia</strong>(provider, uri, start, forceLowFramerate, useJW, ignoreLength)</code></p>
+<p><code><strong>gmod_playx:OpenMedia</strong>(provider, uri, start, forceLowFramerate, useJW)</code></p>
 
 <blockquote class="function-body">
     
@@ -468,10 +776,6 @@
         
         <li>
           <code><em>useJW</em></code> - True to allow the use of the JW player, false for otherwise, nil to default true
-        </li>
-        
-        <li>
-          <code><em>ignoreLength</em></code> - True to not check the length of the video (for auto-close)
         </li>
         
     </ul>
@@ -507,6 +811,38 @@
         <p>Returns true if race protection is still wearing off. return Boolean</p>
     
 
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ShouldAutoSubscribe">ShouldAutoSubscribe</a></h3>
+
+<p><code><strong>gmod_playx:ShouldAutoSubscribe</strong>(ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Returns true if the user should be automatically subscribed to the instance. By default this returns true, but you can override the behavior by defining a hook called PlayXShouldAutoSubscribe or by overriding the function on this entity (or derived entity class). You can manually subscribe and unsubscribe users without having this function matching. This function is only called when a PlayX entity is created and when a player joins but it is never called to "check" subscriptions.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code>
+        </li>
+        
+    </ul>
     
 
 
