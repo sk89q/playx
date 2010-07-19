@@ -171,11 +171,6 @@ local function ControlPanel(panel)
         Command = "playx_force_low_framerate",
     }):SetTooltip("Use this for music-only videos")
     
-    panel:AddControl("CheckBox", {
-        Label = "Don't auto stop on finish when applicable",
-        Command = "playx_ignore_length",
-    })
-    
     panel:AddControl("Button", {
         Label = "Open Media",
         Command = "playx_gui_open",

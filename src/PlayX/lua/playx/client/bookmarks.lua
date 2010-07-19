@@ -190,8 +190,7 @@ function Bookmark:Play()
     end
     
     PlayX.RequestOpenMedia(self.Provider, self.URI, self.StartAt,
-                           self.LowFramerate, GetConVar("playx_use_jw"):GetBool(),
-                           GetConVar("playx_ignore_length"):GetBool())
+                           self.LowFramerate, GetConVar("playx_use_jw"):GetBool())
 end
 
 --- Copies the bookmark's values to the playx_* convars. The panel uses

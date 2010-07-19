@@ -26,7 +26,6 @@ CreateClientConVar("playx_uri", "", false, false)
 CreateClientConVar("playx_start_time", "0:00", false, false)
 CreateClientConVar("playx_force_low_framerate", 0, false, false)
 CreateClientConVar("playx_use_jw", 1, false, false)
-CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_error_windows", 1, true, false)
 CreateClientConVar("playx_debug", 0, true, false)
 

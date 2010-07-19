@@ -62,7 +62,6 @@ local function ConCmdOpen(ply, cmd, args)
         local start = playxlib.ParseTimeString(args[3])
         local forceLowFramerate = playxlib.CastToBool(args[4], false)
         local useJW = playxlib.CastToBool(args[5], true)
-        local ignoreLength = playxlib.CastToBool(args[6], false)
         
         if start == nil then
             PlayX.SendError(ply, "The time format you entered for \"Start At\" isn't understood")
@@ -70,8 +69,7 @@ local function ConCmdOpen(ply, cmd, args)
             PlayX.SendError(ply, "A non-negative start time is required")
         else
             local result, err = 
-                instance:OpenMedia(provider, uri, start,
-                                   forceLowFramerate, useJW, ignoreLength)
+                instance:OpenMedia(provider, uri, start, forceLowFramerate, useJW)
             
             if not result then
                 PlayX.SendError(ply, err)
