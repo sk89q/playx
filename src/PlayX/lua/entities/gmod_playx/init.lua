@@ -35,6 +35,10 @@ ENT.InputForceLowFramerate = false
 --- Initialize the entity.
 -- @hidden
 function ENT:Initialize()
+    if self.KVModel then
+        self.Entity:SetModel(self.KVModel)
+    end
+    
     self.Entity:PhysicsInit(SOLID_VPHYSICS)
     self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
     self.Entity:SetSolid(SOLID_VPHYSICS)

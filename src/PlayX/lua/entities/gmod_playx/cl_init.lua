@@ -37,6 +37,10 @@ ENT.LastFinalVolume = -1
 --- Initializes the entity.
 -- @hidden
 function ENT:Initialize()
+    if self.KVModel then
+        self.Entity:SetModel(self.KVModel)
+    end
+    
     self.Entity:DrawShadow(false)
     self:UpdateScreenBounds()
     PlayX.RegisterSoundProcessor()

@@ -32,6 +32,7 @@ ENT.AdminSpawnable = true
 
 ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
 
+ENT.KVModel = nil
 ENT.NoScreen = false
 ENT.IsProjector = false
 ENT.ScreenOffset = nil
@@ -48,6 +49,14 @@ ENT.DrawShiftY = nil
 ENT.RotateAroundRight = nil
 ENT.RotateAroundUp = nil
 ENT.RotateAroundForward = nil
+
+--- Get key value.
+-- @hidden
+function ENT:KeyValue(key, value)
+    if key == "model" and value:Trim() ~= "" then
+        self.KVModel = value
+    end
+end
 
 --- Detects the screen position.
 -- @hidden
