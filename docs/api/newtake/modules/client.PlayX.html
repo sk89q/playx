@@ -1,0 +1,1159 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Client-side Module: PlayX</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+    <div id="navigation">
+        
+
+<div id="title">
+    <strong>PlayX API Documentation</strong>
+</div>
+
+<hr />
+
+
+    <h2>Client-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/client.Bookmark.html">Bookmark</a>
+            </li>
+    
+            <li>
+                <strong><a href="../modules/client.PlayX.html">PlayX</a></strong>
+            </li>
+            
+            <li>
+                <a href="../modules/client.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Server-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/server.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Shared</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/playxlib.html">playxlib</a>
+            </li>
+    
+    </ul>
+    
+    <hr />
+    
+    <h2>Hooks</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/hooks.Client.html">Client</a>
+            </li>
+    
+            <li>
+                <a href="../modules/hooks.Server.html">Server</a>
+            </li>
+    
+    </ul>
+
+    </div>
+    
+    <div id="body">
+        <ul id="bar">
+            <li><a href="../index.html">Index</a></li>
+            <li><strong>Module</strong></li>
+        </ul>
+        
+        <h1>Client-side Module <code>PlayX</code></h1>
+
+        <p></p>
+        
+        
+
+        
+
+        
+            <h2>Function Summary</h2>
+            
+            <table class="function-summary" cellpadding="0" cellspacing="0">
+                <col width="100">
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#AddBookmark">AddBookmark</a>(title, provider, uri, keyword, startAt, lowFramerate)</code>
+                            <div class="summary-inset"> Adds a new bookmark.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#Debug">Debug</a>(msg, ...)</code>
+                            <div class="summary-inset"> Prints debugging messages.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#Disable">Disable</a>()</code>
+                            <div class="summary-inset"> Disables the player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#Enable">Enable</a>()</code>
+                            <div class="summary-inset"> Enables the player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetBookmark">GetBookmark</a>(title)</code>
+                            <div class="summary-inset"> Get a bookmark by title.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetBookmarkByKeyword">GetBookmarkByKeyword</a>(keyword)</code>
+                            <div class="summary-inset"> Get a bookmark by keyword.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetCounts">GetCounts</a>()</code>
+                            <div class="summary-inset"> Returns counts of instances having media, having resumable media, and are playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetHandler">GetHandler</a>(handler)</code>
+                            <div class="summary-inset"> Gets a handler by name.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetInstance">GetInstance</a>(ply)</code>
+                            <div class="summary-inset"> Gets the player instance entity.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetInstances">GetInstances</a>()</code>
+                            <div class="summary-inset"> Gets a list of instances.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetVolume">GetVolume</a>()</code>
+                            <div class="summary-inset"> Gets the overall volume.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#HasValidHostURL">HasValidHostURL</a>()</code>
+                            <div class="summary-inset"> Checks whether the host URL is valid.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#LoadBookmarks">LoadBookmarks</a>()</code>
+                            <div class="summary-inset"> Load bookmarks from file.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#OpenBookmarksWindow">OpenBookmarksWindow</a>(selectTitle)</code>
+                            <div class="summary-inset"> Opens the bookmark management window.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#OpenSpawnDialog">OpenSpawnDialog</a>(forRepeater)</code>
+                            <div class="summary-inset"> Opens the dialog for choosing a model to spawn the player with.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#OpenUpdateWindow">OpenUpdateWindow</a>(ver)</code>
+                            <div class="summary-inset"> Opens the update window.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#PlayerExists">PlayerExists</a>()</code>
+                            <div class="summary-inset"> Checks whether a player is spawned.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#RequestCloseMedia">RequestCloseMedia</a>()</code>
+                            <div class="summary-inset"> Puts in a request to close media.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#RequestOpenMedia">RequestOpenMedia</a>(provider, uri, start, forceLowFramerate, useJW, ignoreLength)</code>
+                            <div class="summary-inset"> Puts in a request to open media.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ResetRenderBounds">ResetRenderBounds</a>()</code>
+                            <div class="summary-inset"> Reset the render bounds of the project screen.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ResumePlay">ResumePlay</a>()</code>
+                            <div class="summary-inset"> Resume playing if it is not already playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#SaveBookmarks">SaveBookmarks</a>()</code>
+                            <div class="summary-inset"> Write bookmarks to file.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#SetVolume">SetVolume</a>(vol)</code>
+                            <div class="summary-inset"> Sets the overall volume.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ShowError">ShowError</a>(err)</code>
+                            <div class="summary-inset"> Shows an error message.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ShowHint">ShowHint</a>(msg)</code>
+                            <div class="summary-inset"> Shows a hint.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ShowNotice">ShowNotice</a>()</code>
+                            <div class="summary-inset"> Show the first play notice.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#StopPlay">StopPlay</a>()</code>
+                            <div class="summary-inset"> Hides the player and stops it.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#UpdatePanels">UpdatePanels</a>()</code>
+                            <div class="summary-inset"> Updates the tool panels.</div></td>
+                    </tr>
+                
+            </table>
+        
+
+        
+
+
+        
+            <h2><a id="functions">Functions</a></h2>
+            
+            
+                
+
+<h3><a id="AddBookmark">AddBookmark</a></h3>
+
+<p><code><strong>PlayX.AddBookmark</strong>(title, provider, uri, keyword, startAt, lowFramerate)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Adds a new bookmark. All fields are required.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>title</em></code> - How the bookmark is identified
+        </li>
+        
+        <li>
+          <code><em>provider</em></code> - String or blank string
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>keyword</em></code> - Blank string for no keyword
+        </li>
+        
+        <li>
+          <code><em>startAt</em></code> - Can be a time string ("3:22")
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code> - Boolean
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>True for success, false otherwise</li>
+            
+            <li>Error message if error</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Debug">Debug</a></h3>
+
+<p><code><strong>PlayX.Debug</strong>(msg, ...)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Prints debugging messages. The cvar playx_debug must be enabled for the debug messages to show.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>msg</em></code> - Message
+        </li>
+        
+        <li>
+          <code><em>...</em></code> - Vars for sprintf
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Disable">Disable</a></h3>
+
+<p><code><strong>PlayX.Disable</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Disables the player.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Enable">Enable</a></h3>
+
+<p><code><strong>PlayX.Enable</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Enables the player.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetBookmark">GetBookmark</a></h3>
+
+<p><code><strong>PlayX.GetBookmark</strong>(title)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Get a bookmark by title.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>title</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Bookmark object or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetBookmarkByKeyword">GetBookmarkByKeyword</a></h3>
+
+<p><code><strong>PlayX.GetBookmarkByKeyword</strong>(keyword)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Get a bookmark by keyword.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>keyword</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Bookmark object or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetCounts">GetCounts</a></h3>
+
+<p><code><strong>PlayX.GetCounts</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns counts of instances having media, having resumable media, and are playing.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>Number of players that have media</li>
+            
+            <li>Number of players that are resumable</li>
+            
+            <li>Number of players that are playing</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetHandler">GetHandler</a></h3>
+
+<p><code><strong>PlayX.GetHandler</strong>(handler)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets a handler by name. May return nil if the handler doesn't exist.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>handler</em></code> - Handler name
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Handler function or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetInstance">GetInstance</a></h3>
+
+<p><code><strong>PlayX.GetInstance</strong>(ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets the player instance entity. When there are multiple instances out, the behavior is undefined. A hook named PlayXSelectInstance can be defined to return a specific entity. This function may return nil.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player that can be passed to specify a user
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Entity or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetInstances">GetInstances</a></h3>
+
+<p><code><strong>PlayX.GetInstances</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets a list of instances.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>List of entities</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetVolume">GetVolume</a></h3>
+
+<p><code><strong>PlayX.GetVolume</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets the overall volume. This is the overall volume of all players. The value will be between 0 and 100. @return</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="HasValidHostURL">HasValidHostURL</a></h3>
+
+<p><code><strong>PlayX.HasValidHostURL</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Checks whether the host URL is valid.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Whether the host URL is valid</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="LoadBookmarks">LoadBookmarks</a></h3>
+
+<p><code><strong>PlayX.LoadBookmarks</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Load bookmarks from file.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="OpenBookmarksWindow">OpenBookmarksWindow</a></h3>
+
+<p><code><strong>PlayX.OpenBookmarksWindow</strong>(selectTitle)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Opens the bookmark management window. A bookmark title can be provided so that the bookmark is automatically selected when the window is opened.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>selectTitle</em></code> - Optional bookmark title to select.
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="OpenSpawnDialog">OpenSpawnDialog</a></h3>
+
+<p><code><strong>PlayX.OpenSpawnDialog</strong>(forRepeater)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Opens the dialog for choosing a model to spawn the player with.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>forRepeater</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="OpenUpdateWindow">OpenUpdateWindow</a></h3>
+
+<p><code><strong>PlayX.OpenUpdateWindow</strong>(ver)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Opens the update window.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ver</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayerExists">PlayerExists</a></h3>
+
+<p><code><strong>PlayX.PlayerExists</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Checks whether a player is spawned. @return</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="RequestCloseMedia">RequestCloseMedia</a></h3>
+
+<p><code><strong>PlayX.RequestCloseMedia</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Puts in a request to close media. A request will be sent to the server for processing.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="RequestOpenMedia">RequestOpenMedia</a></h3>
+
+<p><code><strong>PlayX.RequestOpenMedia</strong>(provider, uri, start, forceLowFramerate, useJW, ignoreLength)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Puts in a request to open media. A request will be sent to the server for processing.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>provider</em></code> - Name of provider, leave blank to auto-detect
+        </li>
+        
+        <li>
+          <code><em>uri</em></code> - URI to play
+        </li>
+        
+        <li>
+          <code><em>start</em></code> - Time to start the video at, in seconds
+        </li>
+        
+        <li>
+          <code><em>forceLowFramerate</em></code> - Force the client side players to play at 1 FPS
+        </li>
+        
+        <li>
+          <code><em>useJW</em></code> - True to allow the use of the JW player, false for otherwise, nil to default true
+        </li>
+        
+        <li>
+          <code><em>ignoreLength</em></code> - True to not check the length of the video (for auto-close)
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>The result generated by a provider, or nil and the error message</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ResetRenderBounds">ResetRenderBounds</a></h3>
+
+<p><code><strong>PlayX.ResetRenderBounds</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Reset the render bounds of the project screen.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ResumePlay">ResumePlay</a></h3>
+
+<p><code><strong>PlayX.ResumePlay</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Resume playing if it is not already playing.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SaveBookmarks">SaveBookmarks</a></h3>
+
+<p><code><strong>PlayX.SaveBookmarks</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Write bookmarks to file.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SetVolume">SetVolume</a></h3>
+
+<p><code><strong>PlayX.SetVolume</strong>(vol)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Sets the overall volume. This is the overall volume of all players. The value is between 0 and 100. @return</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>vol</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ShowError">ShowError</a></h3>
+
+<p><code><strong>PlayX.ShowError</strong>(err)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Shows an error message. It will be shown in a popup if it is enabled or if hints do not exist in this gamemode.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>err</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ShowHint">ShowHint</a></h3>
+
+<p><code><strong>PlayX.ShowHint</strong>(msg)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Shows a hint. This only works on sandbox gamemodes and gamemodes that implement GAMEMODE.AddNotify. If AddNotify is not available, the message will not be shown anywhere.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>msg</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ShowNotice">ShowNotice</a></h3>
+
+<p><code><strong>PlayX.ShowNotice</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Show the first play notice. This will only show anything if hints exist in the gameode.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="StopPlay">StopPlay</a></h3>
+
+<p><code><strong>PlayX.StopPlay</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Hides the player and stops it.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="UpdatePanels">UpdatePanels</a></h3>
+
+<p><code><strong>PlayX.UpdatePanels</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Updates the tool panels. This calls the PlayXUpdateUI hook with no arguments and with no regards to the returned value.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+        
+
+
+        
+        
+        <div id="footer">
+    &copy; 2009, 2010 <a href="http://www.sk89q.com">sk89q</a>. Generated with <a href="http://luadoc.luaforge.net/">LuaDoc</a>.
+</div>
+    </div>
+</div>
+</body>
+</html>
+

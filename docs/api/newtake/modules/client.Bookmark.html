@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Client-side Module: Bookmark</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+    <div id="navigation">
+        
+
+<div id="title">
+    <strong>PlayX API Documentation</strong>
+</div>
+
+<hr />
+
+
+    <h2>Client-side</h2>
+    
+    <ul>
+    
+            <li>
+                <strong><a href="../modules/client.Bookmark.html">Bookmark</a></strong>
+            </li>
+            
+            <li>
+                <a href="../modules/client.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Server-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/server.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Shared</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/playxlib.html">playxlib</a>
+            </li>
+    
+    </ul>
+    
+    <hr />
+    
+    <h2>Hooks</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/hooks.Client.html">Client</a>
+            </li>
+    
+            <li>
+                <a href="../modules/hooks.Server.html">Server</a>
+            </li>
+    
+    </ul>
+
+    </div>
+    
+    <div id="body">
+        <ul id="bar">
+            <li><a href="../index.html">Index</a></li>
+            <li><strong>Module</strong></li>
+        </ul>
+        
+        <h1>Client-side Module <code>Bookmark</code></h1>
+
+        <p></p>
+        
+        
+
+        
+
+        
+            <h2>Function Summary</h2>
+            
+            <table class="function-summary" cellpadding="0" cellspacing="0">
+                <col width="100">
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#CopyToPanel">CopyToPanel</a>()</code>
+                            <div class="summary-inset">Copies the bookmark's values to the playx_* convars.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#Delete">Delete</a>()</code>
+                            <div class="summary-inset">Delete the bookmark.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#Play">Play</a>()</code>
+                            <div class="summary-inset">Play the bookmark.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#Update">Update</a>(title, provider, uri, keyword, startAt, lowFramerate)</code>
+                            <div class="summary-inset">Update a bookmark with new values.</div></td>
+                    </tr>
+                
+            </table>
+        
+
+        
+
+
+        
+            <h2><a id="functions">Functions</a></h2>
+            
+            
+                
+
+<h3><a id="CopyToPanel">CopyToPanel</a></h3>
+
+<p><code><strong>Bookmark:CopyToPanel</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Copies the bookmark's values to the playx_* convars. The panel uses these convars in the fields, so this function effectively copies the values to the panel.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Delete">Delete</a></h3>
+
+<p><code><strong>Bookmark:Delete</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Delete the bookmark.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Success (true/false)</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Play">Play</a></h3>
+
+<p><code><strong>Bookmark:Play</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Play the bookmark.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Update">Update</a></h3>
+
+<p><code><strong>Bookmark:Update</strong>(title, provider, uri, keyword, startAt, lowFramerate)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Update a bookmark with new values.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>title</em></code>
+        </li>
+        
+        <li>
+          <code><em>provider</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>keyword</em></code>
+        </li>
+        
+        <li>
+          <code><em>startAt</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>Success (true/false)</li>
+            
+            <li>Error message if error</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+        
+
+
+        
+        
+        <div id="footer">
+    &copy; 2009, 2010 <a href="http://www.sk89q.com">sk89q</a>. Generated with <a href="http://luadoc.luaforge.net/">LuaDoc</a>.
+</div>
+    </div>
+</div>
+</body>
+</html>
+

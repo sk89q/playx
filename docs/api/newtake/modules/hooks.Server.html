@@ -1,0 +1,1018 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Hooks</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+    <div id="navigation">
+        
+
+<div id="title">
+    <strong>PlayX API Documentation</strong>
+</div>
+
+<hr />
+
+
+    <h2>Client-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/client.Bookmark.html">Bookmark</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Server-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/server.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Shared</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/playxlib.html">playxlib</a>
+            </li>
+    
+    </ul>
+    
+    <hr />
+    
+    <h2>Hooks</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/hooks.Client.html">Client</a>
+            </li>
+    
+            <li>
+                <strong><a href="../modules/hooks.Server.html">Server</a></strong>
+            </li>
+            
+    </ul>
+
+    </div>
+    
+    <div id="body">
+        <ul id="bar">
+            <li><a href="../index.html">Index</a></li>
+            <li><strong>Server Hooks</strong></li>
+        </ul>
+        
+        <h1>Server Hooks</h1>
+        
+        
+
+        
+
+        
+            <h2>Hook Summary</h2>
+            
+            <table class="function-summary" cellpadding="0" cellspacing="0">
+                
+                    <tr>
+                        <td><code><a href="#PlayXIsPermitted">PlayXIsPermitted</a>(ply, instance)</code>
+                            <div class="summary-inset"> Called to check whether a user can use PlayX.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMediaBegan">PlayXMediaBegan</a>(instance, handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code>
+                            <div class="summary-inset"> Called after BeginMedia().</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMediaBegin">PlayXMediaBegin</a>(instance, handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code>
+                            <div class="summary-inset"> Called on BeginMedia().</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMediaEnd">PlayXMediaEnd</a>(instance)</code>
+                            <div class="summary-inset"> Called right before media end.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMediaEnded">PlayXMediaEnded</a>(instance)</code>
+                            <div class="summary-inset"> Called on media end.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMediaOpen">PlayXMediaOpen</a>(instance, provider, uri, start, forceLowFramerate, useJW, ignoreLength, provider, result)</code>
+                            <div class="summary-inset"> Called when OpenMedia() has been called on an entity.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMetadataReceive">PlayXMetadataReceive</a>(instance, existingMedia, data)</code>
+                            <div class="summary-inset"> Called when metadata is received.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXRemove">PlayXRemove</a>(instance)</code>
+                            <div class="summary-inset"> Called a PlayX entity is being removed.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXRepeaterSpawnFunction">PlayXRepeaterSpawnFunction</a>(ply, tr)</code>
+                            <div class="summary-inset"> Called when a client requests a spawn of a PlayX repeater.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXRepeaterUse">PlayXRepeaterUse</a>(instance, activator, caller)</code>
+                            <div class="summary-inset"> Called when a client does use on a PlayX repeater.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXResolveProvider">PlayXResolveProvider</a>(provider, uri, useJW)</code>
+                            <div class="summary-inset"> Called when a provider is being resolved.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXSelectInstance">PlayXSelectInstance</a>(ply)</code>
+                            <div class="summary-inset"> Called when a single main entity (for a provided client if available) is required.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXShouldAutoSubscribe">PlayXShouldAutoSubscribe</a>(ply, instance)</code>
+                            <div class="summary-inset"> This hook is used to determine whether a user should be automatically subscribed to a player in the event of the user having just joined or in the event of an entity being spawned.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXSpawnFunction">PlayXSpawnFunction</a>(ply, tr)</code>
+                            <div class="summary-inset"> Called when a client requests a spawn of a PlayX player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXSpawnPlayX">PlayXSpawnPlayX</a>(ply, model, repeater, mdl)</code>
+                            <div class="summary-inset"> Called when a player or repeater is being spawned for a user.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXSubscribe">PlayXSubscribe</a>(instance, ply)</code>
+                            <div class="summary-inset"> Called when a player is being unsubscribed from an instance.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXSubscribe">PlayXSubscribe</a>(instance, ply)</code>
+                            <div class="summary-inset"> Called when a player is being unsubscribed from an instance.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXUse">PlayXUse</a>(instance, activator, caller)</code>
+                            <div class="summary-inset"> Called when a client does use on a PlayX player.</div></td>
+                    </tr>
+                
+            </table>
+        
+
+
+        
+            <h2><a id="hooks">Hooks</a></h2>
+            
+            
+                
+
+<h3><a id="PlayXIsPermitted">PlayXIsPermitted</a></h3>
+
+<p><code><strong>PlayXIsPermitted</strong>(ply, instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called to check whether a user can use PlayX. This is called when requesting media and also when spawning a player. In the case of requesting or closing media, the entity that it is for will be passed. If you want to deny all default control mechanism, use this hook and return false.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>True/false to allow/deny</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaBegan">PlayXMediaBegan</a></h3>
+
+<p><code><strong>PlayXMediaBegan</strong>(instance, handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called after BeginMedia().</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>handler</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code>
+        </li>
+        
+        <li>
+          <code><em>resumeSupported</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+        <li>
+          <code><em>handlerArgs</em></code> - Arguments for the handler, can be nil
+        </li>
+        
+        <li>
+          <code><em>length</em></code> - Length of the media in seconds, can be nil
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaBegin">PlayXMediaBegin</a></h3>
+
+<p><code><strong>PlayXMediaBegin</strong>(instance, handler, uri, start, resumeSupported, lowFramerate, handlerArgs, length)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called on BeginMedia().</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>handler</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code>
+        </li>
+        
+        <li>
+          <code><em>resumeSupported</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+        <li>
+          <code><em>handlerArgs</em></code> - Arguments for the handler, can be nil
+        </li>
+        
+        <li>
+          <code><em>length</em></code> - Length of the media in seconds, can be nil
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Nil/true to pass or false to fail</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaEnd">PlayXMediaEnd</a></h3>
+
+<p><code><strong>PlayXMediaEnd</strong>(instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called right before media end.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to prevent</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaEnded">PlayXMediaEnded</a></h3>
+
+<p><code><strong>PlayXMediaEnded</strong>(instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called on media end.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaOpen">PlayXMediaOpen</a></h3>
+
+<p><code><strong>PlayXMediaOpen</strong>(instance, provider, uri, start, forceLowFramerate, useJW, ignoreLength, provider, result)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when OpenMedia() has been called on an entity. Remember that BeginMedia() gets called latter, and OpenMedia() can be skipped. This hook can be used to block the media or change it.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>provider</em></code> - Detect provider
+        </li>
+        
+        <li>
+          <code><em>uri</em></code> - URI to play
+        </li>
+        
+        <li>
+          <code><em>start</em></code> - Time to start the video at, in seconds
+        </li>
+        
+        <li>
+          <code><em>forceLowFramerate</em></code> - Force the client side players to play at 1 FPS
+        </li>
+        
+        <li>
+          <code><em>useJW</em></code> - True to allow the use of the JW player, false for otherwise, nil to default true
+        </li>
+        
+        <li>
+          <code><em>ignoreLength</em></code> - True to not check the length of the video (for auto-close)
+        </li>
+        
+        <li>
+          <code><em>provider</em></code> - Detect provider
+        </li>
+        
+        <li>
+          <code><em>result</em></code> - Result resolved
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>Nil/true to pass, a table to override result, or false to fail</li>
+            
+            <li>Error message in the case of failure</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMetadataReceive">PlayXMetadataReceive</a></h3>
+
+<p><code><strong>PlayXMetadataReceive</strong>(instance, existingMedia, data)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when metadata is received. A table can be returned to replace the metadata that has been received.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>existingMedia</em></code> - Untouched Media table
+        </li>
+        
+        <li>
+          <code><em>data</em></code> - Received metadata table
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>New data table or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXRemove">PlayXRemove</a></h3>
+
+<p><code><strong>PlayXRemove</strong>(instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called a PlayX entity is being removed.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXRepeaterSpawnFunction">PlayXRepeaterSpawnFunction</a></h3>
+
+<p><code><strong>PlayXRepeaterSpawnFunction</strong>(ply, tr)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a client requests a spawn of a PlayX repeater. This is called directly when the entity's SpawnFunction hook is called.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>tr</em></code> - Trace
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to prevent standard behavior</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXRepeaterUse">PlayXRepeaterUse</a></h3>
+
+<p><code><strong>PlayXRepeaterUse</strong>(instance, activator, caller)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a client does use on a PlayX repeater. The use type is SIMPLE_USE. Instead of using this hook, you can also override the entity's OnUse hook.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX repeater entity
+        </li>
+        
+        <li>
+          <code><em>activator</em></code> - See Gmod wiki
+        </li>
+        
+        <li>
+          <code><em>caller</em></code> - See Gmod wiki
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXResolveProvider">PlayXResolveProvider</a></h3>
+
+<p><code><strong>PlayXResolveProvider</strong>(provider, uri, useJW)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a provider is being resolved.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>provider</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>useJW</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Nil to do nothing, or a provider</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXSelectInstance">PlayXSelectInstance</a></h3>
+
+<p><code><strong>PlayXSelectInstance</strong>(ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a single main entity (for a provided client if available) is required. Since a user is provided (though not necessarily in all cases that call this hook), you can use it to choose the closest PlayX entity that a user has access to. If you have a sandbox-based gamemode and you wanted to allow the PlayX tool menu controls to work, you would have to define this hook. Also, when the bookmarks manager is used (sandbox not required), it goes through the same mechanisms that the tool panel uses, so if you want the bookmark manager to work, you have to define this hook as well. However, the client-side PlayXRequestOpenMedia hook also lets you control this process much earlier on the client, so there you could popup a dialog to select an entity if it's too ambiguous, although you would have to skip the server-side portion of this media request/control process.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player or nil
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>PlayX entity or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXShouldAutoSubscribe">PlayXShouldAutoSubscribe</a></h3>
+
+<p><code><strong>PlayXShouldAutoSubscribe</strong>(ply, instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> This hook is used to determine whether a user should be automatically subscribed to a player in the event of the user having just joined or in the event of an entity being spawned. By default, everyone will always be automatically subscribed, so this hook should be defined in most cases, possibly returning false all the time to prevent automatic subscription all together.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to deny</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXSpawnFunction">PlayXSpawnFunction</a></h3>
+
+<p><code><strong>PlayXSpawnFunction</strong>(ply, tr)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a client requests a spawn of a PlayX player. This is called directly when the entity's SpawnFunction hook is called.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>tr</em></code> - Trace
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to prevent standard behavior</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXSpawnPlayX">PlayXSpawnPlayX</a></h3>
+
+<p><code><strong>PlayXSpawnPlayX</strong>(ply, model, repeater, mdl)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a player or repeater is being spawned for a user. Normally this is called when the entity is spawned via the Entities menu of sandbox gamemodes (which can be intercepted earlier using the SpawnFunction hooks). This hook can be used to allow the spawn, prevent it, or change the position and angle that the player is spawned at.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>model</em></code>
+        </li>
+        
+        <li>
+          <code><em>repeater</em></code> - True if for the repeater
+        </li>
+        
+        <li>
+          <code><em>mdl</em></code> - Model name
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>Nil or true to allow, false to deny, vector to change position</li>
+            
+            <li>Error message if false, angle if vector was provided as first return</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXSubscribe">PlayXSubscribe</a></h3>
+
+<p><code><strong>PlayXSubscribe</strong>(instance, ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a player is being unsubscribed from an instance. Return false in order to prevent the unsubscription from happening.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Nil to pass or false to prevent</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXSubscribe">PlayXSubscribe</a></h3>
+
+<p><code><strong>PlayXSubscribe</strong>(instance, ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a player is being unsubscribed from an instance. Return false in order to prevent the unsubscription from happening.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Nil to pass or false to prevent</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXUse">PlayXUse</a></h3>
+
+<p><code><strong>PlayXUse</strong>(instance, activator, caller)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a client does use on a PlayX player. The use type is SIMPLE_USE. Instead of using this hook, you can also override the entity's OnUse hook.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>activator</em></code> - See Gmod wiki
+        </li>
+        
+        <li>
+          <code><em>caller</em></code> - See Gmod wiki
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+        
+        
+        <div id="footer">
+    &copy; 2009, 2010 <a href="http://www.sk89q.com">sk89q</a>. Generated with <a href="http://luadoc.luaforge.net/">LuaDoc</a>.
+</div>
+    </div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,765 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server-side Module: PlayX</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+    <div id="navigation">
+        
+
+<div id="title">
+    <strong>PlayX API Documentation</strong>
+</div>
+
+<hr />
+
+
+    <h2>Client-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/client.Bookmark.html">Bookmark</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Server-side</h2>
+    
+    <ul>
+    
+            <li>
+                <strong><a href="../modules/server.PlayX.html">PlayX</a></strong>
+            </li>
+            
+            <li>
+                <a href="../modules/server.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Shared</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/playxlib.html">playxlib</a>
+            </li>
+    
+    </ul>
+    
+    <hr />
+    
+    <h2>Hooks</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/hooks.Client.html">Client</a>
+            </li>
+    
+            <li>
+                <a href="../modules/hooks.Server.html">Server</a>
+            </li>
+    
+    </ul>
+
+    </div>
+    
+    <div id="body">
+        <ul id="bar">
+            <li><a href="../index.html">Index</a></li>
+            <li><strong>Module</strong></li>
+        </ul>
+        
+        <h1>Server-side Module <code>PlayX</code></h1>
+
+        <p></p>
+        
+        
+
+        
+
+        
+            <h2>Function Summary</h2>
+            
+            <table class="function-summary" cellpadding="0" cellspacing="0">
+                <col width="100">
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetHostURL">GetHostURL</a>()</code>
+                            <div class="summary-inset"> Gets the URL of the host file.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetInstance">GetInstance</a>(ply)</code>
+                            <div class="summary-inset"> Gets the player instance entity.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetInstances">GetInstances</a>()</code>
+                            <div class="summary-inset"> Gets a list of instances.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetJWURL">GetJWURL</a>()</code>
+                            <div class="summary-inset"> Gets the URL of the JW player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetProvider">GetProvider</a>(id)</code>
+                            <div class="summary-inset"> Gets a provider by name.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#GetSubscribed">GetSubscribed</a>(ply)</code>
+                            <div class="summary-inset"> Gets a list of instances that a player has subscribed to.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#IsPermitted">IsPermitted</a>(ply, instance)</code>
+                            <div class="summary-inset"> Returns whether a player is permitted to use the player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#IsUsingJW">IsUsingJW</a>()</code>
+                            <div class="summary-inset"> Checks whether the JW player is enabled.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#JWPlayerSupportsYouTube">JWPlayerSupportsYouTube</a>()</code>
+                            <div class="summary-inset"> Returns whether the JW player supports YouTube.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#PlayerExists">PlayerExists</a>()</code>
+                            <div class="summary-inset"> Checks if a player instance exists in the game.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ResolveProvider">ResolveProvider</a>(provider, uri, useJW)</code>
+                            <div class="summary-inset"> Resolves a provider to a handler.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#SendError">SendError</a>(ply, err)</code>
+                            <div class="summary-inset"> Send the PlayXEnd umsg to clients.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#SendSpawnDialog">SendSpawnDialog</a>(ply, forRepeater)</code>
+                            <div class="summary-inset"> Send the PlayXSpawnDialog umsg to a client, telling the client to open the spawn dialog.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#SendUpdateInfo">SendUpdateInfo</a>(ply, ver)</code>
+                            <div class="summary-inset"> Send the PlayXUpdateInfo umsg to a user.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ShouldAutoSubscribe">ShouldAutoSubscribe</a>(ply, instance)</code>
+                            <div class="summary-inset"> Returns true if the user should be automatically subscribed to the instance.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#SpawnForPlayer">SpawnForPlayer</a>(ply, model, repeater)</code>
+                            <div class="summary-inset"> Spawns the player at the location that a player is looking at.</div></td>
+                    </tr>
+                
+            </table>
+        
+
+        
+
+
+        
+            <h2><a id="functions">Functions</a></h2>
+            
+            
+                
+
+<h3><a id="GetHostURL">GetHostURL</a></h3>
+
+<p><code><strong>PlayX.GetHostURL</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets the URL of the host file. @return</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetInstance">GetInstance</a></h3>
+
+<p><code><strong>PlayX.GetInstance</strong>(ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets the player instance entity. When there are multiple instances out, the behavior is undefined. A hook named PlayXSelectInstance can be defined to return a specific entity. This function may return nil.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player that can be passed to specify a user
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Entity or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetInstances">GetInstances</a></h3>
+
+<p><code><strong>PlayX.GetInstances</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets a list of instances.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>List of entities</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetJWURL">GetJWURL</a></h3>
+
+<p><code><strong>PlayX.GetJWURL</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets the URL of the JW player. @return</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetProvider">GetProvider</a></h3>
+
+<p><code><strong>PlayX.GetProvider</strong>(id)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets a provider by name.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>id</em></code> - ID of provider
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Provider function or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetSubscribed">GetSubscribed</a></h3>
+
+<p><code><strong>PlayX.GetSubscribed</strong>(ply)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets a list of instances that a player has subscribed to.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>List of entities</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="IsPermitted">IsPermitted</a></h3>
+
+<p><code><strong>PlayX.IsPermitted</strong>(ply, instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns whether a player is permitted to use the player. The PlayXIsPermitted hook allows this function to be overridden.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>instance</em></code> - Instance to check against (may be nil) @return
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="IsUsingJW">IsUsingJW</a></h3>
+
+<p><code><strong>PlayX.IsUsingJW</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Checks whether the JW player is enabled.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Whether the JW player is enabled</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="JWPlayerSupportsYouTube">JWPlayerSupportsYouTube</a></h3>
+
+<p><code><strong>PlayX.JWPlayerSupportsYouTube</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns whether the JW player supports YouTube. @return</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayerExists">PlayerExists</a></h3>
+
+<p><code><strong>PlayX.PlayerExists</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Checks if a player instance exists in the game.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Whether a player exists</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ResolveProvider">ResolveProvider</a></h3>
+
+<p><code><strong>PlayX.ResolveProvider</strong>(provider, uri, useJW)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Resolves a provider to a handler.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>provider</em></code> - Name of provider, leave blank to auto-detect
+        </li>
+        
+        <li>
+          <code><em>uri</em></code> - URI to play
+        </li>
+        
+        <li>
+          <code><em>useJW</em></code> - True to allow the use of the JW player, false for otherwise, nil to default true
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>Provider name (detected) or nil</li>
+            
+            <li>Result or error message</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SendError">SendError</a></h3>
+
+<p><code><strong>PlayX.SendError</strong>(ply, err)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Send the PlayXEnd umsg to clients. You should not have much of a a reason to call this method.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code>
+        </li>
+        
+        <li>
+          <code><em>err</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SendSpawnDialog">SendSpawnDialog</a></h3>
+
+<p><code><strong>PlayX.SendSpawnDialog</strong>(ply, forRepeater)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Send the PlayXSpawnDialog umsg to a client, telling the client to open the spawn dialog.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player to send to
+        </li>
+        
+        <li>
+          <code><em>forRepeater</em></code> - True if this is for the repeater
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SendUpdateInfo">SendUpdateInfo</a></h3>
+
+<p><code><strong>PlayX.SendUpdateInfo</strong>(ply, ver)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Send the PlayXUpdateInfo umsg to a user.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code>
+        </li>
+        
+        <li>
+          <code><em>ver</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ShouldAutoSubscribe">ShouldAutoSubscribe</a></h3>
+
+<p><code><strong>PlayX.ShouldAutoSubscribe</strong>(ply, instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns true if the user should be automatically subscribed to the instance. By default this returns true, but you can override the behavior by defining a hook called PlayXShouldAutoSubscribe. You can manually subscribe and unsubscribe users without having this function matching. This function is only called when a PlayX entity is created and when a player joins but it is never called to "check" subscriptions.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>instance</em></code> - Entity instance to check against
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SpawnForPlayer">SpawnForPlayer</a></h3>
+
+<p><code><strong>PlayX.SpawnForPlayer</strong>(ply, model, repeater)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Spawns the player at the location that a player is looking at. This function will check whether there is already a player or not.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>ply</em></code> - Player
+        </li>
+        
+        <li>
+          <code><em>model</em></code> - Model path
+        </li>
+        
+        <li>
+          <code><em>repeater</em></code> - Spawn repeater
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Success, and error message</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+        
+
+
+        
+        
+        <div id="footer">
+    &copy; 2009, 2010 <a href="http://www.sk89q.com">sk89q</a>. Generated with <a href="http://luadoc.luaforge.net/">LuaDoc</a>.
+</div>
+    </div>
+</div>
+</body>
+</html>
+

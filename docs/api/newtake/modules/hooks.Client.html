@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Client Hooks</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+    <div id="navigation">
+        
+
+<div id="title">
+    <strong>PlayX API Documentation</strong>
+</div>
+
+<hr />
+
+
+    <h2>Client-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/client.Bookmark.html">Bookmark</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Server-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/server.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Shared</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/playxlib.html">playxlib</a>
+            </li>
+    
+    </ul>
+    
+    <hr />
+    
+    <h2>Hooks</h2>
+    
+    <ul>
+    
+            <li>
+                <strong><a href="../modules/hooks.Client.html">Client</a></strong>
+            </li>
+            
+            <li>
+                <a href="../modules/hooks.Server.html">Server</a>
+            </li>
+    
+    </ul>
+
+    </div>
+    
+    <div id="body">
+        <ul id="bar">
+            <li><a href="../index.html">Index</a></li>
+            <li><strong>Client Hooks</strong></li>
+        </ul>
+        
+        <h1>Client Hooks</h1>
+        
+        
+
+        
+
+        
+            <h2>Hook Summary</h2>
+            
+            <table class="function-summary" cellpadding="0" cellspacing="0">
+                
+                    <tr>
+                        <td><code><a href="#PlayXDisabled">PlayXDisabled</a>()</code>
+                            <div class="summary-inset"> Called when PlayX has been disabled by the client.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXEnabled">PlayXEnabled</a>()</code>
+                            <div class="summary-inset"> Called when PlayX has been enabled by the client.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXGetSoundMultiplier">PlayXGetSoundMultiplier</a>(instance)</code>
+                            <div class="summary-inset"> Sound fading / local sound calls this hook every 0.1 seconds to get the volume that an instance should be playing at.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMediaBegan">PlayXMediaBegan</a>(instance, handler, uri, start, resumeSupported, lowFramerate, handlerArgs)</code>
+                            <div class="summary-inset"> Called when media has begun.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMediaEnded">PlayXMediaEnded</a>(instance)</code>
+                            <div class="summary-inset"> Called when media has ended.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXMetadataReceive">PlayXMetadataReceive</a>(instance, existingMedia, data)</code>
+                            <div class="summary-inset"> Called when metadata is received.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXPlayed">PlayXPlayed</a>(instance)</code>
+                            <div class="summary-inset"> Called when a player has started playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXRequestCloseMedia">PlayXRequestCloseMedia</a>()</code>
+                            <div class="summary-inset"> Called a media close is requested (generally through the tool menu panel).</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXRequestOpenMedia">PlayXRequestOpenMedia</a>(provider, uri, start, forceLowFramerate, useJW, ignoreLength)</code>
+                            <div class="summary-inset"> Called when media is requested.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXSelectInstance">PlayXSelectInstance</a>()</code>
+                            <div class="summary-inset"> PlayX.GetInstance() calls this hook.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXStopped">PlayXStopped</a>(instance)</code>
+                            <div class="summary-inset"> Called when a player has stopped playing (stopped by the user / server).</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXUpdateUI">PlayXUpdateUI</a>()</code>
+                            <div class="summary-inset"> Called when a UI update is requested, possibly because something started or stopped playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td><code><a href="#PlayXVolumeSet">PlayXVolumeSet</a>(vol)</code>
+                            <div class="summary-inset"> Called when the client has changed the overall PlayX volume.</div></td>
+                    </tr>
+                
+            </table>
+        
+
+
+        
+            <h2><a id="hooks">Hooks</a></h2>
+            
+            
+                
+
+<h3><a id="PlayXDisabled">PlayXDisabled</a></h3>
+
+<p><code><strong>PlayXDisabled</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when PlayX has been disabled by the client.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXEnabled">PlayXEnabled</a></h3>
+
+<p><code><strong>PlayXEnabled</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when PlayX has been enabled by the client.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXGetSoundMultiplier">PlayXGetSoundMultiplier</a></h3>
+
+<p><code><strong>PlayXGetSoundMultiplier</strong>(instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Sound fading / local sound calls this hook every 0.1 seconds to get the volume that an instance should be playing at. Return a value between 0 and 100 or nil to do nothing. This hook is only called if it was defined. PlayX checks to see whether it should be calling this hook after some certain events, such as media loading. It is recommended that this hook exist from the beginning of the game.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Volume (0 - 100) or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaBegan">PlayXMediaBegan</a></h3>
+
+<p><code><strong>PlayXMediaBegan</strong>(instance, handler, uri, start, resumeSupported, lowFramerate, handlerArgs)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when media has begun.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>handler</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code> - Number of seconds
+        </li>
+        
+        <li>
+          <code><em>resumeSupported</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+        <li>
+          <code><em>handlerArgs</em></code> - Table
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaEnded">PlayXMediaEnded</a></h3>
+
+<p><code><strong>PlayXMediaEnded</strong>(instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when media has ended.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMetadataReceive">PlayXMetadataReceive</a></h3>
+
+<p><code><strong>PlayXMetadataReceive</strong>(instance, existingMedia, data)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when metadata is received. A table can be returned to replace the metadata that has been received.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>existingMedia</em></code> - Untouched Media table
+        </li>
+        
+        <li>
+          <code><em>data</em></code> - Received metadata table
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>New data table or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXPlayed">PlayXPlayed</a></h3>
+
+<p><code><strong>PlayXPlayed</strong>(instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a player has started playing.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXRequestCloseMedia">PlayXRequestCloseMedia</a></h3>
+
+<p><code><strong>PlayXRequestCloseMedia</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called a media close is requested (generally through the tool menu panel). Return false to disallow, nil or true to pass through.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to disable, nil/true to allow</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXRequestOpenMedia">PlayXRequestOpenMedia</a></h3>
+
+<p><code><strong>PlayXRequestOpenMedia</strong>(provider, uri, start, forceLowFramerate, useJW, ignoreLength)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when media is requested. The bookmarks manager and the tool menu panel (sandbox only) call PlayX.RequestOpenMedia(), which triggers this hook. Return false to disallow, nil or true to pass through.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>provider</em></code> - May be blank
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code> - Can be a string (i.e. "2:41")
+        </li>
+        
+        <li>
+          <code><em>forceLowFramerate</em></code> - Boolean
+        </li>
+        
+        <li>
+          <code><em>useJW</em></code>
+        </li>
+        
+        <li>
+          <code><em>ignoreLength</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>False to disable, nil/true to allow</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXSelectInstance">PlayXSelectInstance</a></h3>
+
+<p><code><strong>PlayXSelectInstance</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> PlayX.GetInstance() calls this hook. That function is called by PlayX whenever a "primary" entity needs to be selected, client-side. It is primarily used by the repeater to find a PlayX player to be repeating. Hooks should return nil or a gmod_playx entity</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Entity or nil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXStopped">PlayXStopped</a></h3>
+
+<p><code><strong>PlayXStopped</strong>(instance)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a player has stopped playing (stopped by the user / server).</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXUpdateUI">PlayXUpdateUI</a></h3>
+
+<p><code><strong>PlayXUpdateUI</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a UI update is requested, possibly because something started or stopped playing. This may be called several times in quick succession.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXVolumeSet">PlayXVolumeSet</a></h3>
+
+<p><code><strong>PlayXVolumeSet</strong>(vol)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when the client has changed the overall PlayX volume.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>vol</em></code> - New volume
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+        
+        
+        <div id="footer">
+    &copy; 2009, 2010 <a href="http://www.sk89q.com">sk89q</a>. Generated with <a href="http://luadoc.luaforge.net/">LuaDoc</a>.
+</div>
+    </div>
+</div>
+</body>
+</html>
+

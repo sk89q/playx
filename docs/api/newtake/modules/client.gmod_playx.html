@@ -1,0 +1,672 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Client-side Module: gmod_playx</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+    <div id="navigation">
+        
+
+<div id="title">
+    <strong>PlayX API Documentation</strong>
+</div>
+
+<hr />
+
+
+    <h2>Client-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/client.Bookmark.html">Bookmark</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <strong><a href="../modules/client.gmod_playx.html">gmod_playx</a></strong>
+            </li>
+            
+            <li>
+                <a href="../modules/client.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Server-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/server.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Shared</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/playxlib.html">playxlib</a>
+            </li>
+    
+    </ul>
+    
+    <hr />
+    
+    <h2>Hooks</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/hooks.Client.html">Client</a>
+            </li>
+    
+            <li>
+                <a href="../modules/hooks.Server.html">Server</a>
+            </li>
+    
+    </ul>
+
+    </div>
+    
+    <div id="body">
+        <ul id="bar">
+            <li><a href="../index.html">Index</a></li>
+            <li><strong>Module</strong></li>
+        </ul>
+        
+        <h1>Client-side Module <code>gmod_playx</code></h1>
+
+        <p></p>
+        
+        
+
+        
+
+        
+            <h2>Function Summary</h2>
+            
+            <table class="function-summary" cellpadding="0" cellspacing="0">
+                <col width="100">
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#BeginMedia">BeginMedia</a>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)</code>
+                            <div class="summary-inset">Begins media.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#EndMedia">EndMedia</a>()</code>
+                            <div class="summary-inset">Stop what's playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#GetLocalVolume">GetLocalVolume</a>()</code>
+                            <div class="summary-inset">Get the local sound volume, which is the PlayX volume combined with this player's individual volume.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#GetProjectedDistance">GetProjectedDistance</a>(pos)</code>
+                            <div class="summary-inset">Gets the closet distance between a point and this instance.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#GetProjectionPos">GetProjectionPos</a>()</code>
+                            <div class="summary-inset">Gets the projector's screen position, or if it's not a projector, a psuedo projection line endpoint.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#GetProjectorTrace">GetProjectorTrace</a>()</code>
+                            <div class="summary-inset">Get the trace used for the projector.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#GetSourcePos">GetSourcePos</a>()</code>
+                            <div class="summary-inset">Returns the center position of the player, not necessarily where the screen is, in the case of non-projectors.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#GetVolume">GetVolume</a>()</code>
+                            <div class="summary-inset">Get the volume of this individual player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#HasMedia">HasMedia</a>()</code>
+                            <div class="summary-inset">Returns true if this instance has media.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#IsResumable">IsResumable</a>()</code>
+                            <div class="summary-inset">Returns true if this instance has resumable media.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#Play">Play</a>()</code>
+                            <div class="summary-inset">Starts playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#ResetRenderBounds">ResetRenderBounds</a>()</code>
+                            <div class="summary-inset">Reset the render bounds for this player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#SetVolume">SetVolume</a>(volume)</code>
+                            <div class="summary-inset">Changes the volume of this player.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#Stop">Stop</a>()</code>
+                            <div class="summary-inset">Stop playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#UpdateMetadata">UpdateMetadata</a>(data)</code>
+                            <div class="summary-inset">Updates the current media metadata.</div></td>
+                    </tr>
+                
+            </table>
+        
+
+        
+
+
+        
+            <h2><a id="functions">Functions</a></h2>
+            
+            
+                
+
+<h3><a id="BeginMedia">BeginMedia</a></h3>
+
+<p><code><strong>gmod_playx:BeginMedia</strong>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Begins media.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>handler</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code>
+        </li>
+        
+        <li>
+          <code><em>resumeSupported</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+        <li>
+          <code><em>handlerArgs</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="EndMedia">EndMedia</a></h3>
+
+<p><code><strong>gmod_playx:EndMedia</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Stop what's playing.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetLocalVolume">GetLocalVolume</a></h3>
+
+<p><code><strong>gmod_playx:GetLocalVolume</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Get the local sound volume, which is the PlayX volume combined with this player's individual volume. Value is 0 to 100.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Volume</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetProjectedDistance">GetProjectedDistance</a></h3>
+
+<p><code><strong>gmod_playx:GetProjectedDistance</strong>(pos)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Gets the closet distance between a point and this instance. This returns the distance to the point projected onto the finite line segment between self:GetSourcePos() and self:GetProjectionPos().</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>pos</em></code> - Position
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Distance</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetProjectionPos">GetProjectionPos</a></h3>
+
+<p><code><strong>gmod_playx:GetProjectionPos</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Gets the projector's screen position, or if it's not a projector, a psuedo projection line endpoint. If the entity is not a projector then nil will be returned.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>Position</li>
+            
+            <li>Normal</li>
+            
+            <li>Boolean indicating whether a screen is showing</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetProjectorTrace">GetProjectorTrace</a></h3>
+
+<p><code><strong>gmod_playx:GetProjectorTrace</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Get the trace used for the projector.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Trace result</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetSourcePos">GetSourcePos</a></h3>
+
+<p><code><strong>gmod_playx:GetSourcePos</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Returns the center position of the player, not necessarily where the screen is, in the case of non-projectors.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return values:</h4>
+        <ol>
+            
+            <li>Position</li>
+            
+            <li>Normal</li>
+            
+        </ol>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="GetVolume">GetVolume</a></h3>
+
+<p><code><strong>gmod_playx:GetVolume</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Get the volume of this individual player. Volume is 0 to 100.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Volume</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="HasMedia">HasMedia</a></h3>
+
+<p><code><strong>gmod_playx:HasMedia</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Returns true if this instance has media.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Boolean</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="IsResumable">IsResumable</a></h3>
+
+<p><code><strong>gmod_playx:IsResumable</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Returns true if this instance has resumable media.</p>
+    
+
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Boolean</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Play">Play</a></h3>
+
+<p><code><strong>gmod_playx:Play</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Starts playing. This will only work if the entity has media assigned to it, possibly received from the server.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ResetRenderBounds">ResetRenderBounds</a></h3>
+
+<p><code><strong>gmod_playx:ResetRenderBounds</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Reset the render bounds for this player.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="SetVolume">SetVolume</a></h3>
+
+<p><code><strong>gmod_playx:SetVolume</strong>(volume)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Changes the volume of this player. This does not affect the overall PlayX volume, nor will it override it.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>volume</em></code> - Volume (0-100) to change to
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Stop">Stop</a></h3>
+
+<p><code><strong>gmod_playx:Stop</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Stop playing. The play can be resumed at any time (until EndMedia() is called), but not all media can be resumed.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="UpdateMetadata">UpdateMetadata</a></h3>
+
+<p><code><strong>gmod_playx:UpdateMetadata</strong>(data)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Updates the current media metadata. Calling this while nothing is playing has no effect. This can be called many times and multiple times.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>data</em></code> - Metadata structure
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+        
+
+
+        
+        
+        <div id="footer">
+    &copy; 2009, 2010 <a href="http://www.sk89q.com">sk89q</a>. Generated with <a href="http://luadoc.luaforge.net/">LuaDoc</a>.
+</div>
+    </div>
+</div>
+</body>
+</html>
+

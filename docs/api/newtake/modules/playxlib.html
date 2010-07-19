@@ -1,0 +1,1168 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shared Module: playxlib</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+</head>
+<body>
+<div id="wrapper">
+    <div id="navigation">
+        
+
+<div id="title">
+    <strong>PlayX API Documentation</strong>
+</div>
+
+<hr />
+
+
+    <h2>Client-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/client.Bookmark.html">Bookmark</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/client.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Server-side</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/server.PlayX.html">PlayX</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx.html">gmod_playx</a>
+            </li>
+    
+            <li>
+                <a href="../modules/server.gmod_playx_repeater.html">gmod_playx_repeater</a>
+            </li>
+    
+    </ul>
+    
+    <h2>Shared</h2>
+    
+    <ul>
+    
+            <li>
+                <strong><a href="../modules/playxlib.html">playxlib</a></strong>
+            </li>
+            
+    </ul>
+    
+    <hr />
+    
+    <h2>Hooks</h2>
+    
+    <ul>
+    
+            <li>
+                <a href="../modules/hooks.Client.html">Client</a>
+            </li>
+    
+            <li>
+                <a href="../modules/hooks.Server.html">Server</a>
+            </li>
+    
+    </ul>
+
+    </div>
+    
+    <div id="body">
+        <ul id="bar">
+            <li><a href="../index.html">Index</a></li>
+            <li><strong>Module</strong></li>
+        </ul>
+        
+        <h1>Shared Module <code>playxlib</code></h1>
+
+        <p></p>
+        
+        
+
+        
+
+        
+            <h2>Function Summary</h2>
+            
+            <table class="function-summary" cellpadding="0" cellspacing="0">
+                <col width="100">
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#CastToBool">CastToBool</a>(v, default)</code>
+                            <div class="summary-inset"> Casts a console command arg to a bool.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#CastToNumber">CastToNumber</a>(v, default)</code>
+                            <div class="summary-inset"> Casts a console command arg to a number.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#CastToString">CastToString</a>(v, default)</code>
+                            <div class="summary-inset"> Casts a console command arg to a string.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#EmptyToNil">EmptyToNil</a>(s)</code>
+                            <div class="summary-inset"> Returns nil if a string is empty, otherwise it will return the string.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#FindMatch">FindMatch</a>(str, patterns)</code>
+                            <div class="summary-inset"> Attempts to match a list of patterns against a string, and returns the first match, or nil if there were no matches.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#HTMLEscape">HTMLEscape</a>(str)</code>
+                            <div class="summary-inset"> HTML encodes a string.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#HTMLUnescape">HTMLUnescape</a>(s)</code>
+                            <div class="summary-inset"> Unescape HTML.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#IsSquare">IsSquare</a>(width, height)</code>
+                            <div class="summary-inset"> Takes a width and height and returns a boolean to indicate whether the shape is optimally a square.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#IsTrue">IsTrue</a>(s)</code>
+                            <div class="summary-inset"> Tries to interpret a string as a boolean.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#JSEscape">JSEscape</a>(str)</code>
+                            <div class="summary-inset"> Encodes a string to be placed into a JavaScript string.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ParseCSV">ParseCSV</a>(data)</code>
+                            <div class="summary-inset"> Parses a string containing data formatted in CSV into a table.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ParseQuery">ParseQuery</a>(str)</code>
+                            <div class="summary-inset"> Parses a query.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ParseTags">ParseTags</a>(s, delim)</code>
+                            <div class="summary-inset"> Gets the tags out of a string.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ParseTimeString">ParseTimeString</a>(str)</code>
+                            <div class="summary-inset"> Parses a human-readable time string.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#PointLineDistance">PointLineDistance</a>(line1, line2, point)</code>
+                            <div class="summary-inset"> Returns the smallest distance between a point and a line in 3D space.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#PointLineSegmentDistance">PointLineSegmentDistance</a>(line1, line2, point)</code>
+                            <div class="summary-inset"> Returns the smallest distance between a point and a line segment in 3D space.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#PointLineSegmentProjection">PointLineSegmentProjection</a>(line1, line2, point)</code>
+                            <div class="summary-inset"> Returns the projection of a point onto a line segment in 3D space.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#ReadableTime">ReadableTime</a>(t)</code>
+                            <div class="summary-inset"> Turns seconds into minutes and seconds.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#URLEscape">URLEscape</a>(s)</code>
+                            <div class="summary-inset"> Percent encodes a value for URLs.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#URLEscapeTable">URLEscapeTable</a>(vars)</code>
+                            <div class="summary-inset"> Percent encodes a table for the query part of a URL.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#URLUnescape">URLUnescape</a>(str)</code>
+                            <div class="summary-inset"> URL unescapes a string.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#UTCTime">UTCTime</a>(t)</code>
+                            <div class="summary-inset"> Gets a timestamp in UTC.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code>static </code></td>
+                        <td><code><a href="#WriteCSV">WriteCSV</a>(data)</code>
+                            <div class="summary-inset"> Turns a table into CSV data.</div></td>
+                    </tr>
+                
+            </table>
+        
+
+        
+
+
+        
+            <h2><a id="functions">Functions</a></h2>
+            
+            
+                
+
+<h3><a id="CastToBool">CastToBool</a></h3>
+
+<p><code><strong>playxlib.CastToBool</strong>(v, default)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Casts a console command arg to a bool.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>v</em></code>
+        </li>
+        
+        <li>
+          <code><em>default</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Boolean</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="CastToNumber">CastToNumber</a></h3>
+
+<p><code><strong>playxlib.CastToNumber</strong>(v, default)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Casts a console command arg to a number.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>v</em></code>
+        </li>
+        
+        <li>
+          <code><em>default</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Boolean</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="CastToString">CastToString</a></h3>
+
+<p><code><strong>playxlib.CastToString</strong>(v, default)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Casts a console command arg to a string.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>v</em></code>
+        </li>
+        
+        <li>
+          <code><em>default</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Boolean</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="EmptyToNil">EmptyToNil</a></h3>
+
+<p><code><strong>playxlib.EmptyToNil</strong>(s)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns nil if a string is empty, otherwise it will return the string.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>s</em></code> - String
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Value</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="FindMatch">FindMatch</a></h3>
+
+<p><code><strong>playxlib.FindMatch</strong>(str, patterns)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Attempts to match a list of patterns against a string, and returns the first match, or nil if there were no matches.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>str</em></code> - The string
+        </li>
+        
+        <li>
+          <code><em>patterns</em></code> - Table of patterns
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Table of results, or bil</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="HTMLEscape">HTMLEscape</a></h3>
+
+<p><code><strong>playxlib.HTMLEscape</strong>(str)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> HTML encodes a string.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>str</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Encoded string</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="HTMLUnescape">HTMLUnescape</a></h3>
+
+<p><code><strong>playxlib.HTMLUnescape</strong>(s)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Unescape HTML. This function fudges the job, and it does not handle all of HTML's named entities.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>s</em></code> - The string
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Unescaped string</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="IsSquare">IsSquare</a></h3>
+
+<p><code><strong>playxlib.IsSquare</strong>(width, height)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Takes a width and height and returns a boolean to indicate whether the shape is optimally a square. This is used by the engine code to determine whether a square screen is better than a rectangular screen for a certain set of screen dimensions.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>width</em></code>
+        </li>
+        
+        <li>
+          <code><em>height</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Boolean</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="IsTrue">IsTrue</a></h3>
+
+<p><code><strong>playxlib.IsTrue</strong>(s)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Tries to interpret a string as a boolean. "true," "y," etc. are considered to be true.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>s</em></code> - String
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Boolean</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="JSEscape">JSEscape</a></h3>
+
+<p><code><strong>playxlib.JSEscape</strong>(str)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Encodes a string to be placed into a JavaScript string.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>str</em></code> - String to encode
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Encoded</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ParseCSV">ParseCSV</a></h3>
+
+<p><code><strong>playxlib.ParseCSV</strong>(data)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Parses a string containing data formatted in CSV into a table. Fields can be quoted with double quotations or be unquoted, and characters can be escaped with a backslash. This CSV parser is very forgiving. The return table has each line in a new entry, and each field is then a further entry in a table. Not all the rows may have the same number of fields in the returned table.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>data</em></code> - CSV data
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Table containg data</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ParseQuery">ParseQuery</a></h3>
+
+<p><code><strong>playxlib.ParseQuery</strong>(str)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Parses a query.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>str</em></code> - String to parse
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Table with keys and values</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ParseTags">ParseTags</a></h3>
+
+<p><code><strong>playxlib.ParseTags</strong>(s, delim)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets the tags out of a string.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>s</em></code>
+        </li>
+        
+        <li>
+          <code><em>delim</em></code> - Delimiter
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Table</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ParseTimeString">ParseTimeString</a></h3>
+
+<p><code><strong>playxlib.ParseTimeString</strong>(str)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Parses a human-readable time string. Returns the number in seconds, or nil if it cannot detect a format. Blank strings will return 0.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>str</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Time</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PointLineDistance">PointLineDistance</a></h3>
+
+<p><code><strong>playxlib.PointLineDistance</strong>(line1, line2, point)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns the smallest distance between a point and a line in 3D space.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>line1</em></code> - Line's first point
+        </li>
+        
+        <li>
+          <code><em>line2</em></code> - Line's second point
+        </li>
+        
+        <li>
+          <code><em>point</em></code> - Point
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Distance</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PointLineSegmentDistance">PointLineSegmentDistance</a></h3>
+
+<p><code><strong>playxlib.PointLineSegmentDistance</strong>(line1, line2, point)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns the smallest distance between a point and a line segment in 3D space.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>line1</em></code> - Line's first point
+        </li>
+        
+        <li>
+          <code><em>line2</em></code> - Line's second point
+        </li>
+        
+        <li>
+          <code><em>point</em></code> - Point
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Distance</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PointLineSegmentProjection">PointLineSegmentProjection</a></h3>
+
+<p><code><strong>playxlib.PointLineSegmentProjection</strong>(line1, line2, point)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Returns the projection of a point onto a line segment in 3D space.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>line1</em></code> - Line's first point
+        </li>
+        
+        <li>
+          <code><em>line2</em></code> - Line's second point
+        </li>
+        
+        <li>
+          <code><em>point</em></code> - Point
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Distance</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="ReadableTime">ReadableTime</a></h3>
+
+<p><code><strong>playxlib.ReadableTime</strong>(t)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Turns seconds into minutes and seconds.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>t</em></code> - Time
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>String</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="URLEscape">URLEscape</a></h3>
+
+<p><code><strong>playxlib.URLEscape</strong>(s)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Percent encodes a value for URLs.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>s</em></code> - String
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Encoded</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="URLEscapeTable">URLEscapeTable</a></h3>
+
+<p><code><strong>playxlib.URLEscapeTable</strong>(vars)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Percent encodes a table for the query part of a URL.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>vars</em></code> - Table of keys and values
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Encoded string</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="URLUnescape">URLUnescape</a></h3>
+
+<p><code><strong>playxlib.URLUnescape</strong>(str)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> URL unescapes a string. Doesn't handle %####</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>str</em></code> - String
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Unescaped string</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="UTCTime">UTCTime</a></h3>
+
+<p><code><strong>playxlib.UTCTime</strong>(t)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Gets a timestamp in UTC.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>t</em></code> - Time
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Time</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="WriteCSV">WriteCSV</a></h3>
+
+<p><code><strong>playxlib.WriteCSV</strong>(data)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Turns a table into CSV data.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>data</em></code> - Table to convert
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>CSV data</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+        
+
+
+        
+        
+        <div id="footer">
+    &copy; 2009, 2010 <a href="http://www.sk89q.com">sk89q</a>. Generated with <a href="http://luadoc.luaforge.net/">LuaDoc</a>.
+</div>
+    </div>
+</div>
+</body>
+</html>
+
