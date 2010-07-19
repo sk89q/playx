@@ -678,3 +678,40 @@ body {
     
     return playxlib.HandlerResult(css, js, body, url)
 end
+
+--- Returns the smallest distance between a point and a line in 3D space.
+-- @param line1 Line's first point
+-- @param line2 Line's second point
+-- @param point Point
+-- @return Distance
+function playxlib.PointLineDistance(line1, line2, point)
+    return ((point - line1):Cross(point - line2)):Length() / (line2 - line1):Length()
+end
+
+--- Returns the smallest distance between a point and a line segment in 3D space.
+-- @param line1 Line's first point
+-- @param line2 Line's second point
+-- @param point Point
+-- @return Distance
+function playxlib.PointLineSegmentDistance(line1, line2, point)
+    local a = line1:Distance(line2)^2
+    if a == 0 then return point:Distance(line1) end
+    local b = (point - line1):Dot(line2 - line1) / a
+    if b < 0 then return point:Distance(line1) end
+    if b > 1 then return point:Distance(line2) end
+    return point:Distance(line1 + b * (line2 - line1))
+end
+
+--- Returns the projection of a point onto a line segment in 3D space.
+-- @param line1 Line's first point
+-- @param line2 Line's second point
+-- @param point Point
+-- @return Distance
+function playxlib.PointLineSegmentProjection(line1, line2, point)
+    local a = line1:Distance(line2)^2
+    if a == 0 then return line1 end
+    local b = (point - line1):Dot(line2 - line1) / a
+    if b < 0 then return line1 end
+    if b > 1 then return line2 end
+    return line1 + b * (line2 - line1)
+end

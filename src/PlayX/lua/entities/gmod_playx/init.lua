@@ -91,6 +91,7 @@ function ENT:Initialize()
     end
     
     self:SetUseType(SIMPLE_USE)
+    self:UpdateScreenBounds()
 end
 
 --- Add a user to this player's subscription list. The user will start 

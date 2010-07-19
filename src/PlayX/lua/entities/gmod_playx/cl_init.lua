@@ -29,11 +29,18 @@ ENT.Result = nil
 ENT.IsPlaying = false
 ENT.LowFramerateMode = false
 ENT.DrawCenter = false
-ENT.NoScreen = false
 ENT.PlayerData = {}
 ENT.Volume = 100
 ENT.WaitingInjection = false
 ENT.LastFinalVolume = -1
+
+--- Initializes the entity.
+-- @hidden
+function ENT:Initialize()
+    self.Entity:DrawShadow(false)
+    self:UpdateScreenBounds()
+    PlayX.RegisterSoundProcessor()
+end
 
 --- Prints a debugging message about this entity.
 -- @param msg Message
@@ -42,14 +49,6 @@ ENT.LastFinalVolume = -1
 function ENT:Debug(msg, ...)
     local args = {...}
     PlayX.Debug(tostring(self) .. ": " .. msg, unpack(args))
-end
-
---- Initializes the entity.
--- @hidden
-function ENT:Initialize()
-    self.Entity:DrawShadow(false)
-    self:UpdateScreenBounds()
-    PlayX.RegisterSoundProcessor()
 end
 
 --- Returns true if this instance has media.
@@ -251,138 +250,6 @@ function ENT:UpdateMetadata(data)
     if res then data = res end
     
     table.Merge(self.Media, data)
-end
-
---- Detects the screen position.
--- @hidden
-function ENT:UpdateScreenBounds()
-    local model = self.Entity:GetModel()
-    local info = PlayXScreens[model:lower()]
-    
-    pcall(hook.Remove, "HUDPaint", "PlayXHUD" .. self:EntIndex())
-    
-    if info then
-        self.NoScreen = false
-        
-        if info.NoScreen then
-            self.NoScreen = true
-            self:SetProjectorBounds(0, 0, 0)
-            
-            hook.Add("HUDPaint", "PlayXHUD" .. self:EntIndex(), function()
-                if ValidEntity(self) then
-                    self:HUDPaint()
-                end
-            end)
-        elseif info.IsProjector then
-            self:SetProjectorBounds(info.Forward, info.Right, info.Up)
-        else
-            local rotateAroundRight = info.RotateAroundRight
-            local rotateAroundUp = info.RotateAroundUp
-            local rotateAroundForward = info.RotateAroundForward
-            
-            -- For backwards compatibility, adapt to the new rotation system
-            if type(rotateAroundRight) == 'boolean' then
-                rotateAroundRight = rotateAroundRight and -90 or 0
-            end
-            if type(rotateAroundUp) == 'boolean' then
-                rotateAroundUp = rotateAroundUp and 90 or 0
-            end
-            if type(rotateAroundForward) == 'boolean' then
-                rotateAroundForward = rotateAroundForward and 90 or 0
-            end
-            
-            self:SetScreenBounds(info.Offset, info.Width, info.Height,
-                                 rotateAroundRight,
-                                 rotateAroundUp,
-                                 rotateAroundForward)
-        end
-    else
-        local center = self.Entity:OBBCenter()
-        local mins = self.Entity:OBBMins()
-        local maxs = self.Entity:OBBMaxs()
-        local rightArea = (maxs.z * mins.z) * (maxs.y * mins.y)
-        local forwardArea = (maxs.z * mins.z) * (maxs.x * mins.x)
-        local topArea = (maxs.y * mins.y) * (maxs.x * mins.x)
-        local maxArea = math.max(rightArea, forwardArea, topArea)
-        
-        if maxArea == rightArea then
-            local width = maxs.y - mins.y
-            local height = maxs.z - mins.z
-            local pos = Vector(center.x + (maxs.x - mins.x) / 2 + 0.5,
-                               center.y - width / 2,
-                               center.z + height / 2)
-            self:SetScreenBounds(pos, width, height, -90, 90, 0)
-        elseif maxArea == forwardArea then
-            local width = maxs.x - mins.x
-            local height = maxs.z - mins.z
-            local pos = Vector(center.x + width / 2,
-                               center.y + (maxs.y - mins.y) / 2 + 0.5,
-                               center.z + height / 2)
-            self:SetScreenBounds(pos, width, height, 180, 0, -90)
-        else
-            local width = maxs.y - mins.y
-            local height = maxs.x - mins.x
-            local pos = Vector(center.x + height / 2,
-                               center.y + width / 2,
-                               center.z + (maxs.z - mins.z) / 2 + 0.5)
-            self:SetScreenBounds(pos, width, height, 0, -90, 0)
-        end
-    end
-    
-    self:ResetRenderBounds()
-end
-
---- Sets the screen position for a non-projector screen.
--- @hidden
-function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
-                             rotateAroundUp, rotateAroundForward)
-    self.IsProjector = false
-    
-    self.ScreenOffset = pos
-    self.ScreenWidth = width
-    self.ScreenHeight = height
-    self.IsSquare = playxlib.IsSquare(width, height) -- Uncalibrated number!
-    
-    if self.IsSquare then
-        self.HTMLWidth = 1024
-        self.HTMLHeight = 1024
-    else
-        self.HTMLWidth = 1024
-        self.HTMLHeight = 512
-    end
-    
-    if width / height < self.HTMLWidth / self.HTMLHeight then
-        self.DrawScale = width / self.HTMLWidth
-        self.DrawWidth = self.HTMLWidth
-        self.DrawHeight = height / self.DrawScale
-        self.DrawShiftX = 0
-        self.DrawShiftY = (self.DrawHeight - self.HTMLHeight) / 2
-    else
-        self.DrawScale = height / self.HTMLHeight
-        self.DrawWidth = width / self.DrawScale
-        self.DrawHeight = self.HTMLHeight
-        self.DrawShiftX = (self.DrawWidth - self.HTMLWidth) / 2
-        self.DrawShiftY = 0
-    end
-    
-    self.RotateAroundRight = rotateAroundRight
-    self.RotateAroundUp = rotateAroundUp
-    self.RotateAroundForward = rotateAroundForward
-end
-
---- Sets the projector screen position.
--- @hidden
-function ENT:SetProjectorBounds(forward, right, up)
-    self.IsProjector = true
-    
-    self.Forward = forward
-    self.Right = right
-    self.Up = up
-    
-    self.HTMLWidth = 1024
-    self.HTMLHeight = 512
-    
-    self.DrawScale = 1 -- Not used
 end
 
 --- Create the browser.
