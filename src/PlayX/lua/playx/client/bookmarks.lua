@@ -44,21 +44,38 @@ end
 
 local Bookmark = {}
 
+--- Creates a new bookmark.
+-- @param title
+-- @param provider
+-- @param uri
+-- @param keyword
+-- @param startAt
+-- @param lowFramerate
+-- @hidden
 function Bookmark:new(title, provider, uri, keyword, startAt, lowFramerate)
     local instance = {
-        ["Title"] = title,
-        ["Provider"] = provider,
-        ["URI"] = uri,
-        ["Keyword"] = keyword,
-        ["StartAt"] = startAt,
-        ["LowFramerate"] = lowFramerate,
-        ["Deleted"] = false,
+        Title = title,
+        Provider = provider,
+        URI = uri,
+        Keyword = keyword,
+        StartAt = startAt,
+        LowFramerate = lowFramerate,
+        Deleted = false,
     }
     setmetatable(instance, self)
     self.__index = self
     return instance
 end
 
+--- Update a bookmark with new values.
+-- @param title
+-- @param provider
+-- @param uri
+-- @param keyword
+-- @param startAt
+-- @param lowFramerate
+-- @return Success (true/false)
+-- @return Error message if error
 function Bookmark:Update(title, provider, uri, keyword, startAt, lowFramerate)
     if self.Deleted then
         Error("Operation performed on deleted bookmark")    
@@ -128,6 +145,8 @@ function Bookmark:Update(title, provider, uri, keyword, startAt, lowFramerate)
     return true
 end
 
+-- Delete the bookmark.
+-- @return Success (true/false)
 function Bookmark:Delete()
     self.Deleted = true
     
@@ -164,6 +183,7 @@ function Bookmark:Delete()
     return false
 end
 
+--- Play the bookmark.
 function Bookmark:Play()
     if self.Deleted then
         Error("Operation performed on deleted bookmark")    
@@ -174,6 +194,9 @@ function Bookmark:Play()
                            GetConVar("playx_ignore_length"):GetBool())
 end
 
+--- Copies the bookmark's values to the playx_* convars. The panel uses
+-- these convars in the fields, so this function effectively copies the values
+-- to the panel.
 function Bookmark:CopyToPanel()
     if self.Deleted then
         Error("Operation performed on deleted bookmark")    
@@ -185,6 +208,7 @@ function Bookmark:CopyToPanel()
     RunConsoleCommand("playx_force_low_framerate", self.LowFramerate and "1" or "0")
 end
 
+--- Load bookmarks from file.
 function PlayX.LoadBookmarks()
     local data = file.Read("playx/bookmarks.txt")
     
@@ -245,6 +269,7 @@ This Is Halloween,,http://youtube.com/watch?v=i_zYrYkbrGY,,0:00,
     return true
 end
 
+--- Write bookmarks to file.
 function PlayX.SaveBookmarks()
     local data = {}
     
@@ -261,6 +286,15 @@ function PlayX.SaveBookmarks()
     return true
 end
 
+--- Adds a new bookmark. All fields are required.
+-- @param title How the bookmark is identified
+-- @param provider String or blank string
+-- @param uri
+-- @param keyword Blank string for no keyword
+-- @param startAt Can be a time string ("3:22")
+-- @param lowFramerate Boolean
+-- @return True for success, false otherwise
+-- @return Error message if error
 function PlayX.AddBookmark(title, provider, uri, keyword, startAt, lowFramerate)
     local title = title:Trim()
     local provider = provider:Trim()
@@ -306,6 +340,9 @@ function PlayX.AddBookmark(title, provider, uri, keyword, startAt, lowFramerate)
     return true
 end
 
+--- Get a bookmark by title.
+-- @param title
+-- @return Bookmark object or nil
 function PlayX.GetBookmark(title)
     for i, bookmark in pairs(PlayX.Bookmarks) do
         if title:lower() == bookmark.Title:lower() then
@@ -316,6 +353,9 @@ function PlayX.GetBookmark(title)
     return nil
 end
 
+--- Get a bookmark by keyword.
+-- @param keyword
+-- @return Bookmark object or nil
 function PlayX.GetBookmarkByKeyword(keyword)
     if keyword:Trim() == "" then return end
     

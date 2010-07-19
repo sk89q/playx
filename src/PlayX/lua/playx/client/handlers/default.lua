@@ -16,27 +16,31 @@
 -- 
 -- $Id$
 
-list.Set("PlayXHandlers", "IFrame", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "IFrame", function(width, height, start, volume, adjVol, uri, handlerArgs)
     return playxlib.GenerateIFrame(width, height, uri)
 end)
 
-list.Set("PlayXHandlers", "JW", function(width, height, start, volume, uri)
+list.Set("PlayXHandlers", "JW", function(width, height, start, volume, adjVol, uri)
+    volume = adjVol -- This handler supports instant volume changing
      return playxlib.GenerateJWPlayer(width, height, start, volume, uri, handlerArgs)
 end)
 
-list.Set("PlayXHandlers", "JWVideo", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "JWVideo", function(width, height, start, volume, adjVol, uri, handlerArgs)
+    volume = adjVol -- This handler supports instant volume changing
     return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "video")
 end)
 
-list.Set("PlayXHandlers", "JWAudio", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "JWAudio", function(width, height, start, volume, adjVol, uri, handlerArgs)
+    volume = adjVol -- This handler supports instant volume changing
     return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "sound")
 end)
 
-list.Set("PlayXHandlers", "JWRTMP", function(width, height, start, volume, uri, handlerArgs)
-     return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "rtmp")
+list.Set("PlayXHandlers", "JWRTMP", function(width, height, start, volume, adjVol, uri, handlerArgs)
+    volume = adjVol -- This handler supports instant volume changing
+    return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "rtmp")
 end)
 
-list.Set("PlayXHandlers", "Flash", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "Flash", function(width, height, start, volume, adjVol, uri, handlerArgs)
     local flashVars = handlerArgs.FlashVars and handlerArgs.FlashVars or {}
     local forcePlay = handlerArgs.ForcePlay
     local center = handlerArgs.Center
@@ -45,17 +49,21 @@ list.Set("PlayXHandlers", "Flash", function(width, height, start, volume, uri, h
     return result
 end)
 
-list.Set("PlayXHandlers", "Image", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "Image", function(width, height, start, volume, adjVol, uri, handlerArgs)
     local result = playxlib.GenerateImageViewer(width, height, uri)
     result.center = true
     return result
 end)
 
-list.Set("PlayXHandlers", "FlashAPI", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "FlashAPI", function(width, height, start, volume, adjVol, uri, handlerArgs)
     local url = uri
     local js = ""
     local result = nil
     local volChangeJSF = nil
+    
+    if handlerArgs.JSStartFunc then
+        volume = adjVol
+    end
     
     if not handlerArgs.NoDimRepl then
         url = url:gsub("__width__", width)

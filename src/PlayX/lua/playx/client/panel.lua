@@ -31,15 +31,15 @@ local function SettingsPanel(panel)
     })
     
     if PlayX.CrashDetected then
-	    local msg = panel:AddControl("DLabel", {})
-	    msg:SetWrap(true)
-	    msg:SetText(
-	       "PlayX has detected a crash in a previous session. Is it safe to " ..
-	       "re-enable PlayX? For most people, crashes " ..
-	       "with the new versions of Gmod and PlayX are very rare, but a handful " ..
-	       "of people crash every time something is played. Try enabling " ..
-	       "PlayX a few times to determine whether you fall into this group."
-	    )
+		local msg = panel:AddControl("DLabel", {})
+		msg:SetWrap(true)
+		msg:SetText(
+			"PlayX has detected a crash in a previous session. Is it safe to " ..
+			"re-enable PlayX? For most people, crashes " ..
+			"with the new versions of Gmod and PlayX are very rare, but a handful " ..
+			"of people crash every time something is played. Try enabling " ..
+			"PlayX a few times to determine whether you fall into this group."
+		)
         msg:SetColor(Color(255, 255, 255, 255))
         msg:SetTextColor(Color(255, 255, 255, 255))
 		msg:SetTextInset(8)
@@ -50,9 +50,7 @@ local function SettingsPanel(panel)
         end
     end
     
-    if not PlayX.Enabled then
-        return
-    end
+    if not PlayX.Enabled then return end
 
     panel:AddControl("CheckBox", {
         Label = "Show errors in message boxes",
@@ -67,18 +65,20 @@ local function SettingsPanel(panel)
         Max = "100",
     }):SetTooltip("May have no effect, depending on what's playing.")
     
-    if PlayX.CurrentMedia then
-        if PlayX.CurrentMedia.ResumeSupported then
+    local numHasMedia, numResumable, numPlaying = PlayX.GetCounts()
+    
+    if numHasMedia > 0 then
+        if numResumable > 0 then
             local button = panel:AddControl("Button", {
                 Label = "Hide Player",
                 Command = "playx_hide",
             })
             
-            if not PlayX.Playing then
+            if numPlaying == 0 then
                 button:SetDisabled(true)
             end
             
-            if PlayX.Playing then
+            if numPlaying > 0 then
                 panel:AddControl("Button", {
                     Label = "Re-initialize Player",
                     Command = "playx_resume",
@@ -94,44 +94,32 @@ local function SettingsPanel(panel)
                 Text = "The current media supports resuming."
             })
         else
-            if PlayX.Playing then
+            if numPlaying > 0 then
                 panel:AddControl("Button", {
                     Label = "Stop Play",
                     Command = "playx_hide",
                 }):SetTooltip("This is a temporary disable.")
             
-                local button = panel:AddControl("Button", {
+                panel:AddControl("Button", {
                     Label = "Re-initialize Player",
                     Command = "playx_resume",
-                })
-            
-                button:SetDisabled(true)
+                }):SetDisabled(true)
             else
-                local button = panel:AddControl("Button", {
+                panel:AddControl("Button", {
                     Label = "Stop Play",
                     Command = "playx_hide",
-                }):SetTooltip("This is a temporary disable.")
+                }):SetDisabled(true)
                 
-                if not PlayX.Playing then
-                    button:SetDisabled(true)
-                end
-                
-                local button = panel:AddControl("Button", {
+                panel:AddControl("Button", {
                     Label = "Resume Play",
                     Command = "playx_resume",
-                })
-            
-                button:SetDisabled(true)
+                }):SetDisabled(true)
             end
             
             panel:AddControl("Label", {
                 Text = "The current media cannot be resumed once stopped."
             })
         end
-    else
-        panel:AddControl("Label", {
-            Text = "No media is playing at the moment."
-        })
     end
 end
 
@@ -203,7 +191,9 @@ local function ControlPanel(panel)
         Command = "playx_gui_bookmark",
     })
     
-    if not PlayX.CurrentMedia then
+    local numHasMedia, numResumable, numPlaying = PlayX.GetCounts()
+    
+    if not numHasMedia then
         button:SetDisabled(true)
     end
     
@@ -284,9 +274,13 @@ end
 
 hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 
---- Updates the tool panels.
+--- Updates the tool panels. This calls the PlayXUpdateUI hook with no
+-- arguments and with no regards to the returned value.
 function PlayX.UpdatePanels()
+    hook.Call("PlayXUpdateUI", GAMEMODE)
+    
     if not hasLoaded then return end
+    
     SettingsPanel(GetControlPanel("PlayXSettings"))
     ControlPanel(GetControlPanel("PlayXControl"))
 end

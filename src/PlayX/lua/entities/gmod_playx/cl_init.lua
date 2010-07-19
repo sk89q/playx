@@ -24,25 +24,241 @@ language.Add("Undone_#gmod_playx", "Undone PlayX Player")
 language.Add("Cleanup_gmod_playx", "PlayX Player")
 language.Add("Cleaned_gmod_playx", "Cleaned up the PlayX Player")
 
-function ENT:Initialize()
-    self.Entity:DrawShadow(false)
-    
-    self.HadStarted = false
-    self.CurrentPage = nil
-    self.Playing = false
-    self.LowFramerateMode = false
-    self.DrawCenter = false
-    self.NoScreen = false
-    self.PlayerData = {}
-    
-    self:UpdateScreenBounds()
+ENT.Media = nil
+ENT.Result = nil
+ENT.IsPlaying = false
+ENT.LowFramerateMode = false
+ENT.DrawCenter = false
+ENT.NoScreen = false
+ENT.PlayerData = {}
+ENT.Volume = 100
+ENT.WaitingInjection = false
+ENT.LastFinalVolume = -1
+
+--- Prints a debugging message about this entity.
+-- @param msg Message
+-- @param ... Args for springf
+function ENT:Debug(msg, ...)
+    local args = {...}
+    PlayX.Debug(tostring(self) .. ": " .. msg, unpack(args))
 end
 
+--- Initializes the entity.
+-- @hidden
+function ENT:Initialize()
+    self.Entity:DrawShadow(false)
+    self:UpdateScreenBounds()
+    PlayX.RegisterSoundProcessor()
+end
+
+--- Returns true if this instance has media.
+-- @return Boolean
+function ENT:HasMedia()
+    return self.Media ~= nil
+end
+
+--- Returns true if this instance has resumable media.
+-- @return Boolean
+function ENT:IsResumable()
+    return self.Media ~= nil and self.Media.ResumeSupported 
+end
+
+--- Begins media.
+-- @param handler
+-- @param uri
+-- @param start
+-- @param handlerArgs
+function ENT:BeginMedia(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
+    if not PlayX.ResolveHandler(handler) then
+        Error(Format("PlayX: No such handler named %s, can't play %s\n", handler, uri:sub(1, 200)))
+    end
+    
+    self.Media = {
+        Handler = handler,
+        URI = uri,
+        StartTime = RealTime() - start,
+        ResumeSupported = resumeSupported,
+        LowFramerate = lowFramerate,
+        HandlerArgs = handlerArgs,
+    }
+    
+    self.LowFramerateMode = lowFramerate
+    
+    if PlayX.Enabled then
+        if PlayX.DetectCrash() then return end
+        self:Play()
+    elseif self.IsPlaying then
+        self:Stop()
+    end
+    
+    if not PlayX.Enabled then
+        if resumeSupported then
+            LocalPlayer():ChatPrint(
+                "PlayX: Something just started playing! Enable the player to see it."
+            )
+        else
+            LocalPlayer():ChatPrint(
+                "PlayX: Something just started playing! Enable the player to " .. 
+                "see the next thing played."
+            )
+        end
+    end
+    
+    hook.Call("PlayXMediaBegan", GAMEMODE, self, handler, uri, start,
+        resumeSupported, lowFramerate, handlerArgs)
+    
+    PlayX.UpdatePanels()
+end
+
+--- Stop what's playing.
+function ENT:EndMedia()
+    self.Media = nil
+    
+    if self.IsPlaying then
+        self:Stop()
+    end
+    
+    hook.Call("PlayXMediaEnded", GAMEMODE, self)
+    
+    PlayX.UpdatePanels()
+end
+
+--- Starts playing. This will only work if the entity has media assigned
+-- to it, possibly received from the server.
+function ENT:Play()
+    if not self.Media then return end
+    
+    PlayX.ShowNotice()
+    PlayX.RegisterSoundProcessor()
+    
+    local handlerF = PlayX.ResolveHandler(self.Media.Handler)
+    
+    -- Get a handler result that contains information on how to play the media
+    local result = handlerF(self.HTMLWidth, self.HTMLHeight,
+                            RealTime() - self.Media.StartTime,
+                            PlayX.GetVolume(), self:GetLocalVolume(),
+                            self.Media.URI, self.Media.HandlerArgs)
+    
+    self.IsPlaying = true
+    self.Result = result
+    self.DrawCenter = result.Center
+    self.PlayerData = {}
+    PlayX.CrashDetectionOpen(self)
+    
+    if not self.Browser then
+        self:CreateBrowser()
+    end
+    
+    -- Used for JavaScript->Lua communication
+    self.Browser.OpeningURL = function(_, url, target, postdata)
+        if not ValidEntity(self) then return end
+        
+        local query = url:match("^http://playx.sktransport/%?(.*)$")
+        if not query then return end
+        
+        if self.ProcessPlayerData then
+            self:ProcessPlayerData(playxlib.ParseQuery(query))
+        end
+        
+        return true -- Prevent navigation
+    end
+    
+    -- Used to inject page
+    self.Browser.FinishedURL = function()
+        if not ValidEntity(self) then return end
+        
+        self:Debug("Injecting payload")
+        self.WaitingInjection = false
+        self:InjectPage()
+    end
+    
+    self:Debug("Loading page...")
+    
+    -- We begin!
+    if result.ForceURL then
+        self.WaitingInjection = false
+        self.Browser:OpenURL(result.ForceURL)
+    else
+        self.WaitingInjection = true
+        self.Browser:OpenURL(PlayX.HostURL)
+    end
+    
+    hook.Call("PlayXPlayed", GAMEMODE, self)
+    
+    PlayX.UpdatePanels()
+end
+
+--- Stop playing. The play can be resumed at any time (until EndMedia() is
+-- called), but not all media can be resumed.
+function ENT:Stop()
+    if not self.IsPlaying then return end
+    
+    self.IsPlaying = false
+    self.WaitingInjection = false
+    self.Result = nil
+    self.PlayerData = {}
+    self:DestructBrowser()
+    
+    hook.Call("PlayXStopped", GAMEMODE, self)
+    
+    PlayX.UpdatePanels()
+end
+
+--- Get the volume of this individual player. Volume is 0 to 100.
+-- @return Volume
+function ENT:GetVolume()
+    return self.Volume
+end
+
+--- Changes the volume of this player. This does not affect the overall
+-- PlayX volume, nor will it override it.
+-- @param volume Volume (0-100) to change to
+function ENT:SetVolume(volume)
+    if not volume then
+        volume = self.Volume
+    else
+        self.Volume = volume
+    end
+    
+    local finalVolume = math.Clamp(PlayX.GetVolume() / 100 * volume / 100 * 100, 0, 100)
+    
+    if self.IsPlaying and self.LastFinalVolume ~= finalVolume then
+        self.LastFinalVolume = finalVolume
+        
+        local js = self.Result.GetVolumeChangeJS(finalVolume)
+        if js then
+            self.Browser:Exec(js)
+        end
+    end
+end
+
+--- Get the local sound volume, which is the PlayX volume combined with this
+-- player's individual volume. Value is 0 to 100.
+-- @return Volume
+function ENT:GetLocalVolume()
+    return math.Clamp(PlayX.GetVolume() / 100 * self.Volume / 100 * 100, 0, 100)
+end
+
+--- Updates the current media metadata. Calling this while nothing is playing
+-- has no effect. This can be called many times and multiple times.
+-- @param data Metadata structure
+function ENT:UpdateMetadata(data)
+    if not self.Media then return end
+    
+    -- Allow a hook to override the data
+    local res = hook.Call("PlayXMetadataReceive", GAMEMODE, self, self.Media, data)
+    if res then data = res end
+    
+    table.Merge(self.Media, data)
+end
+
+--- Detects the screen position.
+-- @hidden
 function ENT:UpdateScreenBounds()
     local model = self.Entity:GetModel()
     local info = PlayXScreens[model:lower()]
     
-    pcall(hook.Remove, "HUDPaint", "PlayXInfo" .. self:EntIndex())
+    pcall(hook.Remove, "HUDPaint", "PlayXHUD" .. self:EntIndex())
     
     if info then
         self.NoScreen = false
@@ -51,7 +267,7 @@ function ENT:UpdateScreenBounds()
             self.NoScreen = true
             self:SetProjectorBounds(0, 0, 0)
             
-            hook.Add("HUDPaint", "PlayXInfo" .. self:EntIndex(), function()
+            hook.Add("HUDPaint", "PlayXHUD" .. self:EntIndex(), function()
                 if ValidEntity(self) then
                     self:HUDPaint()
                 end
@@ -115,6 +331,8 @@ function ENT:UpdateScreenBounds()
     self:ResetRenderBounds()
 end
 
+--- Sets the screen position for a non-projector screen.
+-- @hidden
 function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
                              rotateAroundUp, rotateAroundForward)
     self.IsProjector = false
@@ -151,6 +369,8 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
     self.RotateAroundForward = rotateAroundForward
 end
 
+--- Sets the projector screen position.
+-- @hidden
 function ENT:SetProjectorBounds(forward, right, up)
     self.IsProjector = true
     
@@ -164,6 +384,8 @@ function ENT:SetProjectorBounds(forward, right, up)
     self.DrawScale = 1 -- Not used
 end
 
+--- Create the browser.
+-- @hidden
 function ENT:CreateBrowser()
     self.Browser = vgui.Create("HTML")
     self.Browser:SetMouseInputEnabled(false)        
@@ -172,6 +394,8 @@ function ENT:CreateBrowser()
     self.Browser:SetVerticalScrollbarEnabled(false)
 end
 
+--- Destruct the browser.
+-- @hidden
 function ENT:DestructBrowser()
     if self.HadStarted then
         self.HadStarted = false
@@ -183,69 +407,12 @@ function ENT:DestructBrowser()
     end
     
     self.Browser = nil
+    
+    PlayX.CrashDetectionClose(self)
 end
 
-function ENT:Play(handler, uri, start, volume, handlerArgs)
-    local h = list.Get("PlayXHandlers")[handler]
-    local result = h(self.HTMLWidth, self.HTMLHeight, start, volume, uri, handlerArgs)
-    self.DrawCenter = result.Center
-    self.CurrentPage = result
-    self.PlayerData = {}
-    
-    if not self.Browser then
-        self:CreateBrowser()
-    end
-    
-    self.Browser.OpeningURL = function(_, url, target, postdata)
-        local query = url:match("^http://playx.sktransport/%?(.*)$")
-        
-        if query then
-            -- Unavailable on entity removal
-            if self.ProcessPlayerData then
-                self:ProcessPlayerData(playxlib.ParseQuery(query))
-            end
-            return true
-        end
-    end
-    
-    self.Browser.FinishedURL = function()
-        MsgN("PlayX DEBUG: Page loaded, preparing to inject")
-        self:InjectPage()
-    end
-    
-    PlayX.CrashDetectionBegin()
-    self.HadStarted = true
-    
-    if result.ForceURL then
-        self.Browser:OpenURL(result.ForceURL)
-    else
-        self.Browser:OpenURL(PlayX.HostURL)
-    end
-    
-    self.Playing = true
-end
-
-function ENT:Stop()
-    self:DestructBrowser()
-    self.Playing = false
-    self.PlayerData = {}
-end
-
-function ENT:ChangeVolume(volume)
-    local js = self.CurrentPage.GetVolumeChangeJS(volume)
-    
-    if js then
-        self.Browser:Exec(js)
-        return true
-    end
-    
-    return false
-end
-
-function ENT:SetFPS(fps)
-    self.FPS = fps
-end
-
+--- Get the trace used for the projector.
+-- @return Trace result
 function ENT:GetProjectorTrace()
     -- Potential GC bottleneck?
     local excludeEntities = player.GetAll()
@@ -260,6 +427,7 @@ function ENT:GetProjectorTrace()
     return tr
 end
 
+--- Reset the render bounds for this player.
 function ENT:ResetRenderBounds()
     local tr = self:GetProjectorTrace()
         
@@ -274,6 +442,8 @@ function ENT:ResetRenderBounds()
     end
 end
 
+--- Draw the screen.
+-- @hidden
 function ENT:Draw()
     self.Entity:DrawModel()
     
@@ -335,8 +505,44 @@ function ENT:Draw()
     render.SuppressEngineLighting(false)
 end
 
+--- Get player state text has provided by the player in the HTML control. This
+-- may return nil, and not all handlers will provide this information. This
+-- is used by the radio HUD and radio display.
+-- @return Text or nil
+-- @hidden
+function ENT:GetPlayerStateText()
+    local text = self.WaitingInjection and "Initializing..." or nil
+    
+    if self.PlayerData.State then
+        text = self.PlayerData.State
+        
+        if text == "BUFFERING" then
+            text = "Buffering" .. string.rep(".", CurTime() % 3)
+        elseif text == "PLAYING" then
+            text = "Playing"
+        elseif text == "ERROR" then
+            text = "Error"
+        elseif text == "COMPLETED" then
+            text = "Ended"
+        elseif text == "STOPPED" then
+            text = "Stopped"
+        elseif text == "PAUSED" then
+            text = "Paused"
+        elseif text == "Idle" then
+            text = "Idle (Error?)"
+        end
+    end
+    
+    return text
+end
+
+--- Used to draw the screen content. This function must be called once
+-- a 3D2D context has been created.
+-- @param centerX Center X
+-- @param centerY Center Y
+-- @hidden
 function ENT:DrawScreen(centerX, centerY)
-    if self.Browser and self.Browser:IsValid() and self.Playing then
+    if self.Browser and self.Browser:IsValid() and self.Media then
         if not self.LowFramerateMode then
             if not self.BrowserMat then return end
             
@@ -346,33 +552,16 @@ function ENT:DrawScreen(centerX, centerY)
                             Vector(self.HTMLWidth, self.HTMLHeight, 0),
                             Vector(0, self.HTMLHeight, 0)) 
         else
-            local text = "Video started in low framerate mode."
+            local text = self:GetPlayerStateText() or 
+                "Video started in low framerate mode."
             
-            if self.PlayerData.State then
-                text = self.PlayerData.State
-                
-                if text == "BUFFERING" then
-                    text = "Buffering" .. string.rep(".", CurTime() % 3)
-                elseif text == "PLAYING" then
-                    text = "Playing"
-                elseif text == "ERROR" then
-                    text = "(ERROR)"
-                elseif text == "COMPLETED" then
-                    text = "(Ended)"
-                elseif text == "STOPPED" then
-                    text = "(Stopped)"
-                elseif text == "PAUSED" then
-                    text = "(Paused)"
-                end
-            end
-            
-            if PlayX.CurrentMedia.Title then
+            if self.Media.Title then
                 draw.SimpleText(text,
                                 "MenuLarge",
                                 centerX, centerY + 20, Color(255, 255, 255, 255),
                                 TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
                 
-	            draw.SimpleText(PlayX.CurrentMedia.Title:sub(1, 50),
+	            draw.SimpleText(self.Media.Title:sub(1, 50),
 	                            "HUDNumber",
 	                            centerX, centerY - 50, Color(255, 255, 255, 255),
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
@@ -383,6 +572,7 @@ function ENT:DrawScreen(centerX, centerY)
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             end
             
+            -- Progress bar (terrible looking, yes?)
             if self.PlayerData.Duration or self.PlayerData.Position then
                 local pct = self.PlayerData.Duration and 
                     math.Clamp(self.PlayerData.Position / self.PlayerData.Duration, 0, 1) or 0
@@ -421,31 +611,14 @@ function ENT:DrawScreen(centerX, centerY)
     end
 end
 
+--- Draw the HUD for the radio.
+-- @hidden
 function ENT:HUDPaint()
-    if not self.DrawScale then return end
-    if not self.NoScreen then return end
-    if not self.Playing then return end
+    if not self.DrawScale or not self.NoScreen then return end
+    if not self.Media or not self.IsPlaying then return end
     if not PlayX.ShowRadioHUD then return end
 
-    local text = nil
-    
-    if self.PlayerData.State then
-        text = self.PlayerData.State
-        
-        if text == "BUFFERING" then
-            text = "Buffering" .. string.rep(".", CurTime() % 3)
-        elseif text == "PLAYING" then
-            text = "Playing"
-        elseif text == "ERROR" then
-            text = "ERROR"
-        elseif text == "COMPLETED" then
-            text = "Ended"
-        elseif text == "STOPPED" then
-            text = "Stopped"
-        elseif text == "PAUSED" then
-            text = "Paused"
-        end
-    end
+    local text = self:GetPlayerStateText()
     
     local hasBottomBar = text or self.PlayerData.Duration or self.PlayerData.Position
     local bw = 320
@@ -455,7 +628,7 @@ function ENT:HUDPaint()
     
     draw.RoundedBox(6, bx, by, bw, bh, Color(0, 0, 0, 150))
         
-    local titleText = PlayX.CurrentMedia.Title and PlayX.CurrentMedia.Title:sub(1, 50) 
+    local titleText = self.Media.Title and self.Media.Title:sub(1, 50) 
         or "Title Unavailable"
     draw.SimpleText(titleText,
                     "DefaultBold",
@@ -469,6 +642,7 @@ function ENT:HUDPaint()
                         TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
     end
     
+    -- Progress bar (terrible looking, yes?)
     if self.PlayerData.Duration or self.PlayerData.Position then
         local pct = self.PlayerData.Duration and 
             math.Clamp(self.PlayerData.Position / self.PlayerData.Duration, 0, 1) or 0
@@ -493,6 +667,8 @@ function ENT:HUDPaint()
     end
 end
 
+--- Think hook to get the material.
+-- @hidden
 function ENT:Think()
     if self.LowFramerateMode or self.NoScreen then
         self.BrowserMat = nil
@@ -507,11 +683,11 @@ function ENT:Think()
     self:NextThink(CurTime() + 0.1)  
 end  
 
+--- Called on entity removal. Note that Gmod calls this on a full update
+-- even if the entity wasn't deleted. PlayX detect this.
+-- @hidden
 function ENT:OnRemove()
-    if self.HadStarted then
-        self.HadStarted = false
-        PlayX.CrashDetectionEnd()
-    end
+    PlayX.CrashDetectionClose(self)
     
     local ent = self
     local entIndex = self:EntIndex()
@@ -522,10 +698,16 @@ function ENT:OnRemove()
         if not ValidEntity(ent) then -- Entity is really gone
             if browser and browser:IsValid() then browser:Remove() end
             pcall(hook.Remove, "HUDPaint", "PlayXInfo" .. entIndex)
+            PlayX.UpdatePanels()
+            PlayX.RegisterSoundProcessor()
+        else
+            self:Debug("Full update detected; not removing entity")
         end
     end)
 end
 
+--- Processes data from the embedded player inside the HTML control.
+-- @hidden
 function ENT:ProcessPlayerData(data)
     for k, v in pairs(data) do
         if k == "State" then
@@ -536,35 +718,37 @@ function ENT:ProcessPlayerData(data)
     end
 end
 
-function ENT:InjectPage()
-    if not self.Browser or not self.Browser:IsValid() or not self.CurrentPage then
+--- Injects the appropriate code into the page.
+-- @hidden
+function ENT:InjectPage()    
+    if not self.Browser or not self.Browser:IsValid() or not self.Result then
         return
     end
     
-    if self.CurrentPage.ForceURL then
+    if self.Result.ForceURL then
         self.Browser:Exec([[
 document.body.style.overflow = 'hidden';
 ]])
     end
     
-    if self.CurrentPage.JS then
-        self.Browser:Exec(self.CurrentPage.JS)
+    if self.Result.JS then
+        self.Browser:Exec(self.Result.JS)
     end
     
-    if self.CurrentPage.JSInclude then
+    if self.Result.JSInclude then
         self.Browser:Exec([[
 var script = document.createElement('script');
 script.type = 'text/javascript';
-script.src = ']] .. playxlib.JSEscape(self.CurrentPage.JSInclude) .. [[';
+script.src = ']] .. playxlib.JSEscape(self.Result.JSInclude) .. [[';
 document.body.appendChild(script);
 ]])
-    elseif self.CurrentPage.Body then
+    elseif self.Result.Body then
         self.Browser:Exec([[
-document.body.innerHTML = ']] .. playxlib.JSEscape(self.CurrentPage.Body) .. [[';
+document.body.innerHTML = ']] .. playxlib.JSEscape(self.Result.Body) .. [[';
 ]])
     end
     
-    if not self.CurrentPage.ForceURL then
+    if not self.Result.ForceURL then
         self.Browser:Exec([[
 document.body.style.margin = '0';
 document.body.style.padding = '0';
@@ -574,16 +758,16 @@ document.body.style.overflow = 'hidden';
 ]])
     end
 
-    if self.CurrentPage.CSS then
+    if self.Result.CSS then
         self.Browser:Exec([[
 var style = document.createElement('style');
 style.type = 'text/css';
-style.styleSheet.cssText = ']] .. playxlib.JSEscape(self.CurrentPage.CSS) .. [[';
+style.styleSheet.cssText = ']] .. playxlib.JSEscape(self.Result.CSS) .. [[';
 document.getElementsByTagName('head')[0].appendChild(style);
 ]])
     end
     
-    if not self.CurrentPage.ForceURL and (self.LowFramerateMode or self.NoScreen) then
+    if not self.Result.ForceURL and (self.LowFramerateMode or self.NoScreen) then
         self.Browser:Exec([[
 var elements = document.getElementsByTagName('*');
 for (var i = 0; i < elements.length; i++) {

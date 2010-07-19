@@ -30,4 +30,8 @@ ENT.AdminSpawnable = true
 
 ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
 
+function ENT:SetupDataTables()
+    self:DTVar("Entity", 0, "Source")
+end
+
 cleanup.Register("gmod_playx_repeater")

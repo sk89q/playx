@@ -24,6 +24,11 @@ language.Add("Undone_#gmod_playx_repeater", "Undone PlayX Repeater")
 language.Add("Cleanup_gmod_playx_repeater", "PlayX Repeaters")
 language.Add("Cleaned_gmod_playx_repeater", "Cleaned up PlayX Repeaters")
 
+ENT.CLSource = nil
+ENT.SourceInstance = nil
+
+--- Initialize the entity.
+-- @hidden
 function ENT:Initialize()
     self.Entity:DrawShadow(false)
     
@@ -33,6 +38,36 @@ function ENT:Initialize()
     self:UpdateScreenBounds()
 end
 
+--- Set the PlayX entity to be the source. Pass nil or NULL to clear.
+-- This will override the server set source.
+-- @param src Source
+function ENT:SetSource(src)
+    self.CLSource = ValidEntity(src) and src or nil
+end
+
+--- Get the client set source entity. May return nil.
+-- @return Source
+function ENT:GetSource()
+    return self.CLSource
+end
+
+--- Get the server set source entity. May return nil.
+-- @return Source
+function ENT:GetServerSource()
+    return ValidEntity(self.dt.Source) and self.dt.Source or nil
+end
+
+--- Get the active source entity. May return nil.
+-- @return Source
+function ENT:GetActiveSource()
+    return ValidEntity(self.SourceInstancee) and self.SourceInstance or nil
+end
+
+--- Used to draw the screen content. This function must be called once
+-- a 3D2D context has been created.
+-- @param centerX Center X
+-- @param centerY Center Y
+-- @hidden
 function ENT:DrawScreen(centerX, centerY)
     if ValidEntity(self.SourceInstance) then
         if not self.SourceInstance.NoScreen then
@@ -51,16 +86,25 @@ function ENT:DrawScreen(centerX, centerY)
     end
 end
 
-function ENT:Think()  
-    if not ValidEntity(self.SourceInstance) then
+--- Think hook that gets the source instance.
+-- @hidden
+function ENT:Think()
+    if ValidEntity(self.CLSource) then
+        self.SourceInstance = self.CLSource
+    elseif ValidEntity(self.dt.Source) then
+        self.SourceInstance = self.dt.Source
+    else
         self.SourceInstance = PlayX.GetInstance()
     end
     
     if ValidEntity(self.SourceInstance) then
         self.DrawCenter = self.SourceInstance.DrawCenter
     end
+    
     self:NextThink(CurTime() + 0.1)  
-end  
+end
 
+--- Do nothing removal hook.
+-- @hidden
 function ENT:OnRemove() 
 end  

@@ -16,7 +16,7 @@
 -- 
 -- $Id$
 
-list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, adjVol, uri, handlerArgs)
     return playxlib.HandlerResult{
         url = uri,
         center = true,
@@ -50,7 +50,9 @@ if (m) {
 ]]}
 end)
 
-list.Set("PlayXHandlers", "justin.tv", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "justin.tv", function(width, height, start, volume, adjVol, uri, handlerArgs)
+    volume = adjVol -- This handler supports instant volume changing
+    
     local volumeFunc = function(volume)
         return [[
 try {

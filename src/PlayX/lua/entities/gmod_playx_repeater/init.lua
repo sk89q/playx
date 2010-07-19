@@ -18,11 +18,12 @@
 
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("cl_init.lua")
+resource.AddFile("materials/vgui/entities/gmod_playx_repeater.vmt")
 
 include("shared.lua")
 
-resource.AddFile("materials/vgui/entities/gmod_playx_repeater.vmt")
-
+--- Initialize the entity.
+-- @hidden
 function ENT:Initialize()
     self.Entity:PhysicsInit(SOLID_VPHYSICS)
     self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
@@ -30,16 +31,43 @@ function ENT:Initialize()
     self.Entity:DrawShadow(false)
 end
 
+--- Set the PlayX entity to be the source. Pass nil or NULL to clear.
+-- @param src Source
+function ENT:SetSource(src)
+    src = src or NULL
+    self.dt.Source = src
+end
+
+--- Get the server-side set source entity. May return nil.
+-- @return Source
+function ENT:GetSource()
+    return ValidEntity(self.dt.Source) and self.dt.Source or nil
+end
+
+--- Do nothing UpdateTransmitState (the entity doesn't need to
+-- always be known by the client).
+-- @hidden
 function ENT:UpdateTransmitState()
 end
 
+--- Spawn function.
+-- @hidden
 function ENT:SpawnFunction(ply, tr)
-    PlayX.SendSpawnDialogUMsg(ply, true)
+    PlayX.SendSpawnDialog(ply, true)
 end
 
+--- When the entity is used.
+-- @hidden
+function ENT:OnUse(activator, caller)
+end
+
+--- Removal function.
+-- @hidden
 function ENT:OnRemove()
 end
 
+--- Duplication function.
+-- @hidden
 local function PlayXRepeaterEntityDuplicator(ply, model, pos, ang)
     if not PlayX.IsPermitted(ply) then
         return nil
