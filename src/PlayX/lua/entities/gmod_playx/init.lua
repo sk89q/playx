@@ -26,6 +26,7 @@ ENT.Subscribers = {}
 ENT.Media = nil
 ENT.LastOpenTime = 0
 ENT.LastWireOpenTime = 0
+ENT.MediaExpired = false
 ENT.InputProvider = ""
 ENT.InputURI = ""
 ENT.InputStartAt = 0
@@ -215,6 +216,7 @@ function ENT:OpenMedia(provider, uri, start, forceLowFramerate, useJW)
     self:BeginMedia(result.Handler, result.URI, start, result.ResumeSupported,
                     useLowFramerate, result.HandlerArgs)
     self:UpdateMetadata({ Provider = provider })
+    self.MediaExpired = false
     
     -- Fetch metadata information
     if result.QueryMetadata then
@@ -265,6 +267,8 @@ function ENT:BeginMedia(handler, uri, start, resumeSupported, lowFramerate, hand
     if self:MediaBegin(handler, uri, start, resumeSupported, lowFramerate, handlerArgs) == false then
         return false
     end
+    
+    timer.Destroy("PlayXMediaExpiration" .. self:EntIndex())
     
     self.LastOpenTime = RealTime()
     
@@ -392,6 +396,8 @@ function ENT:EndMedia()
     
     self.Media = nil
     
+    timer.Destroy("PlayXMediaExpiration" .. self:EntIndex())
+    
     self:ClearWireOutputs()
     self:SendEndMessage()
     self:MediaEnded()
@@ -461,6 +467,20 @@ function ENT:UpdateMetadata(data)
     if data.Title then
         self:SendStdMetadataMessage()
     end
+    
+    -- Handle media expiration
+    if data.Length then
+        if not self.MediaExpired then
+            local timeout = RealTime() - self.Media.StartTime + self.Media.Length + 4
+            if timeout <= 0 then
+                self:ExpireMedia()
+            else
+                timer.Destroy("PlayXMediaExpiration" .. self:EntIndex())
+                timer.Create("PlayXMediaExpiration" .. self:EntIndex(), timeout, 1,
+                    function() self:ExpireMedia() end)
+            end
+        end
+    end
 end
 
 --- Overridable function that works the same as the hook.
@@ -476,6 +496,19 @@ end
 -- @hidden
 function ENT:MetadataError(err)
     hook.Call("PlayXMetadataFail", GAMEMODE, self, err)
+end
+
+--- Used to expire media.
+-- @hidden
+function ENT:ExpireMedia()
+    self.MediaExpired = true
+    self:MediaExpire()
+end
+
+--- Overridable function that is called on media expiration. See the MediaExpire
+-- hook for more information.
+function ENT:MediaExpire()
+    hook.Call("PlayXMediaExpire", GAMEMODE, self, self.Media)
 end
 
 --- Returns true if race protection is still wearing off.
@@ -510,6 +543,8 @@ end
 --- Removes the entity.
 -- @hidden
 function ENT:OnRemove()
+    timer.Destroy("PlayXMediaExpiration" .. self:EntIndex())
+    
     hook.Call("PlayXRemove", GAMEMODE, self) 
     
     -- No need to close the media
