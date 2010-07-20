@@ -168,8 +168,32 @@
                 
                     <tr>
                         <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MediaBegan">MediaBegan</a>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)</code>
+                            <div class="summary-inset">Called when media has begun.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MediaEnded">MediaEnded</a>()</code>
+                            <div class="summary-inset subtle">Undocumented.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#MetadataReceive">MetadataReceive</a>(existingMedia, newData)</code>
+                            <div class="summary-inset">Overridable function that works the same as the hook.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
                         <td><code><a href="#Play">Play</a>()</code>
                             <div class="summary-inset">Starts playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#Played">Played</a>()</code>
+                            <div class="summary-inset">Called when media has started playing.</div></td>
                     </tr>
                 
                     <tr>
@@ -188,6 +212,12 @@
                         <td class="function-prop"><code></code></td>
                         <td><code><a href="#Stop">Stop</a>()</code>
                             <div class="summary-inset">Stop playing.</div></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="function-prop"><code></code></td>
+                        <td><code><a href="#Stopped">Stopped</a>()</code>
+                            <div class="summary-inset">Called on stop.</div></td>
                     </tr>
                 
                     <tr>
@@ -526,6 +556,122 @@
             
                 
 
+<h3><a id="MediaBegan">MediaBegan</a></h3>
+
+<p><code><strong>gmod_playx:MediaBegan</strong>(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Called when media has begun.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>handler</em></code>
+        </li>
+        
+        <li>
+          <code><em>uri</em></code>
+        </li>
+        
+        <li>
+          <code><em>start</em></code>
+        </li>
+        
+        <li>
+          <code><em>resumeSupported</em></code>
+        </li>
+        
+        <li>
+          <code><em>lowFramerate</em></code>
+        </li>
+        
+        <li>
+          <code><em>handlerArgs</em></code>
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="MediaEnded">MediaEnded</a></h3>
+
+<p><code><strong>gmod_playx:MediaEnded</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Undocumented.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="MetadataReceive">MetadataReceive</a></h3>
+
+<p><code><strong>gmod_playx:MetadataReceive</strong>(existingMedia, newData)</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Overridable function that works the same as the hook.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>existingMedia</em></code> - Also accessible as self.Media
+        </li>
+        
+        <li>
+          <code><em>newData</em></code> - Incoming data
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+        <h4>Return value:</h4>
+        <ul>
+            <li>Nil or the new data</li>
+        </ul>
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
 <h3><a id="Play">Play</a></h3>
 
 <p><code><strong>gmod_playx:Play</strong>()</code></p>
@@ -533,6 +679,29 @@
 <blockquote class="function-body">
     
         <p>Starts playing. This will only work if the entity has media assigned to it, possibly received from the server.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Played">Played</a></h3>
+
+<p><code><strong>gmod_playx:Played</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Called when media has started playing.</p>
     
 
     
@@ -611,6 +780,29 @@
 <blockquote class="function-body">
     
         <p>Stop playing. The play can be resumed at any time (until EndMedia() is called), but not all media can be resumed.</p>
+    
+
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="Stopped">Stopped</a></h3>
+
+<p><code><strong>gmod_playx:Stopped</strong>()</code></p>
+
+<blockquote class="function-body">
+    
+        <p>Called on stop.</p>
     
 
     

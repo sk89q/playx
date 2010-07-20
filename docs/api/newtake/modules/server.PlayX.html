@@ -249,7 +249,7 @@
 
 <blockquote class="function-body">
     
-        <p> Gets the player instance entity. When there are multiple instances out, the behavior is undefined. A hook named PlayXSelectInstance can be defined to return a specific entity. This function may return nil.</p>
+        <p> Gets the player instance entity. When there are multiple instances out, default behavior is to get the closest one to the player (if a player is provided). If no player is provided, the behavior is undefined. A hook named PlayXSelectInstance can be -- defined to return a specific entity. This function may return nil. An error message can be returned to indicate why an instance could not be found.</p>
     
 
     
@@ -267,10 +267,14 @@
     
 
     
-        <h4>Return value:</h4>
-        <ul>
+        <h4>Return values:</h4>
+        <ol>
+            
             <li>Entity or nil</li>
-        </ul>
+            
+            <li>Error message (optional)</li>
+            
+        </ol>
     
 
     

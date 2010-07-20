@@ -129,6 +129,11 @@
                     </tr>
                 
                     <tr>
+                        <td><code><a href="#PlayXMediaExpire">PlayXMediaExpire</a>(instance, media)</code>
+                            <div class="summary-inset"> Called when a piece of media has finished.</div></td>
+                    </tr>
+                
+                    <tr>
                         <td><code><a href="#PlayXMediaOpen">PlayXMediaOpen</a>(instance, provider, uri, start, forceLowFramerate, useJW, result)</code>
                             <div class="summary-inset"> Called when OpenMedia() has been called on an entity.</div></td>
                     </tr>
@@ -421,6 +426,42 @@
         
         <li>
           <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+    </ul>
+    
+
+
+    
+
+    
+
+    
+</blockquote>
+
+<hr />
+            
+                
+
+<h3><a id="PlayXMediaExpire">PlayXMediaExpire</a></h3>
+
+<p><code><strong>PlayXMediaExpire</strong>(instance, media)</code></p>
+
+<blockquote class="function-body">
+    
+        <p> Called when a piece of media has finished. This is only called if the length of the media was provided via the metadata functions.</p>
+    
+
+    
+    <h4>Parameters:</h4>
+    <ul>
+        
+        <li>
+          <code><em>instance</em></code> - PlayX entity
+        </li>
+        
+        <li>
+          <code><em>media</em></code> - ENT.Media
         </li>
         
     </ul>
