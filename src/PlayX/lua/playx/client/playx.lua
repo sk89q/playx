@@ -416,6 +416,8 @@ usermessage.Hook("PlayXMetadataStd", function(um)
     instance:UpdateMetadata({ Title = title })
 end)
 
-hook.Add("InitPostEntity", "CrashProtection", PlayX.DetectCrash)
+hook.Add("InitPostEntity", "PlayXCrashProtection", function()
+    PlayX.DetectCrash()
+end)
 
 PlayX.LoadHandlers()
