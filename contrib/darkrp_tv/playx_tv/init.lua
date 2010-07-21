@@ -80,6 +80,8 @@ function ENT:Think()
     return true
 end
 
+duplicator.RegisterEntityClass("playx_tv", function() return nil end, "Model", "Pos", "Ang")
+
 local data = {}
 
 local function CanSee(ply, instance)
