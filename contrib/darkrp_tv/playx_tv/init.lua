@@ -30,9 +30,15 @@ function ENT:Initialize()
         physObj:Wake()
     end
     
-    if ValidEntity(self.dt.owning_ent)
-        and self.dt.owning_ent:GetPos():Distance(self:GetPos()) <= 2000 then
-        PlayX.SubscribeOnly(self.dt.owning_ent, self)
+    if ValidEntity(self.dt.owning_ent) then
+        undo.Create("playx_tv")
+        undo.AddEntity(self)
+        undo.SetPlayer(self.dt.owning_ent)
+        undo.Finish()
+        
+        if self.dt.owning_ent:GetPos():Distance(self:GetPos()) <= 2000 then
+            PlayX.SubscribeOnly(self.dt.owning_ent, self)
+        end
     end
 end
 
