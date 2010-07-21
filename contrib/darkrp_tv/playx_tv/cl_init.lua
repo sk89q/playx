@@ -28,8 +28,13 @@ function ENT:DrawScreen(centerX, centerY, x, y, width, height)
         self.BaseClass.DrawScreen(self, centerX, centerY)
     end
     
-    draw.WordBox(2, x, y, "Owned by " .. self.dt.owning_ent:GetName(),
-        "HUDNumber5", Color(140, 0, 0, 100), Color(255, 255, 255, 255))
+    if ValidEntity(self.dt.owning_ent) then
+        draw.WordBox(2, x, y, "Owned by " .. self.dt.owning_ent:GetName(),
+            "HUDNumber5", Color(140, 0, 0, 100), Color(255, 255, 255, 255))
+    else
+        draw.WordBox(2, x, y, "No longer owned!",
+            "HUDNumber5", Color(140, 0, 0, 100), Color(255, 255, 255, 255))
+    end
 end
 
 local data = {}
