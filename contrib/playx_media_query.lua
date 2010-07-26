@@ -134,13 +134,20 @@ local function SearchYouTube(q, successF, failureF)
 end
 
 local function Play(ply, provider, uri, lowFramerate)
-    if PlayX.IsPermitted(ply) then
-        local result, err = PlayX.OpenMedia(provider, uri, 0, lowFramerate, true, false)
+    if not PlayX.IsPermitted(ply) then
+        ply:ChatPrint("NOTE: You are not permitted to control the player")
+        return
+    end
+    
+    local instance = PlayX.GetInstance(ply)
+    
+    if not instance then
+        ply:ChatPrint("NOTE: No PlayX player is spawned!")
+    else
+        local result, err = instance:OpenMedia(provider, uri, 0, lowFramerate, true, false)
         if not result then
             ply:ChatPrint("PlayX ERROR: " .. err)
         end
-    else
-        ply:ChatPrint("NOTE: You are not permitted to control the player")
     end
 end
 
