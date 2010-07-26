@@ -320,6 +320,10 @@ end
 function PlayX.DetectVersion()
     local version = ""
     local folderName = string.match(debug.getinfo(1, "S").short_src, "addons[/\\]([^/\\]+)")
+    if not folderName then
+        PlayX.Version = ""
+        return
+    end
     if not file.Exists("../addons/" .. folderName .. "/info.txt") then folderName = "PlayX" end
     -- Get version
     if file.Exists("../addons/" .. folderName .. "/info.txt") then
