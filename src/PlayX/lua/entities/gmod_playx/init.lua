@@ -154,6 +154,24 @@ function ENT:GetSubscribers()
     return subscribers
 end
 
+--- Gets the RecipientFilter containing all the subscribers. A Player can
+-- be passed as a shortcut to send to only one player. Nil will be returned
+-- if there is no one to send to.
+-- @param ply
+-- @return RecipientFilter, Player, or nil
+function ENT:GetRecipientFilter(ply)
+    local filter = ply
+    if not filter then
+        local subscribers = self:GetSubscribers()
+        if #subscribers == 0 then return end
+        filter = RecipientFilter()
+        for _, ply in pairs(subscribers) do
+            filter:AddPlayer(ply)
+        end
+    end
+    return filter
+end
+
 --- Returns true if the passed player has subscribed to this instance.
 -- @return Boolean
 function ENT:IsSubscribed(ply)
@@ -349,11 +367,8 @@ end
 -- @param ply
 -- @hidden
 function ENT:SendBeginMessage(ply)
-    local filter = ply
-    if not filter then
-        filter = self:GetSubscribers()
-        if #filter == 0 then return end
-    end
+    local filter = self:GetRecipientFilter(ply)
+    if not filter then return end
     
     -- See if we can fit it in a usermessage
     local strLength = string.len(self.Media.Handler) +
@@ -420,11 +435,8 @@ end
 -- @param ply User to send the message to
 -- @hidden
 function ENT:SendEndMessage(ply)
-    local filter = ply
-    if not filter then
-        filter = self:GetSubscribers()
-        if #filter == 0 then return end
-    end
+    local filter = self:GetRecipientFilter(ply)
+    if not filter then return end
     
     umsg.Start("PlayXEnd", filter)
     umsg.Entity(self)
@@ -438,11 +450,8 @@ end
 function ENT:SendStdMetadataMessage(ply)
     if not self.Media.Title then return end
     
-    local filter = ply
-    if not filter then
-        filter = self:GetSubscribers()
-        if #filter == 0 then return end
-    end
+    local filter = self:GetRecipientFilter(ply)
+    if not filter then return end
     
     umsg.Start("PlayXMetadataStd", filter)
     umsg.Entity(self)
