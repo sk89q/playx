@@ -602,11 +602,15 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
         ["autostart"] = "true",
         ["backcolor"] = "000000",
         ["frontcolor"] = "444444",
-        ["start"] = start,
+        ["start"] = provider ~= "sound" and start or 0,
         ["volume"] = volume,
         ["file"] = uri,
         ["playerready"] = "jwInit",
     }
+    
+    if provider then
+        flashVars["provider"] = provider
+    end
     
     local js = [[
 var knownState = "";
@@ -633,10 +637,6 @@ function jwInit() {
     player.addModelListener("TIME", "handleTime");
 }
 ]]
-    
-    if provider then
-        flashVars["provider"] = provider
-    end
     
     local result = playxlib.GenerateFlashPlayer(width, height, flashURL, flashVars, js)
     
