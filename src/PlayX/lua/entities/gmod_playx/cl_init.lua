@@ -357,6 +357,12 @@ function ENT:Draw()
     if self.NoScreen then return end
     if not self.DrawScale then return end
     
+    -- No black screen if this global var is set
+    if PLAYX_PLACEHOLDER_SCREEN == false and 
+        (not self.Browser or not self.Browser:IsValid() or not self.Media) then
+        return
+    end
+    
     render.SuppressEngineLighting(true)
     
     if self.IsProjector then
