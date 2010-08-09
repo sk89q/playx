@@ -196,6 +196,8 @@ function ENT:SetProjectorBounds(forward, right, up)
     self.HTMLHeight = 512
     
     self.DrawScale = 1 -- Not used
+    self.DrawShiftX = 0
+    self.DrawShiftY = 0
 end
 
 --- Returns the center position of the player, not necessarily where the
