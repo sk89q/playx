@@ -389,14 +389,8 @@ function ENT:Draw()
             self:DrawScreen(1024 / 2, 512 / 2, 0, 0, 1024, 512)
             cam.End3D2D()
         end
-    else
-        local shiftMultiplier = 1
-        if not self.DrawCenter then
-            shiftMultiplier = 2
-        end
-        
-        local pos = self.Entity:LocalToWorld(self.ScreenOffset - 
-            Vector(0, self.DrawShiftX * self.DrawScale, self.DrawShiftY * shiftMultiplier * self.DrawScale))
+    else        
+        local pos = self.Entity:LocalToWorld(self.ScreenOffset)
         local ang = self.Entity:GetAngles()
         
         ang:RotateAroundAxis(ang:Right(), self.RotateAroundRight)
@@ -408,11 +402,16 @@ function ENT:Draw()
                                Vector(1100, 1100, 1100) + self:GetPos())
         
         cam.Start3D2D(pos, ang, self.DrawScale)
+        
+        -- Draw black background
         surface.SetDrawColor(0, 0, 0, 255)
-        surface.DrawRect(-self.DrawShiftX, -self.DrawShiftY * shiftMultiplier, self.DrawWidth, self.DrawHeight)
-        self:DrawScreen(self.DrawWidth / 2 - self.DrawShiftX,
-                        self.DrawHeight / 2 - self.DrawShiftY * shiftMultiplier,
-                        -self.DrawShiftX, -self.DrawShiftY * shiftMultiplier,
+        surface.DrawRect(0, 0, self.DrawWidth, self.DrawHeight)
+        
+        -- Draw screen
+        self:DrawScreen(self.DrawWidth / 2,
+                        self.DrawHeight / 2,
+                        self.DrawShiftX,
+                        self.DrawShiftY,
                         self.DrawWidth, self.DrawHeight)
         cam.End3D2D()
     end
@@ -461,15 +460,23 @@ end
 -- @param height Height of screen
 -- @hidden
 function ENT:DrawScreen(centerX, centerY, x, y, width, height)
+    local shiftMultiplier = 1
+    if not self.DrawCenter then
+        shiftMultiplier = 2
+    end
+    
     if self.Browser and self.Browser:IsValid() and self.Media then
         if not self.LowFramerateMode then
             if not self.BrowserMat then return end
             
             render.SetMaterial(self.BrowserMat)
+            
             -- GC issue here?
-            render.DrawQuad(Vector(0, 0, 0), Vector(self.HTMLWidth, 0, 0),
-                            Vector(self.HTMLWidth, self.HTMLHeight, 0),
-                            Vector(0, self.HTMLHeight, 0)) 
+            local yShift = self.DrawShiftY * shiftMultiplier
+            render.DrawQuad(Vector(self.DrawShiftX, yShift),
+                            Vector(self.DrawShiftX + self.HTMLWidth, yShift, 0),
+                            Vector(self.DrawShiftX + self.HTMLWidth, yShift + self.HTMLHeight, 0),
+                            Vector(self.DrawShiftX, yShift + self.HTMLHeight, 0)) 
         else
             local text = self:GetPlayerStateText() or 
                 "Video started in low framerate mode."
