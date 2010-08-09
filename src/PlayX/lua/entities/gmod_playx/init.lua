@@ -166,7 +166,9 @@ function ENT:GetRecipientFilter(ply)
         if #subscribers == 0 then return end
         filter = RecipientFilter()
         for _, ply in pairs(subscribers) do
-            filter:AddPlayer(ply)
+            if ValidEntity(ply) then
+                filter:AddPlayer(ply)
+            end
         end
     end
     return filter
