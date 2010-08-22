@@ -22,20 +22,20 @@ resource.AddFile("materials/vgui/entities/gmod_playx.vmt")
 
 include("shared.lua")
 
-ENT.Subscribers = {}
-ENT.Media = nil
-ENT.LastOpenTime = 0
-ENT.LastWireOpenTime = 0
-ENT.MediaExpired = false
-ENT.InputProvider = ""
-ENT.InputURI = ""
-ENT.InputStartAt = 0
-ENT.InputDisableJW = false
-ENT.InputForceLowFramerate = false
-
 --- Initialize the entity.
 -- @hidden
 function ENT:Initialize()
+    self.Subscribers = {}
+    self.Media = nil
+    self.LastOpenTime = 0
+    self.LastWireOpenTime = 0
+    self.MediaExpired = false
+    self.InputProvider = ""
+    self.InputURI = ""
+    self.InputStartAt = 0
+    self.InputDisableJW = false
+    self.InputForceLowFramerate = false
+
     if self.KVModel then
         self.Entity:SetModel(self.KVModel)
     end
