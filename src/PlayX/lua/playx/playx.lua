@@ -200,6 +200,8 @@ end
 -- @return Provider name (detected) or nil
 -- @return Result or error message
 function PlayX.ResolveProvider(provider, uri, useJW)
+    local result = nil
+    
     if provider ~= "" then -- Provider detected
         if not list.Get("PlayXProviders")[provider] then
             return nil, "Unknown provider specified"
@@ -416,7 +418,10 @@ function PlayX.EndMedia()
     timer.Stop("PlayXMediaExpire")
     timer.Stop("PlayXAdminTimeout")
     
-    PlayX.GetInstance():ClearWireOutputs()
+    local instance = PlayX.GetInstance()
+    if instance ~= nil then
+        PlayX.GetInstance():ClearWireOutputs()
+    end
     
     PlayX.CurrentMedia = nil
     PlayX.AdminTimeoutTimerRunning = false
