@@ -107,7 +107,7 @@ local function SearchYouTube(q, successF, failureF)
         ["q"] = q,
         ["orderby"] = "relevance",
         ["max-results"] = "1",
-        ["format"] = "5",
+        -- ["format"] = "5", -- We can now play embedded videos!
         ["key"] = "AI39si7XNJTicSx18de-aAVYNq20Z0BVFwRo3l8xHu9s6L0YHFgmIlmuR8sabsj1WCghhfxdMzFgCYJapPfP3xTVdPdkTsxhXQ",
         ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
