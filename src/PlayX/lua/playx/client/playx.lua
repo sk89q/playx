@@ -35,6 +35,7 @@ PlayX = {}
 
 include("playxlib.lua")
 include("playx/client/bookmarks.lua")
+include("playx/client/vgui/PlayXBrowser.lua")
 
 -- Load handlers
 local p = file.FindInLua("playx/client/handlers/*.lua")
@@ -337,6 +338,44 @@ function PlayX.OpenSpawnDialog(forRepeater)
     end
     
     frame:InvalidateLayout(true, true)
+end
+
+--- Opens the navigator window.
+local navWindow
+function PlayX.OpenNavigatorWindow()
+    if navWindow then
+        navWindow:SetVisible(true)
+        navWindow:MakePopup()
+        navWindow:InvalidateLayout(true, true)
+        return
+    end
+    
+    local frame = vgui.Create("DFrame")
+    PlayX._UpdateWindow = frame
+    frame:SetTitle("PlayX Navigator")
+    frame:SetDeleteOnClose(false)
+    frame:SetScreenLock(true)
+    frame:SetSize(ScrW() * 0.8, ScrH() * 0.9)
+    frame:SetSizable(true)
+    frame:Center()
+    frame:MakePopup()
+    
+    local browser = vgui.Create("PlayXBrowser", frame)
+    
+    browser.OpeningVideo = function() 
+        frame:Close()
+    end
+
+    -- Layout
+    local oldPerform = frame.PerformLayout
+    frame.PerformLayout = function()
+        oldPerform(frame)
+        browser:StretchToParent(5, 26, 5, 5)
+    end
+    
+    frame:InvalidateLayout(true, true)
+    
+    navWindow = frame
 end
 
 --- Opens the update window.
@@ -731,6 +770,11 @@ local function ConCmdUpdateWindow()
     PlayX.OpenUpdateWindow()
 end
 
+--- Called for concmd playx_update_window.
+local function ConCmdNavigatorWindow()
+    PlayX.OpenNavigatorWindow()
+end
+
 concommand.Add("playx_resume", ConCmdResume)
 concommand.Add("playx_hide", ConCmdHide)
 concommand.Add("playx_reset_render_bounds", ConCmdResetRenderBounds)
@@ -739,6 +783,7 @@ concommand.Add("playx_gui_close", ConCmdGUIClose)
 concommand.Add("playx_gui_bookmark", ConCmdGUIBookmark)
 concommand.Add("playx_dump_html", ConCmdDumpHTML) -- Debug function
 concommand.Add("playx_update_window", ConCmdUpdateWindow)
+concommand.Add("playx_navigator_window", ConCmdNavigatorWindow)
 
 --- Detect a crash.
 local function DetectCrash()

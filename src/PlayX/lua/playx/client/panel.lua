@@ -173,7 +173,7 @@ local function ControlPanel(panel)
 
     if PlayX.JWPlayerURL then
         panel:AddControl("CheckBox", {
-            Label = "Use JW player when applicable",
+            Label = "Use an improved player when applicable",
             Command = "playx_use_jw",
         })
     end
@@ -274,12 +274,26 @@ local function BookmarksPanel(panel)
     end
 end
 
+--- Draw the control panel.
+local function NavigatorPanel(panel)
+    panel:ClearControls()
+    panel:AddHeader()
+    
+    panel:SizeToContents(true)
+    
+    local button = panel:AddControl("Button", {
+        Label = "Open Media Navigator",
+        Command = "playx_navigator_window",
+    })
+end
+
 --- PopulateToolMenu hook.
 local function PopulateToolMenu()
     hasLoaded = true
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel)
+    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXNavigator", "Navigator", "", "", NavigatorPanel)
 end
 
 hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
