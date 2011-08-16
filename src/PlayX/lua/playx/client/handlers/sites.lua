@@ -91,3 +91,89 @@ document.body.appendChild(script);
 ]],
         volumeFunc = volumeFunc}
 end)
+
+list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume, uri, handlerArgs)
+    
+    local volumeFunc = function(volume)
+        return [[
+try {
+  document.getElementById('video-player').setVolume(]] .. volume .. [[);
+} catch (e) {}
+]]
+    end
+    
+    return playxlib.HandlerResult{
+        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri),
+        center = false,
+        volumeFunc = volumeFunc,
+        js = [[
+var knownState = "Loading...";
+var player;
+
+function sendPlayerData(data) {
+    var str = "";
+    for (var key in data) {
+        str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
+    }
+    window.location = "http://playx.sktransport/?" + str;
+}
+
+function onError(err) {
+  var msg;
+  
+  if (err == 2) {
+    msg = "Error: Invalid media ID";
+  } else if (err == 100) {
+    msg = "Error: Media removed or now private";
+  } else if (err == 101 || err = 150) {
+    msg = "Error: Embedding not allowed";
+    msg = "Buffering...";
+  } else {
+    msg = "Unknown error: " + err;
+  }
+  
+  knownState = msg;
+  
+  sendPlayerData({ State: msg });
+}
+
+function onPlayerStateChange(state) {
+  var msg;
+  
+  if (state == -1) {
+    msg = "Loading...";
+  } else if (state == 0) {
+    msg = "Playback complete.";
+  } else if (state == 1) {
+    msg = "Playing...";
+  } else if (state == 2) {
+    msg = "Paused.";
+  } else if (state == 3) {
+    msg = "Buffering...";
+  } else {
+    msg = "Unknown state: " + state;
+  }
+  
+  knownState = msg;
+  
+  sendPlayerData({ State: msg, Position: player.getCurrentTime(), Duration: player.getDuration() });
+}
+
+function updateState() {
+  sendPlayerData({ Title: "test", State: knownState, Position: player.getCurrentTime(), Duration: player.getDuration() });
+}
+
+yt.embed.onPlayerReady = function() {
+  player = document.getElementById('video-player');
+  player.addEventListener('onStateChange', 'onPlayerStateChange');
+  player.addEventListener('onError', 'onError');
+  player.setVolume(]] .. volume .. [[);
+  setInterval(updateState, 250)
+}
+var src = document.getElementById('video-player').getAttribute('src');
+var flashVars = document.getElementById('video-player').getAttribute('flashVars');
+flashVars = flashVars.replace('enablejsapi=0', 'enablejsapi=1');
+flashVars = flashVars.replace('start=0', 'start=]] .. start .. [[');
+document.getElementById('watch-player-div').innerHTML = '<embed width="100%" id="video-player" height="100%" type="application/x-shockwave-flash" src="' + src + '" allowscriptaccess="always" allowfullscreen="true" bgcolor="#000000" flashvars="' + flashVars + '">'
+]]}
+end)

@@ -37,10 +37,10 @@ end
 
 function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-        if useJW and PlayX.JWPlayerSupportsYouTube() then
+        if useJW then
             return {
-                ["Handler"] = "JW",
-                ["URI"] = "http://www.youtube.com/watch?v=" .. uri,
+                ["Handler"] = "YouTubePopup",
+                ["URI"] = uri,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
                 ["MetadataFunc"] = function(callback, failCallback)
