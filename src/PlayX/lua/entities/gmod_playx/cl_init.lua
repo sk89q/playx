@@ -459,7 +459,7 @@ function ENT:HUDPaint()
         or "Title Unavailable"
     draw.SimpleText(titleText,
                     "DefaultBold",
-                    ScrW() / 2, 25, Color(255, 255, 255, 255),
+                    ScrW() / 2, 37, Color(255, 255, 255, 255),
                     TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
     
     if text then
