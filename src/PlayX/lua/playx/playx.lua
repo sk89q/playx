@@ -694,10 +694,10 @@ timer.Adjust("PlayXAdminTimeout", 1, 1, function()
 end)
 
 local folderName = string.match(debug.getinfo(1, "S").short_src, "addons[/\\]([^/\\]+)")
-if not file.Exists("../addons/" .. folderName .. "/info.txt") then folderName = "PlayX" end
+if not file.Exists("addons/" .. folderName .. "/info.txt", true) then folderName = "PlayX" end
 -- Get version
-if file.Exists("../addons/" .. folderName .. "/info.txt") then
-    local contents = file.Read("../addons/" .. folderName .. "/info.txt")
+if file.Exists("addons/" .. folderName .. "/info.txt", true) then
+    local contents = file.Read("addons/" .. folderName .. "/info.txt", true)
     _version = string.match(contents, "\"version\"[ \t]*\"([^\"]+)\"")
     if _version == nil then
         _version = ""
