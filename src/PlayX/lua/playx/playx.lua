@@ -16,7 +16,7 @@
 -- 
 -- $Id$
 
-require("datastream")
+--require("datastream")
 
 -- FCVAR_GAMEDLL makes cvar change detection work
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf",
@@ -34,11 +34,13 @@ CreateConVar("playx_wire_input_delay", "2", {FCVAR_ARCHIVE})
 -- if the server has been left online for a while.
 
 PlayX = {}
+util.AddNetworkString("PlayXBegin") -- Add to Pool
+util.AddNetworkString("PlayXProvidersList") -- Add to Pool
 
 include("playxlib.lua")
 
 -- Load providers
-local p = file.FindInLua("playx/providers/*.lua")
+local p = file.Find("playx/providers/*.lua",LUA_PATH)
 for _, file in pairs(p) do
     local status, err = pcall(function() include("playx/providers/" .. file) end)
     if not status then
@@ -460,7 +462,8 @@ function PlayX.SendBeginDStream(ply)
         umsg.Bool(PlayX.CurrentMedia.LowFramerate)
         umsg.End()
     else
-	    datastream.StreamToClients(filter, "PlayXBegin", {
+	    net.Start("PlayXBegin")
+		net.WriteTable({
 	        ["Handler"] = PlayX.CurrentMedia.Handler,
 	        ["URI"] = PlayX.CurrentMedia.URI,
 	        ["PlayAge"] = CurTime() - PlayX.CurrentMedia.StartTime,
@@ -468,6 +471,7 @@ function PlayX.SendBeginDStream(ply)
 	        ["LowFramerate"] = PlayX.CurrentMedia.LowFramerate,
 	        ["HandlerArgs"] = PlayX.CurrentMedia.HandlerArgs,
 	    })
+		net.Broadcast()
 	end
 end
 
@@ -617,9 +621,11 @@ function PlayerInitialSpawn(ply)
     SendUserMessage("PlayXHostURL", ply, GetConVar("playx_host_url"):GetString())
     
     -- Send providers list.
-    datastream.StreamToClients(ply, "PlayXProvidersList", {
-        ["List"] = list.Get("PlayXProvidersList"),
-    })
+    net.Start("PlayXProvidersList")
+		net.WriteTable({
+			["List"] = list.Get("PlayXProvidersList"),
+		})
+	net.Send(ply)
     
     local origMedia = PlayX.CurrentMedia
     

@@ -23,7 +23,7 @@ local hasLoaded = false
 --- Draw the settings panel.
 local function SettingsPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
+    panel:AddControl( "Header", { Text = "Settings", Description	= "" }  )
 
     panel:AddControl("CheckBox", {
         Label = "Enabled",
@@ -31,15 +31,12 @@ local function SettingsPanel(panel)
     })
     
     if PlayX.CrashDetected then
-	    local msg = panel:AddControl("DLabel", {})
-	    msg:SetWrap(true)
-	    msg:SetText(
-	       "PlayX has detected a crash in a previous session. Is it safe to " ..
+	    local msg = panel:AddControl("Label", {Text = "PlayX has detected a crash in a previous session. Is it safe to " ..
 	       "re-enable PlayX? For most people, crashes " ..
 	       "with the new versions of Gmod and PlayX are very rare, but a handful " ..
 	       "of people crash every time something is played. Try enabling " ..
-	       "PlayX a few times to determine whether you fall into this group."
-	    )
+	       "PlayX a few times to determine whether you fall into this group."})
+	    msg:SetWrap(true)
         msg:SetColor(Color(255, 255, 255, 255))
         msg:SetTextColor(Color(255, 255, 255, 255))
 		msg:SetTextInset(8)
@@ -138,7 +135,7 @@ end
 --- Draw the control panel.
 local function ControlPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
+    panel:AddControl( "Header", { Text = "Administrate", Description	= "" }  )
     
     local options = {
         ["Auto-detect"] = {["playx_provider"] = ""}
@@ -150,8 +147,7 @@ local function ControlPanel(panel)
     
     -- TODO: Put the following two controls on the same line
     
-    local label = panel:AddControl("DLabel", {})
-    label:SetText("Provider:")
+    local label = panel:AddControl("Label", {Text = "Provider:"})
 
     panel:AddControl("ListBox", {
         Label = "Provider:",
@@ -216,7 +212,7 @@ end
 --- Draw the control panel.
 local function BookmarksPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
+    panel:AddControl( "Header", { Text = "Bookmarks", Description	= "" }  )
     
     panel:SizeToContents(true)
     
@@ -277,7 +273,7 @@ end
 --- Draw the control panel.
 local function NavigatorPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
+    panel:AddControl( "Header", { Text = "Navigator", Description	= "" }  )
     
     panel:SizeToContents(true)
     
@@ -292,7 +288,7 @@ local function PopulateToolMenu()
     hasLoaded = true
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
-    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel)
+    --spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel) 
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXNavigator", "Navigator", "", "", NavigatorPanel)
 end
 

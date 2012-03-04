@@ -17,7 +17,7 @@
 -- $Id$
 
 --require("chrome")
-require("datastream")
+--require("datastream")
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -38,7 +38,7 @@ include("playx/client/bookmarks.lua")
 include("playx/client/vgui/PlayXBrowser.lua")
 
 -- Load handlers
-local p = file.FindInLua("playx/client/handlers/*.lua")
+local p = file.Find("playx/client/handlers/*.lua",LUA_PATH)
 for _, file in pairs(p) do
     local status, err = pcall(function() include("playx/client/handlers/" .. file) end)
     if not status then
@@ -584,7 +584,8 @@ cvars.AddChangeCallback("playx_volume", VolumeChangeCallback)
 PlayX.Enabled = GetConVar("playx_enabled"):GetBool()
 
 --- Called on PlayXBegin datastream.
-local function DSBegin(_, id, encoded, decoded)
+local function DSBegin(len)
+	local decoded = net.ReadTable()
     local handler = decoded.Handler
     local uri = decoded.URI
     local playAge = decoded.PlayAge
@@ -607,7 +608,8 @@ local function UMsgBegin(um)
 end
 
 --- Called on PlayXProvidersList user message.
-local function DSProvidersList(_, id, encoded, decoded)
+local function DSProvidersList(len)
+	local decoded = net.ReadTable()
     Msg("PlayX DEBUG: Providers list received\n")
     
     local list = decoded.List
@@ -681,8 +683,8 @@ local function UMsgMetadata(um)
     end 
 end
 
-datastream.Hook("PlayXBegin", DSBegin)
-datastream.Hook("PlayXProvidersList", DSProvidersList)
+net.Receive("PlayXBegin", DSBegin)
+net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
 usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
