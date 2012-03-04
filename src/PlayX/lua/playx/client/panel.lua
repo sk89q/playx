@@ -23,7 +23,7 @@ local hasLoaded = false
 --- Draw the settings panel.
 local function SettingsPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Settings", Description	= "" }  )
+    //panel:AddControl( "Header", { Text = "Settings", Description	= "" }  )
 
     panel:AddControl("CheckBox", {
         Label = "Enabled",
@@ -135,7 +135,7 @@ end
 --- Draw the control panel.
 local function ControlPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Administrate", Description	= "" }  )
+    //panel:AddControl( "Header", { Text = "Administrate", Description	= "" }  )
     
     local options = {
         ["Auto-detect"] = {["playx_provider"] = ""}
@@ -213,7 +213,7 @@ vgui.Register( "dlistview", PANEL ,"DListView")
 --- Draw the control panel.
 local function BookmarksPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Bookmarks", Description	= "" }  )
+    //panel:AddControl( "Header", { Text = "Bookmarks", Description	= "" }  )
     
     panel:SizeToContents(true)
     
@@ -272,7 +272,7 @@ end
 --- Draw the control panel.
 local function NavigatorPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Navigator", Description	= "" }  )
+    //panel:AddControl( "Header", { Text = "Navigator", Description	= "" }  )
     
     panel:SizeToContents(true)
     
