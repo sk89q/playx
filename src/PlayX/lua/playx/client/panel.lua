@@ -208,7 +208,8 @@ local function ControlPanel(panel)
         Command = "playx_update_window",
     })
 end
-
+PANEL = {}
+vgui.Register( "dlistview", PANEL ,"DListView")
 --- Draw the control panel.
 local function BookmarksPanel(panel)
     panel:ClearControls()
@@ -252,8 +253,7 @@ local function BookmarksPanel(panel)
         PlayX.GetBookmark(line:GetValue(1):Trim()):Play()
     end
     
-    local button = panel:AddControl("DButton", {})
-    button:SetText("Open Selected")
+    local button = panel:AddControl("Button", {Text="Open Selected"})
     button.DoClick = function()
         if bookmarks:GetSelectedLine() then
             local line = bookmarks:GetLine(bookmarks:GetSelectedLine())
@@ -263,8 +263,7 @@ local function BookmarksPanel(panel)
 	    end
     end
     
-    local button = panel:AddControl("DButton", {})
-    button:SetText("Manage Bookmarks...")
+    local button = panel:AddControl("Button", {Text="Manage Bookmarks..."})
     button.DoClick = function()
         PlayX.OpenBookmarksWindow()
     end
@@ -288,7 +287,7 @@ local function PopulateToolMenu()
     hasLoaded = true
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
-    --spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel) 
+    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel) 
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXNavigator", "Navigator", "", "", NavigatorPanel)
 end
 
