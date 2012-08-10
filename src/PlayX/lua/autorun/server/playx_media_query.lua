@@ -86,7 +86,7 @@ local function QueryYouTubeTitle(id, successF, failureF)
     })
     local url = "http://gdata.youtube.com/feeds/api/videos/" .. id .."?" .. vars
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size > 0 then
             local title = string.match(result, "<title type='text'>([^<]+)</title>")
             
@@ -113,7 +113,7 @@ local function SearchYouTube(q, successF, failureF)
     })
     local url = "http://gdata.youtube.com/feeds/api/videos?" .. vars
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size > 0 then
             local title = nil
             local videoID = string.match(result, "http://www%.youtube%.com/watch%?v=([A-Za-z0-9_%-]+)")
