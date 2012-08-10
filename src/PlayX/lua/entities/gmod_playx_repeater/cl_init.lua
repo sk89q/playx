@@ -16,6 +16,8 @@
 -- 
 -- $Id$
 
+surface.CreateFont( "Helvetica", 48, 800, true, false, "PlayXHUDNumber" )
+
 include("shared.lua")
 
 language.Add("gmod_playx_repeater", "PlayX Repeater")
@@ -39,13 +41,13 @@ function ENT:DrawScreen(centerX, centerY)
             self.SourceInstance:DrawScreen(centerX, centerY)
         else
         draw.SimpleText("PlayX source has no screen",
-                        "HUDNumber",
+                        "PlayXHUDNumber",
                         centerX, centerY, Color(255, 255, 255, 255),
                         TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
     else
         draw.SimpleText("PlayX source is required for repeater",
-                        "HUDNumber",
+                        "PlayXHUDNumber",
                         centerX, centerY, Color(255, 255, 255, 255),
                         TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
