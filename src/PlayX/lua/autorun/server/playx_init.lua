@@ -20,6 +20,7 @@ AddCSLuaFile("autorun/client/playx_init.lua")
 AddCSLuaFile("playxlib.lua")
 AddCSLuaFile("playx/client/playx.lua")
 AddCSLuaFile("playx/client/bookmarks.lua")
+AddCSLuaFile("playx/client/vgui/PlayXBrowser.lua")
 AddCSLuaFile("playx/client/panel.lua")
 
 -- Add handlers
