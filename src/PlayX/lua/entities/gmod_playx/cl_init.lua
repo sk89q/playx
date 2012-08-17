@@ -15,9 +15,18 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
-
-surface.CreateFont( "Helvetica", 48, 800, true, false, "PlayXHUDNumber" )
-surface.CreateFont( "Helvetica", 14, 400, true, false, "PlayXMenuLarge" )
+surface.CreateFont ("PlayXHUDNumber", {
+    size = 48,
+    weight = 800,
+    antialias = true,
+    font = "Helvetica"
+})
+surface.CreateFont ("PlayXMenuLarge", {
+    size = 48,
+    weight = 400,
+    antialias = true,
+    font = "Helvetica"
+})
 
 include("shared.lua")
 
