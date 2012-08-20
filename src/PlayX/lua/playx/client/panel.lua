@@ -292,6 +292,6 @@ hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 --- Updates the tool panels.
 function PlayX.UpdatePanels()
     if not hasLoaded then return end
-    SettingsPanel(GetControlPanel("PlayXSettings"))
-    ControlPanel(GetControlPanel("PlayXControl"))
+    SettingsPanel(controlpanel.Get("PlayXSettings"))
+    ControlPanel(controlpanel.Get("PlayXControl"))
 end
