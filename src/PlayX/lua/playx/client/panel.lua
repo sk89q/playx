@@ -201,10 +201,6 @@ local function ControlPanel(panel)
         button:SetDisabled(true)
     end
     
-    local button = panel:AddControl("Button", {
-        Label = "Check for Updates",
-        Command = "playx_update_window",
-    })
 end
 PANEL = {}
 vgui.Register( "dlistview", PANEL ,"DListView")

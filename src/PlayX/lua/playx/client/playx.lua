@@ -58,7 +58,7 @@ PlayX.ShowRadioHUD = true
 PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.Providers = {}
-PlayX._UpdateWindow = nil
+PlayX._NavigatorWindow = nil
 PlayX.CrashDetected = file.Read("_playx_crash_detection.txt") == "BEGIN"
 
 local spawnWindow = nil
@@ -351,7 +351,7 @@ function PlayX.OpenNavigatorWindow()
     end
     
     local frame = vgui.Create("DFrame")
-    PlayX._UpdateWindow = frame
+    PlayX._NavigatorWindow = frame
     frame:SetTitle("PlayX Navigator")
     frame:SetDeleteOnClose(false)
     frame:SetScreenLock(true)
@@ -376,69 +376,6 @@ function PlayX.OpenNavigatorWindow()
     frame:InvalidateLayout(true, true)
     
     navWindow = frame
-end
-
---- Opens the update window.
-function PlayX.OpenUpdateWindow(ver)
-    if ver == nil then
-        RunConsoleCommand("playx_update_info")
-        return
-    end
-    
-    if PlayX._UpdateWindow and PlayX._UpdateWindow:IsValid() then
-        return
-    end
-    
-    local url = "http://playx.sk89q.com/update/?version=" .. playxlib.URLEscape(ver)
-    
-    local frame = vgui.Create("DFrame")
-    PlayX._UpdateWindow = frame
-    frame:SetTitle("PlayX Update News")
-    frame:SetDeleteOnClose(true)
-    frame:SetScreenLock(true)
-    frame:SetSize(600, 400)
-    frame:SetSizable(true)
-    frame:Center()
-    frame:MakePopup()
-    
-    local close = vgui.Create("DButton", frame)
-    close:SetSize(90, 25)
-    close:SetText("Close")
-    close.DoClick = function(button)
-        frame:Close()
-    end
-    
-    local browser = vgui.Create("HTML", frame)
-    browser:SetVerticalScrollbarEnabled(true)
-	browser.OpeningURL = function(panel, url)
-	    if not url:find("^http://[%.a-zA-Z0-9%-]*playx%.sk89q%.com") then
-	       gui.OpenURL(url)
-	       frame:Close()
-	    end
-	end
-	browser.Paint = function(self)
-	    local skin = derma.GetDefaultSkin()
-        if not skin then return end
-	    local c = skin.bg_color_dark
-	    local fg = skin.text_normal
-	    surface.SetDrawColor(c.r, c.g, c.b, 255)
-	    surface.DrawRect(0, 0, self:GetWide() - 22, self:GetTall())
-	    surface.SetFont(skin.fontFrame)
-	    surface.SetTextColor(fg.r, fg.g, fg.b, 255)
-	    surface.SetTextPos(10, 10) 
-	    surface.DrawText("Loading" .. string.rep(".", (CurTime() * 2) % 3))
-	end
-    browser:OpenURL(url)
-
-    -- Layout
-    local oldPerform = frame.PerformLayout
-    frame.PerformLayout = function()
-        oldPerform(frame)
-        browser:StretchToParent(10, 28, 10, 40)
-        close:SetPos(frame:GetWide() - close:GetWide() - 8, frame:GetTall() - close:GetTall() - 8)
-    end
-    
-    frame:InvalidateLayout(true, true)
 end
 
 --- Begins media.
@@ -657,13 +594,6 @@ local function UMsgHostURL(um)
     PlayX.UpdatePanels()
 end
 
---- Called on PlayXUpdateInfo user message.
-local function UMsgUpdateInfo(um)
-    local ver = um:ReadString()
-    
-    PlayX.OpenUpdateWindow(ver)
-end
-
 --- Called on PlayXError user message.
 local function UMsgError(um)
     local err = um:ReadString()
@@ -690,7 +620,6 @@ usermessage.Hook("PlayXEnd", UMsgEnd)
 usermessage.Hook("PlayXSpawnDialog", UMsgSpawnDialog)
 usermessage.Hook("PlayXJWURL", UMsgJWURL)
 usermessage.Hook("PlayXHostURL", UMsgHostURL)
-usermessage.Hook("PlayXUpdateInfo", UMsgUpdateInfo)
 usermessage.Hook("PlayXError", UMsgError)
 usermessage.Hook("PlayXMetadata", UMsgMetadata)
 
@@ -733,7 +662,7 @@ local function ConCmdGUIClose()
     PlayX.RequestCloseMedia()
 end
 
---- Called for concmd playx_update_window.
+--- Called for concmd playx_gui_bookmark.
 local function ConCmdGUIBookmark()
     local provider = GetConVar("playx_provider"):GetString():Trim()
     local uri = GetConVar("playx_uri"):GetString():Trim()
@@ -768,11 +697,6 @@ local function ConCmdDumpHTML()
 end
 
 --- Called for concmd playx_update_window.
-local function ConCmdUpdateWindow()
-    PlayX.OpenUpdateWindow()
-end
-
---- Called for concmd playx_update_window.
 local function ConCmdNavigatorWindow()
     PlayX.OpenNavigatorWindow()
 end
@@ -784,7 +708,6 @@ concommand.Add("playx_gui_open", ConCmdGUIOpen)
 concommand.Add("playx_gui_close", ConCmdGUIClose)
 concommand.Add("playx_gui_bookmark", ConCmdGUIBookmark)
 concommand.Add("playx_dump_html", ConCmdDumpHTML) -- Debug function
-concommand.Add("playx_update_window", ConCmdUpdateWindow)
 concommand.Add("playx_navigator_window", ConCmdNavigatorWindow)
 
 --- Detect a crash.
