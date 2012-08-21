@@ -16,9 +16,6 @@
 -- 
 -- $Id$
 
-surface.CreateFont( "Helvetica", 48, 800, true, false, "PlayXHUDNumber" )
-surface.CreateFont( "Helvetica", 14, 400, true, false, "PlayXMenuLarge" )
-
 include("shared.lua")
 
 language.Add("gmod_playx", "PlayX Player")
@@ -371,17 +368,17 @@ function ENT:DrawScreen(centerX, centerY)
             
             if PlayX.CurrentMedia.Title then
                 draw.SimpleText(text,
-                                "PlayXMenuLarge",
+                                "MenuLarge",
                                 centerX, centerY + 20, Color(255, 255, 255, 255),
                                 TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
                 
 	            draw.SimpleText(PlayX.CurrentMedia.Title:sub(1, 50),
-	                            "PlayXHUDNumber",
+	                            "HUDNumber",
 	                            centerX, centerY - 50, Color(255, 255, 255, 255),
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
             else
 	            draw.SimpleText(text,
-	                            "PlayXHUDNumber",
+	                            "HUDNumber",
 	                            centerX, centerY, Color(255, 255, 255, 255),
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             end
@@ -398,13 +395,13 @@ function ENT:DrawScreen(centerX, centerY)
                 
                 if self.PlayerData.Position then
 	                draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Position),
-	                    "PlayXMenuLarge", centerX - 200, centerY + 20,
+	                    "MenuLarge", centerX - 200, centerY + 20,
 	                    Color(255, 255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
                 end
                 
 		        if self.PlayerData.Duration then
 	                draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Duration),
-	                    "PlayXMenuLarge", centerX + 200, centerY + 20,
+	                    "MenuLarge", centerX + 200, centerY + 20,
 	                    Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
 	            end
             end
@@ -412,12 +409,12 @@ function ENT:DrawScreen(centerX, centerY)
     else
         if PlayX.CrashDetected then
             draw.SimpleText("Disabled due to detected crash (see tool menu -> Options)",
-                            "PlayXHUDNumber",
+                            "HUDNumber",
                             centerX, centerY, Color(255, 255, 0, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         elseif not PlayX.Enabled then
             draw.SimpleText("Re-enable the player in the tool menu -> Options",
-                            "PlayXHUDNumber",
+                            "HUDNumber",
                             centerX, centerY, Color(255, 255, 255, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
@@ -461,7 +458,7 @@ function ENT:HUDPaint()
     local titleText = PlayX.CurrentMedia.Title and PlayX.CurrentMedia.Title:sub(1, 50) 
         or "Title Unavailable"
     draw.SimpleText(titleText,
-                    "DermaDefaultBold",
+                    "DefaultBold",
                     ScrW() / 2, 37, Color(255, 255, 255, 255),
                     TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
     
@@ -484,13 +481,13 @@ function ENT:HUDPaint()
         
         if self.PlayerData.Position then
 	        draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Position),
-	            "DermaDefaultBold", bx + 10, by + 40,
+	            "DefaultBold", bx + 10, by + 40,
 	            Color(255, 255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
         end
         
         if self.PlayerData.Duration then
 	        draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Duration),
-	            "DermaDefaultBold`", bx + bw - 10, by + 40,
+	            "DefaultBold`", bx + bw - 10, by + 40,
 	            Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
 	    end
     end
