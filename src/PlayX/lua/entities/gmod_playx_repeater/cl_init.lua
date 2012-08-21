@@ -16,12 +16,7 @@
 -- 
 -- $Id$
 
-surface.CreateFont ("PlayXHUDNumber", {
-    size = 48,
-    weight = 800,
-    antialias = true,
-    font = "Helvetica"
-})
+surface.CreateFont( "Helvetica", 48, 800, true, false, "PlayXHUDNumber" )
 
 include("shared.lua")
 
