@@ -256,6 +256,7 @@ function PlayX.SaveBookmarks()
     
     local output = playxlib.WriteCSV(data)
     
+    file.CreateDir("playx")
     file.Write("playx/bookmarks.txt", output)
     
     return true
