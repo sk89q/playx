@@ -144,8 +144,8 @@ local function Play(ply, provider, uri, lowFramerate)
     end
 end
 
-hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, all, death)
-    if not all then return end
+hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, death)
+    if teamchat then return end
     
     text = text:TrimRight()
     
