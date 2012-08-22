@@ -501,6 +501,7 @@ function ENT:Think()
     if not self.Browser then
         self.BrowserMat = nil
     else
+        self.Browser:UpdateHTMLTexture()
         self.BrowserMat = self.Browser:GetHTMLMaterial()  
     end  
     

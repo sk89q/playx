@@ -23,7 +23,6 @@ local hasLoaded = false
 --- Draw the settings panel.
 local function SettingsPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Settings", Description	= "" }  )
 
     panel:AddControl("CheckBox", {
         Label = "Enabled",
@@ -135,7 +134,6 @@ end
 --- Draw the control panel.
 local function ControlPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Administrate", Description	= "" }  )
     
     local options = {
         ["Auto-detect"] = {["playx_provider"] = ""}
@@ -203,17 +201,12 @@ local function ControlPanel(panel)
         button:SetDisabled(true)
     end
     
-    local button = panel:AddControl("Button", {
-        Label = "Check for Updates",
-        Command = "playx_update_window",
-    })
 end
 PANEL = {}
 vgui.Register( "dlistview", PANEL ,"DListView")
 --- Draw the control panel.
 local function BookmarksPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Bookmarks", Description	= "" }  )
     
     panel:SizeToContents(true)
     
@@ -272,7 +265,6 @@ end
 --- Draw the control panel.
 local function NavigatorPanel(panel)
     panel:ClearControls()
-    panel:AddControl( "Header", { Text = "Navigator", Description	= "" }  )
     
     panel:SizeToContents(true)
     
@@ -296,6 +288,6 @@ hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 --- Updates the tool panels.
 function PlayX.UpdatePanels()
     if not hasLoaded then return end
-    SettingsPanel(GetControlPanel("PlayXSettings"))
-    ControlPanel(GetControlPanel("PlayXControl"))
+    SettingsPanel(controlpanel.Get("PlayXSettings"))
+    ControlPanel(controlpanel.Get("PlayXControl"))
 end

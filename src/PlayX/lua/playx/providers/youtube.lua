@@ -87,7 +87,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
     
     local url = Format("http://gdata.youtube.com/feeds/api/videos/%s?%s", uri, vars)
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size == 0 then
             failCallback("HTTP request failed (size = 0)")
             return

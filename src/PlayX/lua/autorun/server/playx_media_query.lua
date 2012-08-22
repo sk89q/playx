@@ -86,7 +86,7 @@ local function QueryYouTubeTitle(id, successF, failureF)
     })
     local url = "http://gdata.youtube.com/feeds/api/videos/" .. id .."?" .. vars
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size > 0 then
             local title = string.match(result, "<title type='text'>([^<]+)</title>")
             
@@ -113,7 +113,7 @@ local function SearchYouTube(q, successF, failureF)
     })
     local url = "http://gdata.youtube.com/feeds/api/videos?" .. vars
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size > 0 then
             local title = nil
             local videoID = string.match(result, "http://www%.youtube%.com/watch%?v=([A-Za-z0-9_%-]+)")
@@ -144,8 +144,8 @@ local function Play(ply, provider, uri, lowFramerate)
     end
 end
 
-hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, all, death)
-    if not all then return end
+hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, death)
+    if teamchat then return end
     
     text = text:TrimRight()
     
