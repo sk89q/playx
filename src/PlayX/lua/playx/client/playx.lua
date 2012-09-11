@@ -613,6 +613,15 @@ local function UMsgMetadata(um)
     end 
 end
 
+--- Called on PlayXUse user message.
+local function UMsgUse(um)
+    if not GetConVar("playx_enabled"):GetBool() then
+        RunConsoleCommand("playx_enabled", "1")
+    else
+        RunConsoleCommand("playx_enabled", "0")
+    end
+end
+
 net.Receive("PlayXBegin", DSBegin)
 net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
@@ -622,6 +631,7 @@ usermessage.Hook("PlayXJWURL", UMsgJWURL)
 usermessage.Hook("PlayXHostURL", UMsgHostURL)
 usermessage.Hook("PlayXError", UMsgError)
 usermessage.Hook("PlayXMetadata", UMsgMetadata)
+usermessage.Hook("PlayXUse", UMsgUse)
 
 --- Called for concmd playx_resume.
 local function ConCmdResume()

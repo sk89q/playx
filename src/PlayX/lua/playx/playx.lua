@@ -507,6 +507,12 @@ function PlayX.SendSpawnDialogUMsg(ply, forRepeater)
     end
 end
 
+--- Send the PlayXUse umsg to clients.
+function PlayX.Use(ply)
+    umsg.Start("PlayXUse", ply)
+    umsg.End()
+end
+
 local function JWURLCallback(cvar, old, new)
     -- Do our own cvar replication
     SendUserMessage("PlayXJWURL", nil, GetConVar("playx_jw_url"):GetString())
