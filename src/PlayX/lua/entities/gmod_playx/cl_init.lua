@@ -52,7 +52,7 @@ function ENT:UpdateScreenBounds()
             self:SetProjectorBounds(0, 0, 0)
             
             hook.Add("HUDPaint", "PlayXInfo" .. self:EntIndex(), function()
-                if ValidEntity(self) then
+                if IsValid(self) then
                     self:HUDPaint()
                 end
             end)
@@ -520,7 +520,7 @@ function ENT:OnRemove()
     
     -- Give Gmod 200ms to really delete the entity
     timer.Simple(0.2, function()
-        if not ValidEntity(ent) then -- Entity is really gone
+        if not IsValid(ent) then -- Entity is really gone
             if browser and browser:IsValid() then browser:Remove() end
             pcall(hook.Remove, "HUDPaint", "PlayXInfo" .. entIndex)
         end

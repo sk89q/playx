@@ -34,7 +34,7 @@ function ENT:Initialize()
 end
 
 function ENT:DrawScreen(centerX, centerY)
-    if ValidEntity(self.SourceInstance) then
+    if IsValid(self.SourceInstance) then
         if not self.SourceInstance.NoScreen then
             self.SourceInstance:DrawScreen(centerX, centerY)
         else
@@ -52,11 +52,11 @@ function ENT:DrawScreen(centerX, centerY)
 end
 
 function ENT:Think()  
-    if not ValidEntity(self.SourceInstance) then
+    if not IsValid(self.SourceInstance) then
         self.SourceInstance = PlayX.GetInstance()
     end
     
-    if ValidEntity(self.SourceInstance) then
+    if IsValid(self.SourceInstance) then
         self.DrawCenter = self.SourceInstance.DrawCenter
     end
     self:NextThink(CurTime() + 0.1)  
