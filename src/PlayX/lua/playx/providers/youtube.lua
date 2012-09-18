@@ -82,7 +82,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
     local vars = playxlib.URLEscapeTable({
         ["alt"] = "atom",
         ["key"] = apiKey,
-        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
     
     local url = Format("http://gdata.youtube.com/feeds/api/videos/%s?%s", uri, vars)
