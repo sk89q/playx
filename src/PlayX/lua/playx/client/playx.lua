@@ -38,7 +38,7 @@ include("playx/client/bookmarks.lua")
 include("playx/client/vgui/PlayXBrowser.lua")
 
 -- Load handlers
-local p = file.Find("playx/client/handlers/*.lua",LUA_PATH)
+local p = file.Find("playx/client/handlers/*.lua","LUA")
 for _, file in pairs(p) do
     local status, err = pcall(function() include("playx/client/handlers/" .. file) end)
     if not status then

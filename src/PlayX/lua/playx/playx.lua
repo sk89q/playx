@@ -40,7 +40,7 @@ util.AddNetworkString("PlayXProvidersList") -- Add to Pool
 include("playxlib.lua")
 
 -- Load providers
-local p = file.Find("playx/providers/*.lua",LUA_PATH)
+local p = file.Find("playx/providers/*.lua","LUA")
 for _, file in pairs(p) do
     local status, err = pcall(function() include("playx/providers/" .. file) end)
     if not status then
