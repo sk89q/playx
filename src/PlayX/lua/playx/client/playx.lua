@@ -31,6 +31,14 @@ CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
 CreateClientConVar("playx_error_windows", 1, true, false)
 
+surface.CreateFont( "HUDNumber",{
+	font="Trebuchet MS",
+	size = 40,
+	weight = 900,
+	antialias = true,
+	additive = false
+})
+
 PlayX = {}
 
 include("playxlib.lua")
