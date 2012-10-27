@@ -39,6 +39,14 @@ surface.CreateFont( "HUDNumber",{
 	additive = false
 })
 
+surface.CreateFont( "MenuLarge",{
+	font="Verdana",
+	size = 16,
+	weight = 600,
+	antialias = true,
+	additive = false
+})
+
 PlayX = {}
 
 include("playxlib.lua")
