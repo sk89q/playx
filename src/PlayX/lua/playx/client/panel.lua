@@ -23,7 +23,6 @@ local hasLoaded = false
 --- Draw the settings panel.
 local function SettingsPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
 
     panel:AddControl("CheckBox", {
         Label = "Enabled",
@@ -31,18 +30,15 @@ local function SettingsPanel(panel)
     })
     
     if PlayX.CrashDetected then
-	    local msg = panel:AddControl("DLabel", {})
-	    msg:SetWrap(true)
-	    msg:SetText(
-	       "PlayX has detected a crash in a previous session. Is it safe to " ..
+	    local msg = panel:AddControl("Label", {Text = "PlayX has detected a crash in a previous session. Is it safe to " ..
 	       "re-enable PlayX? For most people, crashes " ..
 	       "with the new versions of Gmod and PlayX are very rare, but a handful " ..
 	       "of people crash every time something is played. Try enabling " ..
-	       "PlayX a few times to determine whether you fall into this group."
-	    )
+	       "PlayX a few times to determine whether you fall into this group."})
+	    msg:SetWrap(true)
         msg:SetColor(Color(255, 255, 255, 255))
         msg:SetTextColor(Color(255, 255, 255, 255))
-		msg:SetTextInset(8)
+		msg:SetTextInset(8, 0)
 		msg:SetContentAlignment(7)
 		msg:SetAutoStretchVertical( true )
         msg.Paint = function(self)
@@ -138,7 +134,6 @@ end
 --- Draw the control panel.
 local function ControlPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
     
     local options = {
         ["Auto-detect"] = {["playx_provider"] = ""}
@@ -150,8 +145,7 @@ local function ControlPanel(panel)
     
     -- TODO: Put the following two controls on the same line
     
-    local label = panel:AddControl("DLabel", {})
-    label:SetText("Provider:")
+    local label = panel:AddControl("Label", {Text = "Provider:"})
 
     panel:AddControl("ListBox", {
         Label = "Provider:",
@@ -207,16 +201,12 @@ local function ControlPanel(panel)
         button:SetDisabled(true)
     end
     
-    local button = panel:AddControl("Button", {
-        Label = "Check for Updates",
-        Command = "playx_update_window",
-    })
 end
-
+PANEL = {}
+vgui.Register( "dlistview", PANEL ,"DListView")
 --- Draw the control panel.
 local function BookmarksPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
     
     panel:SizeToContents(true)
     
@@ -256,8 +246,7 @@ local function BookmarksPanel(panel)
         PlayX.GetBookmark(line:GetValue(1):Trim()):Play()
     end
     
-    local button = panel:AddControl("DButton", {})
-    button:SetText("Open Selected")
+    local button = panel:AddControl("Button", {Text="Open Selected"})
     button.DoClick = function()
         if bookmarks:GetSelectedLine() then
             local line = bookmarks:GetLine(bookmarks:GetSelectedLine())
@@ -267,8 +256,7 @@ local function BookmarksPanel(panel)
 	    end
     end
     
-    local button = panel:AddControl("DButton", {})
-    button:SetText("Manage Bookmarks...")
+    local button = panel:AddControl("Button", {Text="Manage Bookmarks..."})
     button.DoClick = function()
         PlayX.OpenBookmarksWindow()
     end
@@ -277,7 +265,6 @@ end
 --- Draw the control panel.
 local function NavigatorPanel(panel)
     panel:ClearControls()
-    panel:AddHeader()
     
     panel:SizeToContents(true)
     
@@ -292,7 +279,7 @@ local function PopulateToolMenu()
     hasLoaded = true
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXSettings", "Settings", "", "", SettingsPanel)
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXControl", "Administrate", "", "", ControlPanel)
-    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel)
+    spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXBookmarks", "Bookmarks (Local)", "", "", BookmarksPanel) 
     spawnmenu.AddToolMenuOption("Options", "PlayX", "PlayXNavigator", "Navigator", "", "", NavigatorPanel)
 end
 
@@ -301,6 +288,6 @@ hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 --- Updates the tool panels.
 function PlayX.UpdatePanels()
     if not hasLoaded then return end
-    SettingsPanel(GetControlPanel("PlayXSettings"))
-    ControlPanel(GetControlPanel("PlayXControl"))
+    SettingsPanel(controlpanel.Get("PlayXSettings"))
+    ControlPanel(controlpanel.Get("PlayXControl"))
 end

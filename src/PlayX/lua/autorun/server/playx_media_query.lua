@@ -82,11 +82,11 @@ local function QueryYouTubeTitle(id, successF, failureF)
     local vars = URLEncodeTable({
         ["alt"] = "atom",
         ["key"] = "AI39si7XNJTicSx18de-aAVYNq20Z0BVFwRo3l8xHu9s6L0YHFgmIlmuR8sabsj1WCghhfxdMzFgCYJapPfP3xTVdPdkTsxhXQ",
-        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
     local url = "http://gdata.youtube.com/feeds/api/videos/" .. id .."?" .. vars
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size > 0 then
             local title = string.match(result, "<title type='text'>([^<]+)</title>")
             
@@ -109,11 +109,11 @@ local function SearchYouTube(q, successF, failureF)
         ["max-results"] = "1",
         -- ["format"] = "5", -- We can now play embedded videos!
         ["key"] = "AI39si7XNJTicSx18de-aAVYNq20Z0BVFwRo3l8xHu9s6L0YHFgmIlmuR8sabsj1WCghhfxdMzFgCYJapPfP3xTVdPdkTsxhXQ",
-        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
     local url = "http://gdata.youtube.com/feeds/api/videos?" .. vars
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size > 0 then
             local title = nil
             local videoID = string.match(result, "http://www%.youtube%.com/watch%?v=([A-Za-z0-9_%-]+)")
@@ -144,8 +144,8 @@ local function Play(ply, provider, uri, lowFramerate)
     end
 end
 
-hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, all, death)
-    if not all then return end
+hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, death)
+    if teamchat then return end
     
     text = text:TrimRight()
     

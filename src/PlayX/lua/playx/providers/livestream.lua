@@ -100,7 +100,7 @@ end
 function Livestream.QueryMetadata(uri, callback, failCallback)
     local url = Format("http://x%sx.channel-api.livestream-api.com/2.0/info", uri:gsub("_", "-"))
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size == 0 then
             failCallback("HTTP request failed (size = 0)")
             return
