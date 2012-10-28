@@ -374,15 +374,15 @@ function PlayX.OpenBookmarksWindow(selectTitle)
         frame:InvalidateLayout(true, true)
     end
     advancedLink.Paint = function()
-        local r, g, b, a = advancedLink:GetTextColor()
-        local text = advancedView and "<< Advanced" or "Advanced >>"
+        local textStyleColor = advancedLink:GetTextStyleColor()
+        local text = asdvancedView and "<< Advanced" or "Advanced >>"
         surface.SetFont("Default")
-        surface.SetDrawColor(r, g, b, a)
-        surface.SetTextColor(r, g, b, a)
-		surface.SetTextPos(0, 0) 
+        surface.SetDrawColor(textStyleColor)
+        surface.SetTextColor(textStyleColor)
+        surface.SetTextPos(0, 0) 
         local w, h = surface.GetTextSize(text)
-		surface.DrawText(text)
-		surface.DrawLine(0, h, w, h)
+        surface.DrawText(text)
+        surface.DrawLine(0, h, w, h)
     end
     
     -- Keyword input
