@@ -51,7 +51,7 @@ end
 function Vimeo.QueryMetadata(uri, callback, failCallback)
     local url = Format("http://vimeo.com/api/v2/video/%s.xml", uri)
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size == 0 then
             failCallback("HTTP request failed (size = 0)")
             return

@@ -16,7 +16,7 @@
 -- 
 -- $Id$
 
-require("datastream")
+--require("datastream")
 
 -- FCVAR_GAMEDLL makes cvar change detection work
 CreateConVar("playx_jw_url", "http://playx.googlecode.com/svn/jwplayer/player.swf",
@@ -34,11 +34,13 @@ CreateConVar("playx_wire_input_delay", "2", {FCVAR_ARCHIVE})
 -- if the server has been left online for a while.
 
 PlayX = {}
+util.AddNetworkString("PlayXBegin") -- Add to Pool
+util.AddNetworkString("PlayXProvidersList") -- Add to Pool
 
 include("playxlib.lua")
 
 -- Load providers
-local p = file.FindInLua("playx/providers/*.lua")
+local p = file.Find("playx/providers/*.lua","LUA")
 for _, file in pairs(p) do
     local status, err = pcall(function() include("playx/providers/" .. file) end)
     if not status then
@@ -49,8 +51,6 @@ end
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
 PlayX.LastOpenTime = 0
-
-local _version = ""
 
 --- Checks if a player instance exists in the game.
 -- @return Whether a player exists
@@ -460,7 +460,8 @@ function PlayX.SendBeginDStream(ply)
         umsg.Bool(PlayX.CurrentMedia.LowFramerate)
         umsg.End()
     else
-	    datastream.StreamToClients(filter, "PlayXBegin", {
+	    net.Start("PlayXBegin")
+		net.WriteTable({
 	        ["Handler"] = PlayX.CurrentMedia.Handler,
 	        ["URI"] = PlayX.CurrentMedia.URI,
 	        ["PlayAge"] = CurTime() - PlayX.CurrentMedia.StartTime,
@@ -468,6 +469,7 @@ function PlayX.SendBeginDStream(ply)
 	        ["LowFramerate"] = PlayX.CurrentMedia.LowFramerate,
 	        ["HandlerArgs"] = PlayX.CurrentMedia.HandlerArgs,
 	    })
+		net.Broadcast()
 	end
 end
 
@@ -478,14 +480,6 @@ function PlayX.SendEndUMsg()
     filter:AddAllPlayers()
     
     umsg.Start("PlayXEnd", filter)
-    umsg.End()
-end
-
---- Send the PlayXUpdateInfo umsg to a user. You should not have much of a
--- a reason to call this method.
-function PlayX.SendUpdateInfoUMsg(ply, ver)
-    umsg.Start("PlayXUpdateInfo", ply)
-    umsg.String(ver)
     umsg.End()
 end
 
@@ -511,6 +505,12 @@ function PlayX.SendSpawnDialogUMsg(ply, forRepeater)
         umsg.Bool(forRepeater)
         umsg.End()
     end
+end
+
+--- Send the PlayXUse umsg to clients.
+function PlayX.Use(ply)
+    umsg.Start("PlayXUse", ply)
+    umsg.End()
 end
 
 local function JWURLCallback(cvar, old, new)
@@ -594,22 +594,10 @@ function ConCmdSpawn(ply, cmd, args)
     end
 end
 
---- Called for concmd playx_update_info.
-function ConCmdUpdateInfo(ply, cmd, args)
-    if not ply or not ply:IsValid() then
-        return
-    else	    
-        Msg(Format("PlayX: %s asked for update info; ver=%s\n", ply:GetName(), _version))
-	    
-	    PlayX.SendUpdateInfoUMsg(ply, _version)
-    end
-end
- 
 concommand.Add("playx_open", ConCmdOpen)
 concommand.Add("playx_close", ConCmdClose)
 concommand.Add("playx_spawn", ConCmdSpawn)
 concommand.Add("playx_spawn_repeater", ConCmdSpawn)
-concommand.Add("playx_update_info", ConCmdUpdateInfo)
 
 --- Called on game mode hook PlayerInitialSpawn.
 function PlayerInitialSpawn(ply)
@@ -617,9 +605,11 @@ function PlayerInitialSpawn(ply)
     SendUserMessage("PlayXHostURL", ply, GetConVar("playx_host_url"):GetString())
     
     -- Send providers list.
-    datastream.StreamToClients(ply, "PlayXProvidersList", {
-        ["List"] = list.Get("PlayXProvidersList"),
-    })
+    net.Start("PlayXProvidersList")
+		net.WriteTable({
+			["List"] = list.Get("PlayXProvidersList"),
+		})
+	net.Send(ply)
     
     local origMedia = PlayX.CurrentMedia
     
@@ -692,14 +682,3 @@ timer.Adjust("PlayXAdminTimeout", 1, 1, function()
     hook.Call("PlayXAdminTimeout", nil, {})
     PlayX.EndMedia()
 end)
-
-local folderName = string.match(debug.getinfo(1, "S").short_src, "addons[/\\]([^/\\]+)")
-if not file.Exists("addons/" .. folderName .. "/info.txt", true) then folderName = "PlayX" end
--- Get version
-if file.Exists("addons/" .. folderName .. "/info.txt", true) then
-    local contents = file.Read("addons/" .. folderName .. "/info.txt", true)
-    _version = string.match(contents, "\"version\"[ \t]*\"([^\"]+)\"")
-    if _version == nil then
-        _version = ""
-    end
-end

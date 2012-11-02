@@ -97,13 +97,13 @@ list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume,
     local volumeFunc = function(volume)
         return [[
 try {
-  document.getElementById('video-player').setVolume(]] .. volume .. [[);
+  document.getElementById('video-player-flash').setVolume(]] .. volume .. [[);
 } catch (e) {}
 ]]
     end
     
     return playxlib.HandlerResult{
-        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri),
+        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri) .. '&start=' .. start,
         center = false,
         volumeFunc = volumeFunc,
         js = [[
@@ -164,14 +164,14 @@ function updateState() {
 }
 
 yt.embed.onPlayerReady = function() {
-  player = document.getElementById('video-player');
+  player = document.getElementById('video-player-flash');
   player.addEventListener('onStateChange', 'onPlayerStateChange');
   player.addEventListener('onError', 'onError');
   player.setVolume(]] .. volume .. [[);
   setInterval(updateState, 250)
 }
 var src = document.getElementById('video-player').getAttribute('src');
-var flashVars = document.getElementById('video-player').getAttribute('flashVars');
+var flashVars = document.getElementById('video-player-flash').getAttribute('flashVars');
 flashVars = flashVars.replace('enablejsapi=0', 'enablejsapi=1');
 flashVars = flashVars.replace('start=0', 'start=]] .. start .. [[');
 document.getElementById('watch-player-div').innerHTML = '<embed width="100%" id="video-player" height="100%" type="application/x-shockwave-flash" src="' + src + '" allowscriptaccess="always" allowfullscreen="true" bgcolor="#000000" flashvars="' + flashVars + '">'

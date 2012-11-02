@@ -52,7 +52,7 @@ function ENT:UpdateScreenBounds()
             self:SetProjectorBounds(0, 0, 0)
             
             hook.Add("HUDPaint", "PlayXInfo" .. self:EntIndex(), function()
-                if ValidEntity(self) then
+                if IsValid(self) then
                     self:HUDPaint()
                 end
             end)
@@ -61,7 +61,7 @@ function ENT:UpdateScreenBounds()
         else
             local rotateAroundRight = info.RotateAroundRight
             local rotateAroundUp = info.RotateAroundUp
-            local rotateAroundForward = info.RotateAroundForward
+            local rotateAroundForward = info.RotateAroundForward or 0
             
             -- For backwards compatibility, adapt to the new rotation system
             if type(rotateAroundRight) == 'boolean' then
@@ -148,7 +148,7 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
     
     self.RotateAroundRight = rotateAroundRight
     self.RotateAroundUp = rotateAroundUp
-    self.RotateAroundForward = rotateAroundForward
+    self.RotateAroundForward = rotateAroundForward or 0
 end
 
 function ENT:SetProjectorBounds(forward, right, up)
@@ -501,6 +501,7 @@ function ENT:Think()
     if not self.Browser then
         self.BrowserMat = nil
     else
+        self.Browser:UpdateHTMLTexture()
         self.BrowserMat = self.Browser:GetHTMLMaterial()  
     end  
     
@@ -519,7 +520,7 @@ function ENT:OnRemove()
     
     -- Give Gmod 200ms to really delete the entity
     timer.Simple(0.2, function()
-        if not ValidEntity(ent) then -- Entity is really gone
+        if not IsValid(ent) then -- Entity is really gone
             if browser and browser:IsValid() then browser:Remove() end
             pcall(hook.Remove, "HUDPaint", "PlayXInfo" .. entIndex)
         end
