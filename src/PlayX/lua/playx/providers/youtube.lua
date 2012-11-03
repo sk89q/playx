@@ -23,6 +23,7 @@ local YouTube = {}
 
 function YouTube.Detect(uri)    
     local m = playxlib.FindMatch(uri, {
+        "^http://youtu%.be/([A-Za-z0-9_%-]+)",
         "^http://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^http://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^http://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
