@@ -103,7 +103,7 @@ try {
     end
     
     return playxlib.HandlerResult{
-        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri),
+        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri) .. '&start=' .. start,
         center = false,
         volumeFunc = volumeFunc,
         js = [[
