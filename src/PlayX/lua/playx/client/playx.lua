@@ -31,7 +31,7 @@ CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
 CreateClientConVar("playx_error_windows", 1, true, false)
 
-surface.CreateFont( "HUDNumber",{
+surface.CreateFont( "PlayXHUDNumber",{
 	font="Trebuchet MS",
 	size = 40,
 	weight = 900,
@@ -39,7 +39,7 @@ surface.CreateFont( "HUDNumber",{
 	additive = false
 })
 
-surface.CreateFont( "MenuLarge",{
+surface.CreateFont( "PlayXMenuLarge",{
 	font="Verdana",
 	size = 16,
 	weight = 600,
@@ -62,22 +62,6 @@ for _, file in pairs(p) do
     end
 end
 
-
-surface.CreateFont("PlayXMenuLarge",
-	{
-		font = "Trebuchet MS",
-		size = 45,
-		weight = 900
-	}
-)
-
-surface.CreateFont("PlayXHUDNumber",
-	{
-		font = "Trebuchet MS",
-		size = 40,
-		weight = 900
-	}
-)
 include("playx/client/panel.lua")
 
 PlayX.Enabled = true
