@@ -379,8 +379,7 @@ playxlib.HandlerResult = HandlerResult
 -- Make callable
 local mt = {}
 mt.__call = function(...)
-    local arg = {...}
-    return HandlerResult.new(unpack(arg))
+    return HandlerResult.new(...)
 end
 setmetatable(HandlerResult, mt)
 
@@ -456,7 +455,7 @@ end
 -- @param url
 -- @return HTML
 function playxlib.GenerateIFrame(width, height, url)
-    return playxlib.HandlerResult(nil, nil, nil, nil, false, url)
+    return playxlib.HandlerResult("", "", "", "", false, url)
 end
 
 --- Generates the HTML for an image viewer. The image viewer will automatiaclly
@@ -513,7 +512,7 @@ setInterval(function() {
 </div>
 ]]
     
-    return playxlib.HandlerResult(css, js, body)
+    return playxlib.HandlerResult(css, js, body, nil, nil, nil)
 end
 
 --- Generates the HTML for a Flash player viewer.
@@ -556,7 +555,7 @@ setInterval(function() {
     
     local body = [[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
-<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" 
+<object
   type="application/x-shockwave-flash"
   src="]] .. url .. [["
   width="100%" height="100%" id="player">
@@ -668,5 +667,5 @@ body {
 </div>
 ]]
     
-    return playxlib.HandlerResult(css, js, body, url)
+    return playxlib.HandlerResult(css, js, body, url, nil, nil)
 end

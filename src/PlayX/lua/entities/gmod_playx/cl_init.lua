@@ -165,7 +165,7 @@ function ENT:SetProjectorBounds(forward, right, up)
 end
 
 function ENT:CreateBrowser()
-    self.Browser = vgui.Create("HTML")
+    self.Browser = vgui.Create("DHTML")
     self.Browser:SetMouseInputEnabled(false)        
     self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
     self.Browser:SetPaintedManually(true)
@@ -195,8 +195,16 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     if not self.Browser then
         self:CreateBrowser()
     end
-    
-    self.Browser.OpeningURL = function(_, url, target, postdata)
+	
+    self.Browser:AddFunction("gmod","Ready",function() 
+		if not IsValid(self) then return end
+
+        --self:Debug("Injecting payload")
+        self.WaitingInjection = false
+        self:InjectPage()
+    end)
+	
+    --[[self.Browser.OpeningURL = function(_, url, target, postdata)
         local query = url:match("^http://playx.sktransport/%?(.*)$")
         
         if query then
@@ -206,12 +214,12 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
             end
             return true
         end
-    end
+    end]]
     
-    self.Browser.FinishedURL = function()
+    --[[self.Browser.FinishedURL = function()
         MsgN("PlayX DEBUG: Page loaded, preparing to inject")
         self:InjectPage()
-    end
+    end]]
     
     PlayX.CrashDetectionBegin()
     self.HadStarted = true
@@ -220,6 +228,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
         self.Browser:OpenURL(result.ForceURL)
     else
         self.Browser:OpenURL(PlayX.HostURL)
+        self.Browser:QueueJavascript("gmod.Ready()")
     end
     
     self.Playing = true
@@ -368,17 +377,17 @@ function ENT:DrawScreen(centerX, centerY)
             
             if PlayX.CurrentMedia.Title then
                 draw.SimpleText(text,
-                                "MenuLarge",
+                                "PlayXMenuLarge",
                                 centerX, centerY + 20, Color(255, 255, 255, 255),
                                 TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
                 
 	            draw.SimpleText(PlayX.CurrentMedia.Title:sub(1, 50),
-	                            "HUDNumber",
+	                            "PlayXHUDNumber",
 	                            centerX, centerY - 50, Color(255, 255, 255, 255),
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
             else
 	            draw.SimpleText(text,
-	                            "HUDNumber",
+	                            "PlayXHUDNumber",
 	                            centerX, centerY, Color(255, 255, 255, 255),
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             end
@@ -409,12 +418,12 @@ function ENT:DrawScreen(centerX, centerY)
     else
         if PlayX.CrashDetected then
             draw.SimpleText("Disabled due to detected crash (see tool menu -> Options)",
-                            "HUDNumber",
+                            "PlayXHUDNumber",
                             centerX, centerY, Color(255, 255, 0, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         elseif not PlayX.Enabled then
             draw.SimpleText("Re-enable the player in the tool menu -> Options",
-                            "HUDNumber",
+                            "PlayXHUDNumber",
                             centerX, centerY, Color(255, 255, 255, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
