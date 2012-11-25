@@ -165,7 +165,7 @@ function ENT:SetProjectorBounds(forward, right, up)
 end
 
 function ENT:CreateBrowser()
-    self.Browser = vgui.Create("HTML")
+    self.Browser = vgui.Create("DHTML")
     self.Browser:SetMouseInputEnabled(false)        
     self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
     self.Browser:SetPaintedManually(true)
@@ -195,7 +195,13 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     if not self.Browser then
         self:CreateBrowser()
     end
-    
+	
+    self.Browser:AddFunction("gmod","Ready",function() 
+		if not IsValid(self) then return end
+		MsgN("PlayX DEBUG: Page loaded, preparing to inject")
+        self:InjectPage()
+    end)
+	
     self.Browser.OpeningURL = function(_, url, target, postdata)
         local query = url:match("^http://playx.sktransport/%?(.*)$")
         
@@ -221,7 +227,8 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     else
         self.Browser:OpenURL(PlayX.HostURL)
     end
-    
+	
+    self.Browser:QueueJavascript("gmod.Ready()")
     self.Playing = true
 end
 

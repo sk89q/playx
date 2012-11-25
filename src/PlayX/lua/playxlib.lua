@@ -379,8 +379,7 @@ playxlib.HandlerResult = HandlerResult
 -- Make callable
 local mt = {}
 mt.__call = function(...)
-    local arg = {...}
-    return HandlerResult.new(unpack(arg))
+    return HandlerResult.new(...)
 end
 setmetatable(HandlerResult, mt)
 
@@ -556,7 +555,7 @@ setInterval(function() {
     
     local body = [[
 <div style="width: ]] .. width .. [[px; height: ]] .. height .. [[px; overflow: hidden">
-<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" 
+<object
   type="application/x-shockwave-flash"
   src="]] .. url .. [["
   width="100%" height="100%" id="player">
