@@ -199,7 +199,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     self.Browser:AddFunction("gmod","Ready",function() 
 		if not IsValid(self) then return end
 
-        self:Debug("Injecting payload")
+        --self:Debug("Injecting payload")
         self.WaitingInjection = false
         self:InjectPage()
 	end)
