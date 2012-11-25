@@ -202,7 +202,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
         --self:Debug("Injecting payload")
         self.WaitingInjection = false
         self:InjectPage()
-	end)
+    end)
 	
     --[[self.Browser.OpeningURL = function(_, url, target, postdata)
         local query = url:match("^http://playx.sktransport/%?(.*)$")
@@ -228,7 +228,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
         self.Browser:OpenURL(result.ForceURL)
     else
         self.Browser:OpenURL(PlayX.HostURL)
-		self.Browser:QueueJavascript("gmod.Ready()")
+        self.Browser:QueueJavascript("gmod.Ready()")
     end
     
     self.Playing = true
