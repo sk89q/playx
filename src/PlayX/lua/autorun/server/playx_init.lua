@@ -20,10 +20,11 @@ AddCSLuaFile("autorun/client/playx_init.lua")
 AddCSLuaFile("playxlib.lua")
 AddCSLuaFile("playx/client/playx.lua")
 AddCSLuaFile("playx/client/bookmarks.lua")
+AddCSLuaFile("playx/client/vgui/PlayXBrowser.lua")
 AddCSLuaFile("playx/client/panel.lua")
 
 -- Add handlers
-local p = file.Find("playx/client/handlers/*.lua",LUA_PATH)
+local p = file.Find("playx/client/handlers/*.lua","LUA")
 for _, file in pairs(p) do
     AddCSLuaFile("playx/client/handlers/" .. file)
 end

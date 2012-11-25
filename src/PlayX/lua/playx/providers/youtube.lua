@@ -23,6 +23,7 @@ local YouTube = {}
 
 function YouTube.Detect(uri)    
     local m = playxlib.FindMatch(uri, {
+        "^http://youtu%.be/([A-Za-z0-9_%-]+)",
         "^http://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^http://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^http://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
@@ -82,12 +83,12 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
     local vars = playxlib.URLEscapeTable({
         ["alt"] = "atom",
         ["key"] = apiKey,
-        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
     
     local url = Format("http://gdata.youtube.com/feeds/api/videos/%s?%s", uri, vars)
 
-    http.Get(url, "", function(result, size)
+    http.Fetch(url, function(result, size)
         if size == 0 then
             failCallback("HTTP request failed (size = 0)")
             return

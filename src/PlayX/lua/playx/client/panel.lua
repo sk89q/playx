@@ -38,7 +38,7 @@ local function SettingsPanel(panel)
 	    msg:SetWrap(true)
         msg:SetColor(Color(255, 255, 255, 255))
         msg:SetTextColor(Color(255, 255, 255, 255))
-		msg:SetTextInset(8)
+		msg:SetTextInset(8, 0)
 		msg:SetContentAlignment(7)
 		msg:SetAutoStretchVertical( true )
         msg.Paint = function(self)
@@ -201,10 +201,6 @@ local function ControlPanel(panel)
         button:SetDisabled(true)
     end
     
-    local button = panel:AddControl("Button", {
-        Label = "Check for Updates",
-        Command = "playx_update_window",
-    })
 end
 PANEL = {}
 vgui.Register( "dlistview", PANEL ,"DListView")
@@ -292,6 +288,6 @@ hook.Add("PopulateToolMenu", "PlayXPopulateToolMenu", PopulateToolMenu)
 --- Updates the tool panels.
 function PlayX.UpdatePanels()
     if not hasLoaded then return end
-    SettingsPanel(GetControlPanel("PlayXSettings"))
-    ControlPanel(GetControlPanel("PlayXControl"))
+    SettingsPanel(controlpanel.Get("PlayXSettings"))
+    ControlPanel(controlpanel.Get("PlayXControl"))
 end
