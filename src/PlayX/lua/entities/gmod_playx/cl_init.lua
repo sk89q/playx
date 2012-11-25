@@ -61,7 +61,7 @@ function ENT:UpdateScreenBounds()
         else
             local rotateAroundRight = info.RotateAroundRight
             local rotateAroundUp = info.RotateAroundUp
-            local rotateAroundForward = info.RotateAroundForward
+            local rotateAroundForward = info.RotateAroundForward or 0
             
             -- For backwards compatibility, adapt to the new rotation system
             if type(rotateAroundRight) == 'boolean' then
@@ -148,7 +148,7 @@ function ENT:SetScreenBounds(pos, width, height, rotateAroundRight,
     
     self.RotateAroundRight = rotateAroundRight
     self.RotateAroundUp = rotateAroundUp
-    self.RotateAroundForward = rotateAroundForward
+    self.RotateAroundForward = rotateAroundForward or 0
 end
 
 function ENT:SetProjectorBounds(forward, right, up)

@@ -34,6 +34,7 @@ function ENT:Initialize()
     self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
     self.Entity:SetSolid(SOLID_VPHYSICS)
     self.Entity:DrawShadow(false)
+    self.Entity:SetUseType(SIMPLE_USE)
     
     if WireAddon then
         self.Inputs = Wire_CreateInputs(self.Entity, {
@@ -89,6 +90,10 @@ end
 
 function ENT:OnRemove()
     PlayX.CloseMedia()
+end
+
+function ENT:Use( activator, caller, use_type, value )
+    PlayX.Use( activator )
 end
 
 function ENT:ClearWireOutputs()

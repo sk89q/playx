@@ -31,6 +31,22 @@ CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
 CreateClientConVar("playx_error_windows", 1, true, false)
 
+surface.CreateFont( "HUDNumber",{
+	font="Trebuchet MS",
+	size = 40,
+	weight = 900,
+	antialias = true,
+	additive = false
+})
+
+surface.CreateFont( "MenuLarge",{
+	font="Verdana",
+	size = 16,
+	weight = 600,
+	antialias = true,
+	additive = false
+})
+
 PlayX = {}
 
 include("playxlib.lua")
@@ -629,6 +645,15 @@ local function UMsgMetadata(um)
     end 
 end
 
+--- Called on PlayXUse user message.
+local function UMsgUse(um)
+    if not GetConVar("playx_enabled"):GetBool() then
+        RunConsoleCommand("playx_enabled", "1")
+    else
+        RunConsoleCommand("playx_enabled", "0")
+    end
+end
+
 net.Receive("PlayXBegin", DSBegin)
 net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
@@ -638,6 +663,7 @@ usermessage.Hook("PlayXJWURL", UMsgJWURL)
 usermessage.Hook("PlayXHostURL", UMsgHostURL)
 usermessage.Hook("PlayXError", UMsgError)
 usermessage.Hook("PlayXMetadata", UMsgMetadata)
+usermessage.Hook("PlayXUse", UMsgUse)
 
 --- Called for concmd playx_resume.
 local function ConCmdResume()
