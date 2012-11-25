@@ -195,8 +195,16 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     if not self.Browser then
         self:CreateBrowser()
     end
-    
-    self.Browser.OpeningURL = function(_, url, target, postdata)
+	
+    self.Browser:AddFunction("gmod","Ready",function() 
+		if not IsValid(self) then return end
+
+        self:Debug("Injecting payload")
+        self.WaitingInjection = false
+        self:InjectPage()
+	end)
+	
+    --[[self.Browser.OpeningURL = function(_, url, target, postdata)
         local query = url:match("^http://playx.sktransport/%?(.*)$")
         
         if query then
@@ -206,12 +214,12 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
             end
             return true
         end
-    end
+    end]]
     
-    self.Browser.FinishedURL = function()
+    --[[self.Browser.FinishedURL = function()
         MsgN("PlayX DEBUG: Page loaded, preparing to inject")
         self:InjectPage()
-    end
+    end]]
     
     PlayX.CrashDetectionBegin()
     self.HadStarted = true
@@ -220,6 +228,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
         self.Browser:OpenURL(result.ForceURL)
     else
         self.Browser:OpenURL(PlayX.HostURL)
+		self.Browser:QueueJavascript("gmod.Ready()")
     end
     
     self.Playing = true
