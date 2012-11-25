@@ -379,8 +379,7 @@ playxlib.HandlerResult = HandlerResult
 -- Make callable
 local mt = {}
 mt.__call = function(...)
-    local arg = {...}
-    return HandlerResult.new(unpack(arg))
+    return HandlerResult.new(...)
 end
 setmetatable(HandlerResult, mt)
 

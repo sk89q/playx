@@ -52,7 +52,7 @@ function ENT:UpdateScreenBounds()
             self:SetProjectorBounds(0, 0, 0)
             
             hook.Add("HUDPaint", "PlayXInfo" .. self:EntIndex(), function()
-                if ValidEntity(self) then
+                if IsValid(self) then
                     self:HUDPaint()
                 end
             end)
@@ -165,7 +165,7 @@ function ENT:SetProjectorBounds(forward, right, up)
 end
 
 function ENT:CreateBrowser()
-    self.Browser = vgui.Create("HTML")
+    self.Browser = vgui.Create("DHTML")
     self.Browser:SetMouseInputEnabled(false)        
     self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
     self.Browser:SetPaintedManually(true)
@@ -377,17 +377,17 @@ function ENT:DrawScreen(centerX, centerY)
             
             if PlayX.CurrentMedia.Title then
                 draw.SimpleText(text,
-                                "MenuLarge",
+                                "PlayXMenuLarge",
                                 centerX, centerY + 20, Color(255, 255, 255, 255),
                                 TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
                 
 	            draw.SimpleText(PlayX.CurrentMedia.Title:sub(1, 50),
-	                            "HUDNumber",
+	                            "PlayXHUDNumber",
 	                            centerX, centerY - 50, Color(255, 255, 255, 255),
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
             else
 	            draw.SimpleText(text,
-	                            "HUDNumber",
+	                            "PlayXHUDNumber",
 	                            centerX, centerY, Color(255, 255, 255, 255),
 	                            TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             end
@@ -418,12 +418,12 @@ function ENT:DrawScreen(centerX, centerY)
     else
         if PlayX.CrashDetected then
             draw.SimpleText("Disabled due to detected crash (see tool menu -> Options)",
-                            "HUDNumber",
+                            "PlayXHUDNumber",
                             centerX, centerY, Color(255, 255, 0, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         elseif not PlayX.Enabled then
             draw.SimpleText("Re-enable the player in the tool menu -> Options",
-                            "HUDNumber",
+                            "PlayXHUDNumber",
                             centerX, centerY, Color(255, 255, 255, 255),
                             TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         end
@@ -529,7 +529,7 @@ function ENT:OnRemove()
     
     -- Give Gmod 200ms to really delete the entity
     timer.Simple(0.2, function()
-        if not ValidEntity(ent) then -- Entity is really gone
+        if not IsValid(ent) then -- Entity is really gone
             if browser and browser:IsValid() then browser:Remove() end
             pcall(hook.Remove, "HUDPaint", "PlayXInfo" .. entIndex)
         end

@@ -40,6 +40,7 @@ PlayXScreens = {
         ["Height"] = 115,
         ["RotateAroundRight"] = true,
         ["RotateAroundUp"] = true,
+		["RotateAroundForward"] = false,
     },
     ["models/props/cs_office/tv_plasma.mdl"] = {
         ["Offset"] = Vector(6.2, -28, 36),
@@ -47,6 +48,7 @@ PlayXScreens = {
         ["Height"] = 33.5,    
         ["RotateAroundRight"] = true,
         ["RotateAroundUp"] = true,
+		["RotateAroundForward"] = false,
     },
     ["models/props/cs_office/computer_monitor.mdl"] = {
         ["Offset"] = Vector(3.3, -10.5, 24.55),
@@ -54,6 +56,7 @@ PlayXScreens = {
         ["Height"] = 15.65,    
         ["RotateAroundRight"] = true,
         ["RotateAroundUp"] = true,
+		["RotateAroundForward"] = false,
     },
     ["models/props_wasteland/controlroom_monitor001b.mdl"] = {
         ["Offset"] = Vector(15, -10.5, 1.4),
@@ -61,6 +64,7 @@ PlayXScreens = {
         ["Height"] = 18,    
         ["RotateAroundRight"] = -103,
         ["RotateAroundUp"] = true,
+		["RotateAroundForward"] = false,
     },
     ["models/props_lab/monitor02.mdl"] = {
         ["Offset"] = Vector(10.8, -9, 22.5),
@@ -68,6 +72,7 @@ PlayXScreens = {
         ["Height"] = 14,    
         ["RotateAroundRight"] = -83,
         ["RotateAroundUp"] = true,
+		["RotateAroundForward"] = false,
     },
     ["models/props_c17/tv_monitor01.mdl"] = {
         ["Offset"] = Vector(6, -9, 6),
@@ -75,6 +80,7 @@ PlayXScreens = {
         ["Height"] = 10.5,    
         ["RotateAroundRight"] = -90,
         ["RotateAroundUp"] = true,
+		["RotateAroundForward"] = false,
     },
     ["models/props_lab/monitor01a.mdl"] = {
         ["Offset"] = Vector(12.2, -9, 11.3),
@@ -82,6 +88,7 @@ PlayXScreens = {
         ["Height"] = 15,    
         ["RotateAroundRight"] = -85,
         ["RotateAroundUp"] = true,
+		["RotateAroundForward"] = false,
     },
     ["models/props/cs_office/projector.mdl"] = {
         ["IsProjector"] = true,

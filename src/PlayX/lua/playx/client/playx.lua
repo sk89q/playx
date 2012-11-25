@@ -38,7 +38,7 @@ include("playx/client/bookmarks.lua")
 include("playx/client/vgui/PlayXBrowser.lua")
 
 -- Load handlers
-local p = file.Find("playx/client/handlers/*.lua",LUA_PATH)
+local p = file.Find("playx/client/handlers/*.lua","LUA")
 for _, file in pairs(p) do
     local status, err = pcall(function() include("playx/client/handlers/" .. file) end)
     if not status then
@@ -46,6 +46,22 @@ for _, file in pairs(p) do
     end
 end
 
+
+surface.CreateFont("PlayXMenuLarge",
+	{
+		font = "Trebuchet MS",
+		size = 45,
+		weight = 900
+	}
+)
+
+surface.CreateFont("PlayXHUDNumber",
+	{
+		font = "Trebuchet MS",
+		size = 40,
+		weight = 900
+	}
+)
 include("playx/client/panel.lua")
 
 PlayX.Enabled = true

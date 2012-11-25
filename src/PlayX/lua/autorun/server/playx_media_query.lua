@@ -82,7 +82,7 @@ local function QueryYouTubeTitle(id, successF, failureF)
     local vars = URLEncodeTable({
         ["alt"] = "atom",
         ["key"] = "AI39si7XNJTicSx18de-aAVYNq20Z0BVFwRo3l8xHu9s6L0YHFgmIlmuR8sabsj1WCghhfxdMzFgCYJapPfP3xTVdPdkTsxhXQ",
-        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
     local url = "http://gdata.youtube.com/feeds/api/videos/" .. id .."?" .. vars
 
@@ -109,7 +109,7 @@ local function SearchYouTube(q, successF, failureF)
         ["max-results"] = "1",
         -- ["format"] = "5", -- We can now play embedded videos!
         ["key"] = "AI39si7XNJTicSx18de-aAVYNq20Z0BVFwRo3l8xHu9s6L0YHFgmIlmuR8sabsj1WCghhfxdMzFgCYJapPfP3xTVdPdkTsxhXQ",
-        ["client"] = SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
     })
     local url = "http://gdata.youtube.com/feeds/api/videos?" .. vars
 
