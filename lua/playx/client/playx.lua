@@ -15,9 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
-
---require("chrome")
---require("datastream")
+-- Version 2.7 by Nexus [BR] on 23-02-2013 03:16 AM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -30,6 +28,9 @@ CreateClientConVar("playx_use_jw", 1, false, false)
 CreateClientConVar("playx_ignore_length", 0, false, false)
 CreateClientConVar("playx_use_chrome", 1, true, false)
 CreateClientConVar("playx_error_windows", 1, true, false)
+CreateClientConVar("playx_video_range_enabled", 1, true, false)
+CreateClientConVar("playx_video_range_hints_enabled", 1, true, false)
+CreateClientConVar("playx_video_radius", 1000, true, false)
 
 surface.CreateFont( "HUDNumber",{
 	font="Trebuchet MS",
@@ -76,6 +77,8 @@ PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.Providers = {}
 PlayX._NavigatorWindow = nil
 PlayX.CrashDetected = file.Read("_playx_crash_detection.txt") == "BEGIN"
+PlayX.VideoRangeStatus = 1
+PlayX.HintDelay = 1
 
 local spawnWindow = nil
 
@@ -638,6 +641,54 @@ local function UMsgUse(um)
     end
 end
 
+-- Called on PlayX Video Range Check
+local function PlayXRangeCheck(ply, cMoveData) 
+	local enabled = GetConVarNumber("playx_video_range_enabled")
+    local radius = GetConVarNumber("playx_video_radius")
+	local showHints = GetConVarNumber("playx_video_range_hints_enabled")
+	local distance = 0
+	local ent = nil
+	local entities = {}
+		
+	if enabled == 1 then
+		entities = ents.FindByClass("gmod_playx")		
+		
+		if #entities >= 1 then
+			if entities[1]:IsValid() then
+				if entities[1]:GetClass() == "gmod_playx" then
+					ent = entities[1]
+				end
+			end
+		end
+		
+		if ply:IsValid() then   
+			if ent != nil then
+				if ent:IsValid() then
+					distance = ply:GetPos():Distance(ent:GetPos())
+					if distance > radius and PlayX.VideoRangeStatus == 1 then    
+						PlayX.VideoRangeStatus = 0
+						EndPlay()
+						if showHints == 1 and PlayX.HintDelay == 0 then
+							PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
+							PlayX.HintDelay = 1
+						end						
+					elseif distance < radius and PlayX.VideoRangeStatus == 0 then
+						PlayX.VideoRangeStatus = 1
+						PlayX.ResumePlay()
+						if showHints == 1 and PlayX.HintDelay == 0 then
+							PlayX.ShowHint("PlayX: You are now in Range of Video Player!")
+							PlayX.HintDelay = 1
+						end					
+					end
+				end
+			end
+		end
+	end	
+end
+
+timer.Create( "hintDelay", 2, 99999, function() PlayX.HintDelay = 0 end  )
+
+hook.Add("PlayerTick","PlayXRangeCheck",PlayXRangeCheck)
 net.Receive("PlayXBegin", DSBegin)
 net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)

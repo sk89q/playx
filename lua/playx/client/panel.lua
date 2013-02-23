@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.7 by Nexus [BR] on 23-02-2013 03:16 AM
 
 PlayX._BookmarksPanelList = nil
 
@@ -54,6 +55,16 @@ local function SettingsPanel(panel)
         Label = "Show errors in message boxes",
         Command = "playx_error_windows",
     }):SetTooltip("Uncheck to use hints instead")
+	
+	panel:AddControl("CheckBox", {
+        Label = "Only play videos near me",
+        Command = "playx_video_range_enabled",
+    }):SetTooltip("Uncheck to play videos in any part of the map")
+	
+	panel:AddControl("CheckBox", {
+        Label = "Show hints about video range",
+        Command = "playx_video_range_hints_enabled",
+    }):SetTooltip("Uncheck to not see hints about video out of range")
 
     panel:AddControl("Slider", {
         Label = "Volume:",
@@ -62,6 +73,14 @@ local function SettingsPanel(panel)
         Min = "1",
         Max = "100",
     }):SetTooltip("May have no effect, depending on what's playing.")
+	
+	panel:AddControl("Slider", {
+        Label = "Video radius:",
+        Command = "playx_video_radius",
+        Type = "Integer",
+        Min = "500",
+        Max = "5000",
+    }):SetTooltip("Choose the video player radius.")
     
     if PlayX.CurrentMedia then
         if PlayX.CurrentMedia.ResumeSupported then

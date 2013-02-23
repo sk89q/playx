@@ -17,17 +17,26 @@
 -- $Id$
 -- Version 2.7 by Nexus [BR] on 23-02-2013 03:16 AM
 
-AddCSLuaFile("autorun/client/playx_init.lua")
-AddCSLuaFile("playxlib.lua")
-AddCSLuaFile("playx/client/playx.lua")
-AddCSLuaFile("playx/client/bookmarks.lua")
-AddCSLuaFile("playx/client/vgui/PlayXBrowser.lua")
-AddCSLuaFile("playx/client/panel.lua")
-
--- Add handlers
-local p = file.Find("playx/client/handlers/*.lua","LUA")
-for _, file in pairs(p) do
-    AddCSLuaFile("playx/client/handlers/" .. file)
+--Setup Loading Log Formatation
+function loadingLog (text)
+	--Set Max Size
+	local size = 32
+	--If Text Len < max size
+	if(string.len(text) < size) then
+		-- Format the text to be Text+Spaces*LeftSize
+		text = text .. string.rep( " ", size-string.len(text) )
+	else
+		--If Text is too much big then cut and add ...
+		text = string.Left( text, size-3 ) .. "..."
+	end
+	--Log Messsage
+	Msg( "||  "..text.."||\n" )
 end
 
-include("playx/playx.lua")
+Msg( "\n/====================================\\\n")
+Msg( "||               PlayX              ||\n" )
+Msg( "||----------------------------------||\n" )
+loadingLog("Version 2.7")
+loadingLog("Updated on 23-02-2013")
+loadingLog("Last Patch by Nexus [BR]")
+Msg( "\\====================================/\n\n" )
