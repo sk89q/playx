@@ -24,6 +24,7 @@ ENT.Author = "sk89q"
 ENT.Contact = "http://www.sk89q.com"
 ENT.Purpose = "Internet media player"
 ENT.Instructions = "Spawn one, and then use the spawn menu."
+ENT.Category = "PlayX"
 
 ENT.WireDebugName = "PlayX Player"
 

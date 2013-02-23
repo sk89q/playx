@@ -24,7 +24,7 @@ ENT.Author = "sk89q"
 ENT.Contact = "http://www.sk89q.com"
 ENT.Purpose = "Repeater of a PlayX screen"
 ENT.Instructions = "Spawn a regular PlayX screen first."
-
+ENT.Category = "PlayX"
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
 
