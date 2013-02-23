@@ -667,7 +667,7 @@ local function PlayXRangeCheck(ply, cMoveData)
 					distance = ply:GetPos():Distance(ent:GetPos())
 					if distance > radius and PlayX.VideoRangeStatus == 1 then    
 						PlayX.VideoRangeStatus = 0
-						EndPlay()
+						PlayX.HidePlayer()
 						if showHints == 1 and PlayX.HintDelay == 0 then
 							PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
 							PlayX.HintDelay = 1
