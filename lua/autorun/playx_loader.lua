@@ -41,9 +41,7 @@ loadingLog("Updated on 23-02-2013")
 loadingLog("Last Patch by Nexus [BR]")
 Msg( "\\====================================/\n\n" )
 
--- Print contents of `tbl`, with indentation.
--- `indent` sets the initial level of indentation.
-function print2( var, name )
+function debugTable( var, name )
   if not name then name = "anonymous" end
   if "table" ~= type( var ) then
     print( name .. " = " .. tostring( var ) )
@@ -58,7 +56,7 @@ function print2( var, name )
         -- key contains special characters
         child = name .. '["' .. k .. '"]'
       end
-      print2( v, child )
+      debugTable( v, child )
     end
   end
 end

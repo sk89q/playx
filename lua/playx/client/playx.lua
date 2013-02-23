@@ -706,7 +706,7 @@ end
 
 timer.Create( "hintDelay", 2, 999999, function() PlayX.HintDelay = 0 end  )
 timer.Create("PlayXRangeCheck", 0.500, 999999, PlayXRangeCheck)
---hook.Add("PlayerTick","PlayXRangeCheck",PlayXRangeCheck)
+
 net.Receive("PlayXBegin", DSBegin)
 net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
