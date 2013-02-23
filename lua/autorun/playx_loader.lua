@@ -40,3 +40,25 @@ loadingLog("Version 2.7")
 loadingLog("Updated on 23-02-2013")
 loadingLog("Last Patch by Nexus [BR]")
 Msg( "\\====================================/\n\n" )
+
+-- Print contents of `tbl`, with indentation.
+-- `indent` sets the initial level of indentation.
+function print2( var, name )
+  if not name then name = "anonymous" end
+  if "table" ~= type( var ) then
+    print( name .. " = " .. tostring( var ) )
+  else
+    -- for tables, recurse through children
+    for k,v in pairs( var ) do
+      local child
+      if 1 == string.find( k, "%a[%w_]*" ) then
+        -- key can be accessed using dot syntax
+        child = name .. '.' .. k
+      else
+        -- key contains special characters
+        child = name .. '["' .. k .. '"]'
+      end
+      print2( v, child )
+    end
+  end
+end

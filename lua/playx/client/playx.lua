@@ -549,7 +549,9 @@ local function DSBegin(len)
     local lowFramerate = decoded.LowFramerate
     local handlerArgs = decoded.HandlerArgs
     
-    PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, handlerArgs)
+	if GetConVarNumber("playx_video_range_enabled") == 1 and PlayX.VideoRangeStatus == 1 then
+		PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, handlerArgs)
+	end
 end
 
 --- Called on PlayXBegin usermessage.
@@ -642,13 +644,14 @@ local function UMsgUse(um)
 end
 
 -- Called on PlayX Video Range Check
-local function PlayXRangeCheck(ply, cMoveData) 
+local function PlayXRangeCheck() 
 	local enabled = GetConVarNumber("playx_video_range_enabled")
     local radius = GetConVarNumber("playx_video_radius")
 	local showHints = GetConVarNumber("playx_video_range_hints_enabled")
 	local distance = 0
 	local ent = nil
 	local entities = {}
+	local ply = LocalPlayer()
 		
 	if enabled == 1 then
 		entities = ents.FindByClass("gmod_playx")		
@@ -663,18 +666,20 @@ local function PlayXRangeCheck(ply, cMoveData)
 		
 		if ply:IsValid() then   
 			if ent != nil then
-				if ent:IsValid() then
+				if ent:IsValid() then					
 					distance = ply:GetPos():Distance(ent:GetPos())
 					if distance > radius and PlayX.VideoRangeStatus == 1 then    
 						PlayX.VideoRangeStatus = 0
-						PlayX.HidePlayer()
+				
+						ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body><div style=\'font-size:54px;margin-top:20%;margin-left:30%;\'>Video out of Range</div></body></html>"')
 						if showHints == 1 and PlayX.HintDelay == 0 then
 							PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
 							PlayX.HintDelay = 1
 						end						
 					elseif distance < radius and PlayX.VideoRangeStatus == 0 then
 						PlayX.VideoRangeStatus = 1
-						PlayX.ResumePlay()
+
+						ent.Browser:RunJavascript('window.location.reload()')
 						if showHints == 1 and PlayX.HintDelay == 0 then
 							PlayX.ShowHint("PlayX: You are now in Range of Video Player!")
 							PlayX.HintDelay = 1
@@ -684,14 +689,24 @@ local function PlayXRangeCheck(ply, cMoveData)
 			end
 		end
 	elseif (PlayX.VideoRangeStatus == 0 and enabled == 0) then
-		PlayX.ResumePlay()
+		entities = ents.FindByClass("gmod_playx")		
+				
+		if #entities >= 1 then
+			if entities[1]:IsValid() then
+				if entities[1]:GetClass() == "gmod_playx" then
+					ent = entities[1]
+				end
+			end
+		end
+		
+		ent.Browser:RunJavascript('window.location.reload()')
 		PlayX.VideoRangeStatus = 1
 	end	
 end
 
-timer.Create( "hintDelay", 2, 99999, function() PlayX.HintDelay = 0 end  )
-
-hook.Add("PlayerTick","PlayXRangeCheck",PlayXRangeCheck)
+timer.Create( "hintDelay", 2, 999999, function() PlayX.HintDelay = 0 end  )
+timer.Create("PlayXRangeCheck", 0.500, 999999, PlayXRangeCheck)
+--hook.Add("PlayerTick","PlayXRangeCheck",PlayXRangeCheck)
 net.Receive("PlayXBegin", DSBegin)
 net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
