@@ -683,6 +683,9 @@ local function PlayXRangeCheck(ply, cMoveData)
 				end
 			end
 		end
+	elseif (PlayX.VideoRangeStatus == 0 and enabled == 0) then
+		PlayX.ResumePlay()
+		PlayX.VideoRangeStatus = 1
 	end	
 end
 

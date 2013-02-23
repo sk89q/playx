@@ -19,7 +19,7 @@
 local PANEL = {}
 
 function PANEL:Init()
-	self.Chrome = vgui.Create("DHTMLControls", self);
+	self.Chrome = vgui.Create("PlayXHTMLControls", self);
 	self.Chrome:Dock(TOP)
     self.Chrome.HomeURL = "http://navigator.playx.sk89q.com/"
 end
@@ -38,8 +38,9 @@ function PANEL:Paint()
 	if not self.Started then
 		self.Started = true
 		
-		self.HTML = vgui.Create("HTML", self)
+		self.HTML = vgui.Create("PlayXHTML", self)
 		self.HTML:Dock(FILL)
+		self.HTML:OpenURL(self.Chrome.HomeURL)
         
 		self.Chrome:SetHTML(self.HTML)
         
@@ -63,15 +64,13 @@ function PANEL:Paint()
             local value = url:match("youtube.*v=([^&]+)")
             
             if value then
-                self:Open("", "http://www.youtube.com/watch?v=" .. value)
-                
+				self.HTML:OpenURL(self.Chrome.HomeURL);
+                self:Open("", "http://www.youtube.com/watch?v=" .. value)                
                 return true
             end
             
             oldOpenURL(_, url, target, postdata)
         end
-        
-		self.HTML:OpenURL(self.Chrome.HomeURL);
         
 		self:InvalidateLayout()
 		
