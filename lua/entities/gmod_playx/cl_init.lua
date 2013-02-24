@@ -199,6 +199,14 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     self.Browser:AddFunction("gmod","Ready",function() 
 		if not IsValid(self) then return end
 		MsgN("PlayX DEBUG: Page loaded, preparing to inject")
+		if (PlayX.VideoRangeStatus == 0 and GetConVarNumber("playx_video_range_enabled") == 1) or (PlayX.Pause == 1 and GetConVarNumber("playx_video_range_enabled") == 1) then
+			if !PlayX.CurrentMedia.Handler:find("YouTube") then
+				self.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body><div style=\'font-size:54px;margin-top:20%;margin-left:30%;\'>Video out of Range</div></body></html>"')
+			else
+				self.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px'; setTimeout(\"document.getElementsByTagName('embed')[0].pauseVideo();\",1000);");
+				PlayX.Pause = 1
+			end
+		end
         self:InjectPage()
     end)
 	

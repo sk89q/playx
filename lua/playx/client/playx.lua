@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7 by Nexus [BR] on 23-02-2013 03:16 AM
+-- Version 2.7.1 by Nexus [BR] on 24-02-2013 07:25 PM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -79,6 +79,7 @@ PlayX._NavigatorWindow = nil
 PlayX.CrashDetected = file.Read("_playx_crash_detection.txt") == "BEGIN"
 PlayX.VideoRangeStatus = 1
 PlayX.HintDelay = 1
+PlayX.Pause = 0
 
 local spawnWindow = nil
 
@@ -180,8 +181,8 @@ end
 
 --- Used to get the HTML, namely for debugging purposes.
 function PlayX.GetHTML()
-    if PlayX.PlayerExists() then
-        return PlayX.GetInstance().CurrentPage:GetHTML()
+    if PlayX.PlayerExists() and PlayX.GetInstance().Browser != nil then
+        return PlayX.GetInstance().Browser:GetHTML()
     end
 end
 
@@ -549,9 +550,7 @@ local function DSBegin(len)
     local lowFramerate = decoded.LowFramerate
     local handlerArgs = decoded.HandlerArgs
     
-	if GetConVarNumber("playx_video_range_enabled") == 1 and PlayX.VideoRangeStatus == 1 then
-		PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, handlerArgs)
-	end
+	PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, handlerArgs)
 end
 
 --- Called on PlayXBegin usermessage.
@@ -562,7 +561,7 @@ local function UMsgBegin(um)
     local resumeSupported = um:ReadBool()
     local lowFramerate = um:ReadBool()
     
-    PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, {})
+	PlayX.BeginMedia(handler, uri, playAge, resumeSupported, lowFramerate, {})
 end
 
 --- Called on PlayXProvidersList user message.
@@ -672,17 +671,31 @@ local function PlayXRangeCheck()
 						PlayX.VideoRangeStatus = 0
 						
 						if ent.Browser != nil then
-							ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body><div style=\'font-size:54px;margin-top:20%;margin-left:30%;\'>Video out of Range</div></body></html>"')
-							if showHints == 1 and PlayX.HintDelay == 0 then
-								PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
-								PlayX.HintDelay = 1
-							end			
+							if !PlayX.CurrentMedia.Handler:find("YouTube") then
+								ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body><div style=\'font-size:54px;margin-top:20%;margin-left:30%;\'>Video out of Range</div></body></html>"')
+							else
+								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px';");
+								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].pauseVideo();");
+								PlayX.Pause = 1
+								if showHints == 1 and PlayX.HintDelay == 0 then
+									PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
+									PlayX.HintDelay = 1
+								end		
+							end
 						end
 					elseif distance < radius and PlayX.VideoRangeStatus == 0 then
 						PlayX.VideoRangeStatus = 1
 						
 						if ent.Browser != nil then
-							ent.Browser:RunJavascript('window.location.reload()')
+							if !PlayX.CurrentMedia.Handler:find("YouTube") then
+								ent.Browser:RunJavascript("window.location.reload();");
+							else
+								if PlayX.Pause == 1 then
+									ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='100%'");
+									ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].playVideo();");
+									PlayX.Pause = 0
+								end
+							end
 							if showHints == 1 and PlayX.HintDelay == 0 then
 								PlayX.ShowHint("PlayX: You are now in Range of Video Player!")
 								PlayX.HintDelay = 1

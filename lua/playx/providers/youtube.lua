@@ -59,7 +59,7 @@ function YouTube.GetPlayer(uri, useJW)
                 ["enablejsapi"] = "1",
             }
             
-            local url = Format("http://www.youtube.com/v/%s&%s", uri, playxlib.URLEscapeTable(vars))
+            local url = Format("http://www.youtube.com/v/%s&%s&version=3&enablejsapi=1", uri, playxlib.URLEscapeTable(vars))
             
             return {
                 ["Handler"] = "FlashAPI",

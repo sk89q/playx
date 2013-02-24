@@ -101,11 +101,12 @@ try {
 } catch (e) {}
 ]]
     end
-    
+	    
     return playxlib.HandlerResult{
-        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri) .. '&start=' .. start,
+        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri) .. '&enablejsapi=1&version=3&start=' .. start,
         center = false,
         volumeFunc = volumeFunc,
+
         js = [[
 var knownState = "Loading...";
 var player;
@@ -175,5 +176,6 @@ var flashVars = document.getElementById('video-player-flash').getAttribute('flas
 flashVars = flashVars.replace('enablejsapi=0', 'enablejsapi=1');
 flashVars = flashVars.replace('start=0', 'start=]] .. start .. [[');
 document.getElementById('watch-player-div').innerHTML = '<embed width="100%" id="video-player" height="100%" type="application/x-shockwave-flash" src="' + src + '" allowscriptaccess="always" allowfullscreen="true" bgcolor="#000000" flashvars="' + flashVars + '">'
+
 ]]}
 end)

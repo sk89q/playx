@@ -393,7 +393,6 @@ function HandlerResult:new(t, js, body, jsURL, center, url)
         jsURL = t.jsURL
         center = t.center
         url = t.url
-        volumeFunc = t.volumeFunc
     else
         css = t
     end
@@ -409,13 +408,13 @@ function HandlerResult:new(t, js, body, jsURL, center, url)
         JS = js,
         JSInclude = jsURL,
         Center = center,
-        ForceURL = url,
+        ForceURL = url
     }
     
     if volumeFunc then
         instance.GetVolumeChangeJS = volumeFunc
     end
-    
+	    
     setmetatable(instance, self)
     self.__index = self
     return instance

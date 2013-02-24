@@ -21,28 +21,28 @@ function PANEL:Init()
 	self.BackButton:SetMaterial( "gui/HTML/back" )
 	self.BackButton:Dock( LEFT )
 	self.BackButton:DockMargin( Spacing*3, Margins, Spacing, Margins )
-	self.BackButton.DoClick = function() self.BackButton:SetDisabled( true ) self.HTML:HTMLBack(); self.Cur = self.Cur - 1; self.Navigating = true end
+	self.BackButton.DoClick = function() self.BackButton:SetDisabled( true ) self.HTML:RunJavascript("history.go(-1)"); self.Cur = self.Cur - 1; self.Navigating = true end
 	
 	self.ForwardButton = vgui.Create( "DImageButton", self )
 	self.ForwardButton:SetSize( ButtonSize, ButtonSize )
 	self.ForwardButton:SetMaterial( "gui/HTML/forward" )
 	self.ForwardButton:Dock( LEFT )
 	self.ForwardButton:DockMargin( Spacing, Margins, Spacing, Margins )
-	self.ForwardButton.DoClick = function() self.ForwardButton:SetDisabled( true ) self.HTML:HTMLForward(); self.Cur = self.Cur + 1; self.Navigating = true end
+	self.ForwardButton.DoClick = function() self.ForwardButton:SetDisabled( true ) self.HTML:RunJavascript("history.go(1)"); self.Cur = self.Cur + 1; self.Navigating = true end
 	
 	self.RefreshButton = vgui.Create( "DImageButton", self )
 	self.RefreshButton:SetSize( ButtonSize, ButtonSize )
 	self.RefreshButton:SetMaterial( "gui/HTML/refresh" )
 	self.RefreshButton:Dock( LEFT )
 	self.RefreshButton:DockMargin( Spacing, Margins, Spacing, Margins )
-	self.RefreshButton.DoClick = function() self.RefreshButton:SetDisabled( true ) self.Refreshing = true; self.HTML:Refresh() end
+	self.RefreshButton.DoClick = function() self.RefreshButton:SetDisabled( true ) self.Refreshing = true; self.HTML:RunJavascript("window.location.refresh()") end
 	
 	self.HomeButton = vgui.Create( "DImageButton", self )
 	self.HomeButton:SetSize( ButtonSize, ButtonSize )
 	self.HomeButton:SetMaterial( "gui/HTML/home" )
 	self.HomeButton:Dock( LEFT )
 	self.HomeButton:DockMargin( Spacing, Margins, Spacing*3, Margins )
-	self.HomeButton.DoClick = function() if ( self.HTML.URL == self.HomeURL ) then return end self.HTML:Stop() self.HTML:OpenURL( self.HomeURL ) end
+	self.HomeButton.DoClick = function() if ( self.HTML.URL == self.HomeURL ) then return end;  self.Cur = self.Cur - 1; self.HTML:OpenURL( self.HomeURL ) end
 	
 	self.AddressBar = vgui.Create( "DTextEntry", self )
 	self.AddressBar:Dock( FILL )
