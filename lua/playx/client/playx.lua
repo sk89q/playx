@@ -672,7 +672,7 @@ local function PlayXRangeCheck()
 						
 						if ent.Browser != nil then
 							if !PlayX.CurrentMedia.Handler:find("YouTube") then
-								ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body><div style=\'font-size:54px;margin-top:20%;margin-left:30%;\'>Video out of Range</div></body></html>"')
+								ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body></body></html>"')
 							else
 								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px';");
 								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].pauseVideo();");
