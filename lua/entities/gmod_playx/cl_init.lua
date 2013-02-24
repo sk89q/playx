@@ -203,7 +203,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 			if !PlayX.CurrentMedia.Handler:find("YouTube") then
 				self.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body></body></html>"')
 			else
-				self.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px'; setTimeout(\"document.getElementsByTagName('embed')[0].pauseVideo();\",1000);");
+				self.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px'; InterV = setInterval('document.getElementsByTagName(\"embed\")[0].pauseVideo(); if(document.getElementsByTagName(\"embed\")[0].getPlayerState() == 2){clearInterval(InterV);}',500);");
 				PlayX.Pause = 1
 			end
 		end
