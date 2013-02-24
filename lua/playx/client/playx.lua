@@ -670,20 +670,24 @@ local function PlayXRangeCheck()
 					distance = ply:GetPos():Distance(ent:GetPos())
 					if distance > radius and PlayX.VideoRangeStatus == 1 then    
 						PlayX.VideoRangeStatus = 0
-				
-						ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body><div style=\'font-size:54px;margin-top:20%;margin-left:30%;\'>Video out of Range</div></body></html>"')
-						if showHints == 1 and PlayX.HintDelay == 0 then
-							PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
-							PlayX.HintDelay = 1
-						end						
+						
+						if ent.Browser != nil then
+							ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body><div style=\'font-size:54px;margin-top:20%;margin-left:30%;\'>Video out of Range</div></body></html>"')
+							if showHints == 1 and PlayX.HintDelay == 0 then
+								PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
+								PlayX.HintDelay = 1
+							end			
+						end
 					elseif distance < radius and PlayX.VideoRangeStatus == 0 then
 						PlayX.VideoRangeStatus = 1
-
-						ent.Browser:RunJavascript('window.location.reload()')
-						if showHints == 1 and PlayX.HintDelay == 0 then
-							PlayX.ShowHint("PlayX: You are now in Range of Video Player!")
-							PlayX.HintDelay = 1
-						end					
+						
+						if ent.Browser != nil then
+							ent.Browser:RunJavascript('window.location.reload()')
+							if showHints == 1 and PlayX.HintDelay == 0 then
+								PlayX.ShowHint("PlayX: You are now in Range of Video Player!")
+								PlayX.HintDelay = 1
+							end		
+						end
 					end
 				end
 			end
@@ -699,8 +703,10 @@ local function PlayXRangeCheck()
 			end
 		end
 		
-		ent.Browser:RunJavascript('window.location.reload()')
-		PlayX.VideoRangeStatus = 1
+		if ent.Browser != nil then
+			ent.Browser:RunJavascript('window.location.reload()')
+			PlayX.VideoRangeStatus = 1
+		end
 	end	
 end
 
