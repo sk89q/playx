@@ -80,6 +80,7 @@ PlayX.CrashDetected = file.Read("_playx_crash_detection.txt") == "BEGIN"
 PlayX.VideoRangeStatus = 1
 PlayX.HintDelay = 1
 PlayX.Pause = 0
+PlayX.StartPaused = 0
 
 local spawnWindow = nil
 
@@ -653,14 +654,8 @@ local function PlayXRangeCheck()
 	local ply = LocalPlayer()
 		
 	if enabled == 1 then
-		entities = ents.FindByClass("gmod_playx")		
-		
-		if #entities >= 1 then
-			if entities[1]:IsValid() then
-				if entities[1]:GetClass() == "gmod_playx" then
-					ent = entities[1]
-				end
-			end
+		if PlayX.PlayerExists() then
+			ent = PlayX.GetInstance()
 		end
 		
 		if ply:IsValid() then   
@@ -672,7 +667,7 @@ local function PlayXRangeCheck()
 						
 						if ent.Browser != nil then
 							if !PlayX.CurrentMedia.Handler:find("YouTube") then
-								ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body></body></html>"')
+								ent.Browser:RunJavascript('document.body.innerHTML = ""')
 							else
 								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px';");
 								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].pauseVideo();");
@@ -687,8 +682,9 @@ local function PlayXRangeCheck()
 						PlayX.VideoRangeStatus = 1
 						
 						if ent.Browser != nil then
-							if !PlayX.CurrentMedia.Handler:find("YouTube") then
+							if !PlayX.CurrentMedia.Handler:find("YouTube") or PlayX.StartPaused == 1 then
 								ent.Browser:RunJavascript("window.location.reload();");
+								PlayX.StartPaused = 0
 							else
 								if PlayX.Pause == 1 then
 									ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='100%'");
