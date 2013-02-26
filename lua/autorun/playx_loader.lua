@@ -33,14 +33,6 @@ function loadingLog (text)
 	Msg( "||  "..text.."||\n" )
 end
 
-Msg( "\n/====================================\\\n")
-Msg( "||               PlayX              ||\n" )
-Msg( "||----------------------------------||\n" )
-loadingLog("Version 2.7.1")
-loadingLog("Updated on 23-02-2013")
-loadingLog("Last Patch by Nexus [BR]")
-Msg( "\\====================================/\n\n" )
-
 function debugTable( var, name )
   if not name then name = "anonymous" end
   if "table" ~= type( var ) then
@@ -60,3 +52,11 @@ function debugTable( var, name )
     end
   end
 end
+
+Msg( "\n/====================================\\\n")
+Msg( "||               PlayX              ||\n" )
+Msg( "||----------------------------------||\n" )
+loadingLog("Version 2.7.1")
+loadingLog("Updated on 23-02-2013")
+loadingLog("Last Patch by Nexus [BR]")
+Msg( "\\====================================/\n\n" )

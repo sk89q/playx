@@ -61,6 +61,8 @@ function PANEL:Paint()
                 return true
             end
             
+            PlayX.NavigatorCapturedURL = url
+            
             local value = url:match("youtube.*v=([^&]+)")
             
             if value then

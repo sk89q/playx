@@ -22,7 +22,7 @@ PlayX.Bookmarks = {}
 local bookmarksWindowList = nil
 local advancedView = false
 
-local function DoBookmarkDelete(bookmarks, line)
+function PlayX.BookmarkDelete(line)
     local title = line:GetValue(1)
     
     Derma_Query("Are you sure you want to delete '" .. title .. "'?",
@@ -168,6 +168,8 @@ function Bookmark:Play()
     if self.Deleted then
         Error("Operation performed on deleted bookmark")    
     end
+    
+    PlayX.NavigatorCapturedURL = ""
     
     PlayX.RequestOpenMedia(self.Provider, self.URI, self.StartAt,
                            self.LowFramerate, GetConVar("playx_use_jw"):GetBool(),
@@ -513,7 +515,7 @@ function PlayX.OpenBookmarksWindow(selectTitle)
     deleteButton.DoClick = function()
         if bookmarks:GetSelectedLine() then
             -- GetSelected() not working
-            DoBookmarkDelete(bookmarks, bookmarks:GetLine(bookmarks:GetSelectedLine()))
+            PlayX.BookmarkDelete(bookmarks:GetLine(bookmarks:GetSelectedLine()))
         else
             Derma_Message("A bookmark is not selected.", "Error", "OK")
         end
@@ -577,7 +579,7 @@ function PlayX.OpenBookmarksWindow(selectTitle)
             frame:Close()
         end)
         menu:AddOption("Delete...", function()
-            DoBookmarkDelete(bookmarks, line)
+            PlayX.BookmarkDelete(line)
         end)
         menu:AddOption("Copy URI", function()
             SetClipboardText(line:GetValue(2))
