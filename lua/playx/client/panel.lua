@@ -220,7 +220,7 @@ local function ControlPanel(panel)
     
 	if ULib != nil then	
 		panel:AddControl("Label", {
-	        Text = "User Groups allowed to Play Videos (ULIB ONLY)"
+	        Text = "User Groups allowed to Play Videos / Spawn PlayX (ULIB ONLY)"
 		})
 				
  		local groups = panel:AddControl("DListView", {})
