@@ -32,59 +32,10 @@ function Livestream.Detect(uri, useJW)
 end
 
 function Livestream.GetPlayer(uri, useJW)
-    if uri:lower():find("^[a-zA-Z0-9_]+$") then
-        local vars = {
-            ["channel"] = uri,
-            ["layout"] = "playerEmbedDefault",
-            ["backgroundColor"] = "0x000000",
-            ["backgroundAlpha"] = "1",
-            ["backgroundGradientStrength"] = "0",
-            ["chromeColor"] = "0x000000",
-            ["headerBarGlossEnabled"] = "false",
-            ["controlBarGlossEnabled"] = "false",
-            ["chatInputGlossEnabled"] = "false",
-            ["uiWhite"] = "true",
-            ["uiAlpha"] = "0.5",
-            ["uiSelectedAlpha"] = "1",
-            ["dropShadowEnabled"] = "false",
-            ["dropShadowHorizontalDistance"] = "10",
-            ["dropShadowVerticalDistance"] = "10",
-            ["paddingLeft"] = "0",
-            ["paddingRight"] = "0",
-            ["paddingTop"] = "0",
-            ["paddingBottom"] = "0",
-            ["cornerRadius"] = "0",
-            ["backToDirectoryURL"] = "null",
-            ["bannerURL"] = "null",
-            ["bannerText"] = "null",
-            ["bannerWidth"] = "320",
-            ["bannerHeight"] = "50",
-            ["showViewers"] = "true",
-            ["embedEnabled"] = "false",
-            ["chatEnabled"] = "false",
-            ["onDemandEnabled"] = "true",
-            ["programGuideEnabled"] = "false",
-            ["fullScreenEnabled"] = "false",
-            ["reportAbuseEnabled"] = "false",
-            ["gridEnabled"] = "false",
-            ["initialIsOn"] = "true",
-            ["initialIsMute"] = "false",
-            ["initialVolume"] = "__volume__",
-            ["contentId"] = "null",
-            ["initThumbUrl"] = "null",
-            ["playeraspectwidth"] = "4",
-            ["playeraspectheight"] = "3",
-            ["mogulusLogoEnabled"] = "true",
-            ["width"] = "__width__",
-            ["height"] = "__height__",
-            ["wmode"] = "window",
-        }
-        
-        local url = "http://cdn.livestream.com/grid/PlayerV2.swf?" .. playxlib.URLEscapeTable(vars)
-        
+    if uri:lower():find("^[a-zA-Z0-9_]+$") then        
         return {
-            ["Handler"] = "FlashAPI",
-            ["URI"] = url,
+            ["Handler"] = "IFrame",
+            ["URI"] = "http://cdn.livestream.com/embed/"..uri.."?layout=4&color=0x000000&autoPlay=true&mute=false&iconColorOver=0xe7e7e7&iconColor=0xcccccc&allowchat=true&height=385&width=640",
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
