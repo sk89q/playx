@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.1 by Nexus [BR] on 24-02-2013 07:25 PM
+-- Version 2.7.2 by Nexus [BR] on 27-02-2013 01:35 AM
 
 --Setup Loading Log Formatation
 function loadingLog (text)
@@ -32,14 +32,6 @@ function loadingLog (text)
 	--Log Messsage
 	Msg( "||  "..text.."||\n" )
 end
-
-Msg( "\n/====================================\\\n")
-Msg( "||               PlayX              ||\n" )
-Msg( "||----------------------------------||\n" )
-loadingLog("Version 2.7.1")
-loadingLog("Updated on 23-02-2013")
-loadingLog("Last Patch by Nexus [BR]")
-Msg( "\\====================================/\n\n" )
 
 function debugTable( var, name )
   if not name then name = "anonymous" end
@@ -60,3 +52,24 @@ function debugTable( var, name )
     end
   end
 end
+
+function string:split(delimiter)
+  local result = { }
+  local from  = 1
+  local delim_from, delim_to = string.find( self, delimiter, from  )
+  while delim_from do
+    table.insert( result, string.sub( self, from , delim_from-1 ) )
+    from  = delim_to + 1
+    delim_from, delim_to = string.find( self, delimiter, from  )
+  end
+  table.insert( result, string.sub( self, from  ) )
+  return result
+end
+
+Msg( "\n/====================================\\\n")
+Msg( "||               PlayX              ||\n" )
+Msg( "||----------------------------------||\n" )
+loadingLog("Version 2.7.2")
+loadingLog("Updated on 27-02-2013")
+loadingLog("Last Patch by Nexus [BR]")
+Msg( "\\====================================/\n\n" )

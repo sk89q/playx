@@ -20,7 +20,7 @@ local Hulu = {}
 
 function Hulu.Detect(uri)
     local m = playxlib.FindMatch(uri, {
-        "^http://www.hulu.com/watch/[0-9]+/.+$",
+        "^http://www.hulu.com/watch/[0-9]+$",
     })
     
     if m then
@@ -30,7 +30,7 @@ end
 
 function Hulu.GetPlayer(uri, useJW)
     local m = playxlib.FindMatch(uri, {
-        "^http://www.hulu.com/watch/[0-9]+/.+$",
+        "^http://www.hulu.com/watch/[0-9]+$",
     })
     
     if m then

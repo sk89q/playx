@@ -17,6 +17,10 @@
 -- $Id$
 -- Version 2.7 by Nexus [BR] on 23-02-2013 03:16 AM
 
+if von == nil then
+	include("von.lua")
+end
+
 AddCSLuaFile("autorun/client/playx_init.lua")
 AddCSLuaFile("playxlib.lua")
 AddCSLuaFile("playx/client/playx.lua")

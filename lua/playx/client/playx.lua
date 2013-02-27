@@ -80,6 +80,10 @@ PlayX.CrashDetected = file.Read("_playx_crash_detection.txt") == "BEGIN"
 PlayX.VideoRangeStatus = 1
 PlayX.HintDelay = 1
 PlayX.Pause = 0
+PlayX.StartPaused = 0
+PlayX.NavigatorCapturedURL = ""
+PlayX.AllowedPlayerGroups = {}
+PlayX.UIGroups = nil
 
 local spawnWindow = nil
 
@@ -170,7 +174,11 @@ end
 -- @return Entity or nil
 function PlayX.GetInstance()
     local props = ents.FindByClass("gmod_playx")
-    return props[1]
+    if table.Count(props) >= 1 then
+    	return props[1]
+    else
+    	return nil
+    end
 end
 
 --- Checks whether the host URL is valid.
@@ -653,14 +661,8 @@ local function PlayXRangeCheck()
 	local ply = LocalPlayer()
 		
 	if enabled == 1 then
-		entities = ents.FindByClass("gmod_playx")		
-		
-		if #entities >= 1 then
-			if entities[1]:IsValid() then
-				if entities[1]:GetClass() == "gmod_playx" then
-					ent = entities[1]
-				end
-			end
+		if PlayX.PlayerExists() then
+			ent = PlayX.GetInstance()
 		end
 		
 		if ply:IsValid() then   
@@ -672,7 +674,7 @@ local function PlayXRangeCheck()
 						
 						if ent.Browser != nil then
 							if !PlayX.CurrentMedia.Handler:find("YouTube") then
-								ent.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body></body></html>"')
+								ent.Browser:RunJavascript('document.body.innerHTML = ""')
 							else
 								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px';");
 								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].pauseVideo();");
@@ -687,8 +689,9 @@ local function PlayXRangeCheck()
 						PlayX.VideoRangeStatus = 1
 						
 						if ent.Browser != nil then
-							if !PlayX.CurrentMedia.Handler:find("YouTube") then
+							if !PlayX.CurrentMedia.Handler:find("YouTube") or PlayX.StartPaused == 1 then
 								ent.Browser:RunJavascript("window.location.reload();");
+								PlayX.StartPaused = 0
 							else
 								if PlayX.Pause == 1 then
 									ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='100%'");
@@ -723,9 +726,19 @@ local function PlayXRangeCheck()
 	end	
 end
 
-timer.Create( "hintDelay", 2, 999999, function() PlayX.HintDelay = 0 end  )
-timer.Create("PlayXRangeCheck", 0.500, 999999, PlayXRangeCheck)
+function DSUpdateAllowedPlayerGroups(len)
+	PlayX.AllowedPlayerGroups = net.ReadTable()	
+	if PlayX.UIGroups != nil and ULib != nil then
+		PlayX.UIGroups:ClearSelection()
+		for _, group in pairs(PlayX.UIGroups:GetLines()) do
+			if PlayX.AllowedPlayerGroups[group:GetValue(1)] == true then
+	    		group:SetSelected(true)
+	    	end
+		end
+	end
+end
 
+net.Receive("PlayXAllowedPlayerGroups", DSUpdateAllowedPlayerGroups )
 net.Receive("PlayXBegin", DSBegin)
 net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
@@ -736,6 +749,9 @@ usermessage.Hook("PlayXHostURL", UMsgHostURL)
 usermessage.Hook("PlayXError", UMsgError)
 usermessage.Hook("PlayXMetadata", UMsgMetadata)
 usermessage.Hook("PlayXUse", UMsgUse)
+
+timer.Create( "hintDelay", 2, 999999, function() PlayX.HintDelay = 0 end  )
+timer.Create("PlayXRangeCheck", 0.500, 999999, PlayXRangeCheck)
 
 --- Called for concmd playx_resume.
 local function ConCmdResume()
@@ -762,6 +778,8 @@ local function ConCmdGUIOpen()
             return
         end
     end
+    
+    PlayX.NavigatorCapturedURL = ""
     
     PlayX.RequestOpenMedia(GetConVar("playx_provider"):GetString(),
                            GetConVar("playx_uri"):GetString(),
@@ -805,6 +823,29 @@ local function ConCmdGUIBookmark()
     end
 end
 
+local function ConCmdGUIBookmarkNavigator()    
+    if PlayX.NavigatorCapturedURL == "" then
+        Derma_Message("No URI is entered.", "Error", "OK")
+    else
+        Derma_StringRequest("Add Bookmark", "Enter a name for the bookmark", "",
+            function(title)
+                local title = title:Trim()
+                if title ~= "" then
+			        local result, err = PlayX.AddBookmark(title, "", PlayX.NavigatorCapturedURL, "",
+			                                              "", false)
+			        
+			        if result then
+                        Derma_Message("Bookmark added.", "Bookmark Added", "OK")
+			            
+			            PlayX.SaveBookmarks()
+			        else
+			            Derma_Message(err, "Error", "OK")
+			        end
+                end
+            end)
+    end
+end
+
 --- Called for concmd playx_dump_html.
 local function ConCmdDumpHTML()
     print(PlayX.GetHTML())
@@ -820,6 +861,7 @@ concommand.Add("playx_hide", ConCmdHide)
 concommand.Add("playx_reset_render_bounds", ConCmdResetRenderBounds)
 concommand.Add("playx_gui_open", ConCmdGUIOpen)
 concommand.Add("playx_gui_close", ConCmdGUIClose)
+concommand.Add("playx_navigator_addbookmark", ConCmdGUIBookmarkNavigator)
 concommand.Add("playx_gui_bookmark", ConCmdGUIBookmark)
 concommand.Add("playx_dump_html", ConCmdDumpHTML) -- Debug function
 concommand.Add("playx_navigator_window", ConCmdNavigatorWindow)

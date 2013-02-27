@@ -200,12 +200,9 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 		if not IsValid(self) then return end
 		MsgN("PlayX DEBUG: Page loaded, preparing to inject")
 		if (PlayX.VideoRangeStatus == 0 and GetConVarNumber("playx_video_range_enabled") == 1) or (PlayX.Pause == 1 and GetConVarNumber("playx_video_range_enabled") == 1) then
-			if !PlayX.CurrentMedia.Handler:find("YouTube") then
-				self.Browser:RunJavascript('document.body.innerHTML = "<html><head></head><body></body></html>"')
-			else
-				self.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px'; InterV = setInterval('document.getElementsByTagName(\"embed\")[0].pauseVideo(); if(document.getElementsByTagName(\"embed\")[0].getPlayerState() == 2){clearInterval(InterV);}',500);");
-				PlayX.Pause = 1
-			end
+			self.Browser:RunJavascript('document.body.innerHTML = ""')
+			PlayX.StartPaused = 1
+			PlayX.Pause = 0
 		end
         self:InjectPage()
     end)

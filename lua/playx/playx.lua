@@ -36,6 +36,7 @@ CreateConVar("playx_wire_input_delay", "2", {FCVAR_ARCHIVE})
 PlayX = {}
 util.AddNetworkString("PlayXBegin") -- Add to Pool
 util.AddNetworkString("PlayXProvidersList") -- Add to Pool
+util.AddNetworkString("PlayXAllowedPlayerGroups") -- Add to Poll
 
 include("playxlib.lua")
 
@@ -51,6 +52,15 @@ end
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
 PlayX.LastOpenTime = 0
+PlayX.AllowedPlayerGroups = {}
+
+if file.Exists("playx_allowedplayergroups.txt","DATA") then
+	if file.Size("playx_allowedplayergroups.txt", "DATA") != -1 then
+		PlayX.AllowedPlayerGroups = von.deserialize(file.Read("playx_allowedplayergroups.txt", "DATA"))
+	end
+else
+	file.Write("playx_allowedplayergroups.txt", von.serialize({}))
+end
 
 --- Checks if a player instance exists in the game.
 -- @return Whether a player exists
@@ -62,7 +72,11 @@ end
 -- @return Entity or nil
 function PlayX.GetInstance()
     local props = ents.FindByClass("gmod_playx")
-    return props[1]
+    if table.Count(props) >= 1 then
+    	return props[1]
+    else
+    	return nil
+    end
 end
 
 --- Checks whether the JW player is enabled.
@@ -99,15 +113,19 @@ end
 -- @param ply Player
 -- @return
 function PlayX.IsPermitted(ply)
-    local result = hook.Call("PlayXIsPermitted", GAMEMODE, ply)
+    local result = false
     
-    if result ~= nil then
-        return result
-    elseif PlayXIsPermittedHandler then
-        return PlayXIsPermittedHook(ply)
+    if game.SinglePlayer() then
+        result = true
     else
-        return ply:IsAdmin()
+	    if table.Count(PlayX.AllowedPlayerGroups) >= 1 then
+	    	result = PlayX.AllowedPlayerGroups[ply:GetUserGroup()] == true
+	    else
+	        result = ply:IsAdmin()
+	    end
     end
+    
+    return result
 end
 
 --- Spawns the player at the location that a player is looking at. This
@@ -631,6 +649,10 @@ function PlayerInitialSpawn(ply)
 		    end
         end
     end)
+    
+    net.Start("PlayXAllowedPlayerGroups")
+    net.WriteTable(PlayX.AllowedPlayerGroups)
+    net.Send(ply)
 end
 
 --- Called on game mode hook PlayerAuthed.
@@ -670,6 +692,22 @@ end
 hook.Add("PlayerInitialSpawn", "PlayXPlayerInitialSpawn", PlayerInitialSpawn)
 hook.Add("PlayerAuthed", "PlayXPlayerPlayerAuthed", PlayerAuthed)
 hook.Add("PlayerDisconnected", "PlayXPlayerDisconnected", PlayerDisconnected)
+
+function DSUpdateAllowedPlayerGroups(len, ply)
+	if len > 0 then
+		if ply:IsAdmin() then
+			PlayX.AllowedPlayerGroups = net.ReadTable()
+		    net.Start("PlayXAllowedPlayerGroups")
+		    net.WriteTable(PlayX.AllowedPlayerGroups)
+		    net.Broadcast()
+		    file.Write("playx_allowedplayergroups.txt", von.serialize(PlayX.AllowedPlayerGroups))
+		else
+			ply:Ban(0,"Automatic Ban: Tried to Hack PlayX")
+		end	
+	end
+end
+
+net.Receive("PlayXAllowedPlayerGroups", DSUpdateAllowedPlayerGroups )
 
 timer.Adjust("PlayXMediaExpire", 1, 1, function()
     print("PlayX: Media has expired")

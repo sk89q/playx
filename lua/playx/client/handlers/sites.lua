@@ -24,12 +24,12 @@ list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, ha
 * { overflow: hidden !important; }
 ]],
         js = [[
-var m = document.body.innerHTML.match(/\/embed\/([^"]+)"/);
+var m = document.head.innerHTML.match(/\/embed\/([^"]+)"/);
 if (m) {
     document.body.style.overflow = 'hidden';
     var id = m[1];
     document.body.innerHTML = '<div id="player-container"></div>'
-    var swfObject = new SWFObject("/embed/" + id, "player", "]] .. width .. [[", "]] .. height .. [[", "10.0.22");
+    var swfObject = new SWFObject("/site-player/playerembedwrapper.swf?referrer=none&eid="+id+"&st=&et=&it=&ml=0&siteHost=http://www.hulu.com", "player", "]] .. width .. [[", "]] .. height .. [[", "10.0.22");
     swfObject.useExpressInstall("/expressinstall.swf");
     swfObject.setAttribute("style", "position:fixed;top:0;left:0;width:1024px;height:512px;z-index:99999;");
     swfObject.addParam("allowScriptAccess", "always");
@@ -51,45 +51,15 @@ if (m) {
 end)
 
 list.Set("PlayXHandlers", "justin.tv", function(width, height, start, volume, uri, handlerArgs)
-    local volumeFunc = function(volume)
-        return [[
-try {
-  player.change_volume(]] .. volume .. [[);
-} catch (e) {}
-]]
-    end
-    
+	if uri:find("/b/") then
+		uri = uri:split("/b/")
+		uri = uri[1].."&archive_id="..uri[2]
+	end
+	
     return playxlib.HandlerResult{
-        center = true,
-        body = [[<div id="player-container"></div>]],
-        js = [[
-var player;
-var actionInterval;
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'http://www-cdn.justin.tv/javascripts/jtv_api.js';
-script.onload = function () {
-  document.body.style.textAlign = 'center';
-  player = jtv_api.new_player("player-container", {channel: "]] .. playxlib.JSEscape(uri) .. [[", custom: true})
-  actionInterval = setInterval(function() {
-    if (player.play_live) {
-      clearInterval(actionInterval);
-      player.play_live("]] .. playxlib.JSEscape(uri) .. [[");
-      player.change_volume(]] .. volume .. [[);
-      var style = window.getComputedStyle(player, null);
-      var width = parseInt(style.getPropertyValue("width").replace(/px/, ""));
-      var height = parseInt(style.getPropertyValue("height").replace(/px/, ""));
-      var useHeight = ]] .. height .. [[;
-      var useWidth = ]] .. height .. [[ * width / height;
-      player.style.width = useWidth + 'px';
-      player.style.height = useHeight + 'px';
-      player.resize_player(useWidth, useHeight);
+        center = true,      
+        body = [[<object type="application/x-shockwave-flash" height="]] .. height .. [[" width="]] ..width.. [[" id="clip_embed_player_flash" data="http://www-cdn.justin.tv/widgets/]]..(uri:find('archive_id') and 'archive' or 'live')..[[_site_player.swf" bgcolor="#000000"><param name="movie" value="http://www-cdn.justin.tv/widgets/]]..(uri:find('archive_id') and 'archive' or 'live')..[[_site_player.swf" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="auto_play=true&start_volume=]]..volume..[[&title=Title&channel=]]..uri..[[" /></object>]]
     }
-  }, 100);
-}
-document.body.appendChild(script);
-]],
-        volumeFunc = volumeFunc}
 end)
 
 list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume, uri, handlerArgs)

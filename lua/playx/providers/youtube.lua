@@ -116,7 +116,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
         
         local length = tonumber(string.match(result, "<yt:duration seconds='([0-9]+)'"))
         local tags = playxlib.ParseTags(playxlib.HTMLUnescape(string.match(result, "<media:keywords>([^<]+)</media:keywords>")), ",")
-        local thumbnail = playxlib.HTMLUnescape(string.match(result, "<media:thumbnail url='([^']+)' height='240' width='320' time='[^']+'/>"))
+        local thumbnail = playxlib.HTMLUnescape(string.match(result, "<media:thumbnail url='([^']+)' height='360' width='480' time='[^']+'/>"))
         local comments = tonumber(string.match(result, "<gd:comments><gd:feedLink href='[^']+' countHint='([0-9]+)'/>"))
         
         local faves, views = string.match(result, "<yt:statistics favoriteCount='([0-9]+)' viewCount='([0-9]+)'/>")

@@ -164,8 +164,6 @@ local function ControlPanel(panel)
     
     -- TODO: Put the following two controls on the same line
     
-    local label = panel:AddControl("Label", {Text = "Provider:"})
-
     panel:AddControl("ListBox", {
         Label = "Provider:",
         Options = options,
@@ -220,6 +218,48 @@ local function ControlPanel(panel)
         button:SetDisabled(true)
     end
     
+	if ULib != nil then	
+		panel:AddControl("Label", {
+	        Text = "User Groups allowed to Play Videos (ULIB ONLY)"
+		})
+				
+ 		local groups = panel:AddControl("DListView", {})
+		groups:SetMultiSelect(true)
+		groups:AddColumn("Group")
+		groups:SetTall(200)
+		
+		groups.OnRowSelected = function( panel , line )
+			if LocalPlayer():IsAdmin() then
+				for _, line in pairs(panel:GetLines()) do
+					local lv = line:GetValue(1)
+					if !line:IsSelected() and PlayX.AllowedPlayerGroups[lv] == true then
+						PlayX.AllowedPlayerGroups[lv] = nil
+					elseif line:IsSelected() and PlayX.AllowedPlayerGroups[lv] == nil then
+						PlayX.AllowedPlayerGroups[lv] = true	
+					end
+				end
+				
+				net.Start("PlayXAllowedPlayerGroups")
+				net.WriteTable(PlayX.AllowedPlayerGroups)
+				net.SendToServer()
+			else
+				Derma_Message("Only Administrators are allowed to change this list", "Error", "OK")
+			end			
+		end
+		
+		PlayX.UIGroups = groups
+				
+		for group, _ in pairs(ULib.ucl.groups) do
+			if type(group) == "string" and group != nil then
+	        	line = groups:AddLine(group)
+	        	if PlayX.AllowedPlayerGroups[group] == true then
+	    			line:SetSelected(true)
+	    		end
+	        end
+	    end
+	else
+		print("ULib not founded!")
+    end    
 end
 PANEL = {}
 vgui.Register( "dlistview", PANEL ,"DListView")
@@ -251,8 +291,14 @@ local function BookmarksPanel(panel)
         menu:AddOption("Edit...", function()
             PlayX.OpenBookmarksWindow(line:GetValue(1))
         end)
+		
+		menu:AddOption("Delete...", function()
+           	PlayX.BookmarkDelete(line)
+        end)
+
         menu:AddOption("Copy URI", function()
             SetClipboardText(line:GetValue(2))
+
         end)
         menu:AddOption("Copy to 'Administrate'", function()
             PlayX.GetBookmark(line:GetValue(1):Trim()):CopyToPanel()
@@ -287,10 +333,21 @@ local function NavigatorPanel(panel)
     
     panel:SizeToContents(true)
     
+    if PlayX.NavigatorCapturedURL != "" and PlayX.CurrentMedia then
+	    panel:AddControl("Label", {
+	        Text = "URI: "..PlayX.NavigatorCapturedURL
+	     })
+	     
+	     local button = panel:AddControl("Button", {
+	        Label = "Add as Bookmark",
+	        Command = "playx_navigator_addbookmark",
+	    })    
+    end
+    
     local button = panel:AddControl("Button", {
         Label = "Open Media Navigator",
         Command = "playx_navigator_window",
-    })
+    })  
 end
 
 --- PopulateToolMenu hook.
@@ -309,4 +366,5 @@ function PlayX.UpdatePanels()
     if not hasLoaded then return end
     SettingsPanel(controlpanel.Get("PlayXSettings"))
     ControlPanel(controlpanel.Get("PlayXControl"))
+    NavigatorPanel(controlpanel.Get("PlayXNavigator"))
 end

@@ -32,8 +32,8 @@ end
 function Vimeo.GetPlayer(uri, useJW)
     if uri:lower():find("^[0-9]+$") then
         return {
-            ["Handler"] = "FlashAPI",
-            ["URI"] = "http://vimeo.com/moogaloop.swf?clip_id=" .. uri .. "&autoplay=1&js_api=1",
+            ["Handler"] = "IFrame",
+            ["URI"] = "http://player.vimeo.com/video/" .. uri .. "?api=1&player_id=player&autoplay=1",
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
