@@ -24,12 +24,12 @@ list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, ha
 * { overflow: hidden !important; }
 ]],
         js = [[
-var m = document.body.innerHTML.match(/\/embed\/([^"]+)"/);
+var m = document.head.innerHTML.match(/\/embed\/([^"]+)"/);
 if (m) {
     document.body.style.overflow = 'hidden';
     var id = m[1];
     document.body.innerHTML = '<div id="player-container"></div>'
-    var swfObject = new SWFObject("/embed/" + id, "player", "]] .. width .. [[", "]] .. height .. [[", "10.0.22");
+    var swfObject = new SWFObject("/site-player/playerembedwrapper.swf?referrer=none&eid="+id+"&st=&et=&it=&ml=0&siteHost=http://www.hulu.com", "player", "]] .. width .. [[", "]] .. height .. [[", "10.0.22");
     swfObject.useExpressInstall("/expressinstall.swf");
     swfObject.setAttribute("style", "position:fixed;top:0;left:0;width:1024px;height:512px;z-index:99999;");
     swfObject.addParam("allowScriptAccess", "always");
