@@ -609,7 +609,6 @@ function sendPlayerData(data) {
     for (var key in data) {
         str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
     }
-    console.log("SENDING PLAYER DATA:"+str);
     playx.processPlayerData(str);
 }
 
