@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
 
 playxlib = {}
 
@@ -393,6 +394,7 @@ function HandlerResult:new(t, js, body, jsURL, center, url)
         jsURL = t.jsURL
         center = t.center
         url = t.url
+        volumeFunc = t.volumeFunc and t.volumeFunc or nil
     else
         css = t
     end
@@ -607,7 +609,8 @@ function sendPlayerData(data) {
     for (var key in data) {
         str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
     }
-    window.location = "http://playx.sktransport/?" + str;
+    console.log("SENDING PLAYER DATA:"+str);
+    playx.processPlayerData(str);
 }
 
 function handleState(a) {;

@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
 
 include("shared.lua")
 
@@ -165,8 +166,8 @@ function ENT:SetProjectorBounds(forward, right, up)
 end
 
 function ENT:CreateBrowser()
-    self.Browser = vgui.Create("DHTML")
-    self.Browser:SetMouseInputEnabled(false)        
+    self.Browser = vgui.Create("PlayXHTML")
+    self.Browser:SetMouseInputEnabled(true)        
     self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
     self.Browser:SetPaintedManually(true)
     self.Browser:SetVerticalScrollbarEnabled(false)
@@ -195,34 +196,19 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
     if not self.Browser then
         self:CreateBrowser()
     end
-	
-    self.Browser:AddFunction("gmod","Ready",function() 
+
+    self.Browser.FinishedURL = function()
 		if not IsValid(self) then return end
-		MsgN("PlayX DEBUG: Page loaded, preparing to inject")
-		if (PlayX.VideoRangeStatus == 0 and GetConVarNumber("playx_video_range_enabled") == 1) or (PlayX.Pause == 1 and GetConVarNumber("playx_video_range_enabled") == 1) then
+		MsgN("PlayX DEBUG: Page loaded, preparing to inject")		
+        self:InjectPage()
+        if (PlayX.VideoRangeStatus == 0 and GetConVarNumber("playx_video_range_enabled") == 1) or (PlayX.Pause == 1 and GetConVarNumber("playx_video_range_enabled") == 1) then
 			self.Browser:RunJavascript('document.body.innerHTML = ""')
 			PlayX.StartPaused = 1
 			PlayX.Pause = 0
-		end
-        self:InjectPage()
-    end)
-	
-    self.Browser.OpeningURL = function(_, url, target, postdata)
-        local query = url:match("^http://playx.sktransport/%?(.*)$")
-        
-        if query then
-            -- Unavailable on entity removal
-            if self.ProcessPlayerData then
-                self:ProcessPlayerData(playxlib.ParseQuery(query))
-            end
-            return true
-        end
+		end		
     end
     
-    self.Browser.FinishedURL = function()
-        MsgN("PlayX DEBUG: Page loaded, preparing to inject")
-        self:InjectPage()
-    end
+    self.Playing = true
     
     PlayX.CrashDetectionBegin()
     self.HadStarted = true
@@ -231,10 +217,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
         self.Browser:OpenURL(result.ForceURL)
     else
         self.Browser:OpenURL(PlayX.HostURL)
-    end
-	
-    self.Browser:QueueJavascript("gmod.Ready()")
-    self.Playing = true
+    end    
 end
 
 function ENT:Stop()

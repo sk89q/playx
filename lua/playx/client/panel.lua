@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7 by Nexus [BR] on 23-02-2013 03:16 AM
+-- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
 
 PlayX._BookmarksPanelList = nil
 
@@ -69,8 +69,8 @@ local function SettingsPanel(panel)
     panel:AddControl("Slider", {
         Label = "Volume:",
         Command = "playx_volume",
-        Type = "Float",
-        Min = "1",
+        Type = "Integer",
+        Min = "0",
         Max = "100",
     }):SetTooltip("May have no effect, depending on what's playing.")
 	

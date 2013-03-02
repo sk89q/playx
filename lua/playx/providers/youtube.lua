@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
 
 local apiKey = "AI39si79-V-ltHhNyYvyTeaiJeexopkZoiUA56Sk-W8Z5alYUkgntdwvkmu1" ..
                "avAWGNixM_DuLx8-Jai6qy1am7HhbhYvWERzWA"
@@ -57,9 +58,10 @@ function YouTube.GetPlayer(uri, useJW)
                 ["showsearch"] = "0",
                 ["showinfo"] = "0",
                 ["enablejsapi"] = "1",
+                ["version"] = "3"
             }
             
-            local url = Format("http://www.youtube.com/v/%s&%s&version=3&enablejsapi=1", uri, playxlib.URLEscapeTable(vars))
+            local url = Format("http://www.youtube.com/v/%s&%s", uri, playxlib.URLEscapeTable(vars))
             
             return {
                 ["Handler"] = "FlashAPI",

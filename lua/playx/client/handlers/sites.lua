@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -65,9 +66,9 @@ end)
 list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume, uri, handlerArgs)
     
     local volumeFunc = function(volume)
-        return [[
+        return [[ 
 try {
-  document.getElementById('video-player-flash').setVolume(]] .. volume .. [[);
+  document.getElementsByTagName('embed')[0].setVolume(]] .. volume .. [[);
 } catch (e) {}
 ]]
     end
@@ -78,15 +79,16 @@ try {
         volumeFunc = volumeFunc,
 
         js = [[
+var checkReady = setInterval(function(){ if(document.readyState === "complete"){ playerReady(); clearInterval(checkReady);} }, 10);
 var knownState = "Loading...";
-var player;
+var player = document.getElementsByTagName('embed')[0];
 
 function sendPlayerData(data) {
     var str = "";
     for (var key in data) {
         str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
     }
-    window.location = "http://playx.sktransport/?" + str;
+    playx.processPlayerData(str);
 }
 
 function onError(err) {
@@ -103,8 +105,7 @@ function onError(err) {
     msg = "Unknown error: " + err;
   }
   
-  knownState = msg;
-  
+  knownState = msg;  
   sendPlayerData({ State: msg });
 }
 
@@ -125,8 +126,7 @@ function onPlayerStateChange(state) {
     msg = "Unknown state: " + state;
   }
   
-  knownState = msg;
-  
+  knownState = msg;  
   sendPlayerData({ State: msg, Position: player.getCurrentTime(), Duration: player.getDuration() });
 }
 
@@ -134,18 +134,11 @@ function updateState() {
   sendPlayerData({ Title: "test", State: knownState, Position: player.getCurrentTime(), Duration: player.getDuration() });
 }
 
-yt.embed.onPlayerReady = function() {
-  player = document.getElementById('video-player-flash');
-  player.addEventListener('onStateChange', 'onPlayerStateChange');
+function playerReady() {  
   player.addEventListener('onError', 'onError');
+  player.addEventListener('onStateChange', 'onPlayerStateChange');
   player.setVolume(]] .. volume .. [[);
-  setInterval(updateState, 250)
+  setInterval(updateState, 250);
 }
-var src = document.getElementById('video-player').getAttribute('src');
-var flashVars = document.getElementById('video-player-flash').getAttribute('flashVars');
-flashVars = flashVars.replace('enablejsapi=0', 'enablejsapi=1');
-flashVars = flashVars.replace('start=0', 'start=]] .. start .. [[');
-document.getElementById('watch-player-div').innerHTML = '<embed width="100%" id="video-player" height="100%" type="application/x-shockwave-flash" src="' + src + '" allowscriptaccess="always" allowfullscreen="true" bgcolor="#000000" flashvars="' + flashVars + '">'
-
 ]]}
 end)

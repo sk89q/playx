@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.1 by Nexus [BR] on 24-02-2013 07:25 PM
+-- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)

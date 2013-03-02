@@ -8,7 +8,7 @@
 	DHTML
 
 --]]
-
+-- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
 
 PANEL = {}
 
@@ -38,6 +38,17 @@ function PANEL:Init()
 	--
 	self:AddFunction( "console", "log", function( param ) self:ConsoleMessage( param ) end )
 	self:AddFunction( "console", "error", function( param ) self:ConsoleMessage( param ) end )
+
+    self:AddFunction( "playx", "processPlayerData", function( query )
+    	local playx = PlayX.GetInstance()
+		if query and playx:IsValid() then
+		    -- Unavailable on entity removal
+		    if playx.ProcessPlayerData then
+		        playx:ProcessPlayerData(playxlib.ParseQuery(query))
+		    end
+		    return true
+		end
+	end )
 	
 	self:AddFunction( "gmod", "getUrl", function( href, finished )
 		self.URL = href
