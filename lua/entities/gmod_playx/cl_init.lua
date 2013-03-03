@@ -454,13 +454,13 @@ function ENT:HUDPaint()
         or "Title Unavailable"
     draw.SimpleText(titleText,
                     "DefaultBold",
-                    ScrW() / 2, 37, Color(255, 255, 255, 255),
+                    ScrW() / 2, 25, Color(255, 255, 255, 255),
                     TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
     
     if text then
         draw.SimpleText(text,
                         "Default",
-                        ScrW() / 2, by + 40, Color(255, 255, 255, 255),
+                        ScrW() / 2, by + 60, Color(255, 255, 255, 255),
                         TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
     end
     
@@ -468,21 +468,21 @@ function ENT:HUDPaint()
         local pct = self.PlayerData.Duration and 
             math.Clamp(self.PlayerData.Position / self.PlayerData.Duration, 0, 1) or 0
         surface.SetDrawColor(255, 255, 255, 255)
-        surface.DrawOutlinedRect(bx + 10, by + 30, bw - 20, 6)
+        surface.DrawOutlinedRect(bx + 10, by + 27, bw - 20, 18)
         if self.PlayerData.Position and self.PlayerData.Duration then
 	        surface.SetDrawColor(255, 0, 0, 255)
-	        surface.DrawRect(bx + 11, by + 31, (bw - 22) * pct, 4)
+	        surface.DrawRect(bx + 11, by + 28, (bw - 22) * pct, 15)
         end
         
         if self.PlayerData.Position then
 	        draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Position),
-	            "DefaultBold", bx + 10, by + 40,
+	            "DefaultBold", bx + 13, by + 43,
 	            Color(255, 255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
         end
         
         if self.PlayerData.Duration then
 	        draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Duration),
-	            "DefaultBold", bx + bw - 10, by + 40,
+	            "DefaultBold", bx + bw - 12, by + 43,
 	            Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
 	    end
     end
