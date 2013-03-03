@@ -482,7 +482,7 @@ function ENT:HUDPaint()
         
         if self.PlayerData.Duration then
 	        draw.SimpleText(playxlib.ReadableTime(self.PlayerData.Duration),
-	            "DefaultBold`", bx + bw - 10, by + 40,
+	            "DefaultBold", bx + bw - 10, by + 40,
 	            Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
 	    end
     end
