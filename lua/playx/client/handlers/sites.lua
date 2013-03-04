@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
+-- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -63,20 +63,108 @@ list.Set("PlayXHandlers", "justin.tv", function(width, height, start, volume, ur
     }
 end)
 
-list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume, uri, handlerArgs)
+list.Set("PlayXHandlers", "Vimeo", function(width, height, start, volume, uri, handlerArgs)
     
-    local volumeFunc = function(volume)
-        return [[ 
-try {
-  document.getElementsByTagName('embed')[0].setVolume(]] .. volume .. [[);
-} catch (e) {}
+    local volumeFunc = function(volume)	    
+        return [[document.getElementsByTagName('object')[0].api_setVolume(]]..playxlib.volumeFloat(volume)..[[);]]
+    end
+
+    local playFunc = function(volume)
+        return [[document.getElementsByTagName('object')[0].api_play();document.getElementsByTagName('object')[0].style.width='100%';]]
+    end
+
+    local pauseFunc = function(volume)
+        return [[document.getElementsByTagName('object')[0].api_pause();document.getElementsByTagName('object')[0].style.width='1px';]]
+    end
+	    
+    return playxlib.HandlerResult{
+        url = "http://player.vimeo.com/video/" .. playxlib.JSEscape(uri) .. "?api=1&player_id=player&autoplay=1",
+        center = false,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc,
+
+        js = [[
+var checkReady = setInterval(function(){ if(document.readyState === "complete"){ playerReady(); clearInterval(checkReady);} }, 10);
+var knownState = "Loading...";
+var player = document.getElementsByTagName('object')[0];
+
+function sendPlayerData(data) {
+    var str = "";
+    for (var key in data) {
+        str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
+    }
+    playx.processPlayerData(str);
+}
+
+function updateState() {
+  sendPlayerData({ Title: "test", State: knownState, Position: player.api_getCurrentTime(), Duration: player.api_getDuration() });
+}
+
+function onPlayerStateChange(state) {
+  var msg;
+  
+  if (state == -1) {
+    msg = "Loading...";
+  } else if (state == 0) {
+    msg = "Playback complete.";
+  } else if (state == 1) {
+    msg = "Playing...";
+  } else if (state == 2) {
+    msg = "Paused.";
+  } else if (state == 3) {
+    msg = "Buffering...";
+  } else {
+    msg = "Unknown state: " + state;
+  }
+  
+  knownState = msg;  
+  sendPlayerData({ State: msg, Position: player.api_getCurrentTime(), Duration: player.api_getDuration() });
+}
+
+function onFinish(){
+	onPlayerStateChange(0);	
+}
+
+function onPlay(){
+	onPlayerStateChange(1);	
+}
+
+function onPause(){
+	onPlayerStateChange(2);	
+}
+
+function playerReady() {  
+  player.api_setVolume(]] .. playxlib.volumeFloat(volume) .. [[);
+  player.api_addEventListener('finish', 'onFinish');
+  player.api_addEventListener('play', 'onPlay');
+  player.api_addEventListener('pause', 'onPause');
+  player.api_seekTo(]]..start..[[);
+  setInterval(updateState, 250);
+}
 ]]
+}
+end)
+
+list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume, uri, handlerArgs)
+    local volumeFunc = function(volume)
+        return [[document.getElementsByTagName('embed')[0].setVolume(]] .. volume .. [[);]]
+    end
+    
+    local playFunc = function(volume)
+        return [[document.getElementsByTagName('embed')[0].playVideo();document.getElementsByTagName('embed')[0].style.width='100%';]]
+    end
+    
+    local pauseFunc = function(volume)
+        return [[document.getElementsByTagName('embed')[0].pauseVideo();document.getElementsByTagName('embed')[0].style.width='1px';]]
     end
 	    
     return playxlib.HandlerResult{
         url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri) .. '&enablejsapi=1&version=3&start=' .. start,
         center = false,
         volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc,
 
         js = [[
 var checkReady = setInterval(function(){ if(document.readyState === "complete"){ playerReady(); clearInterval(checkReady);} }, 10);

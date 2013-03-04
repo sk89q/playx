@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
+-- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
 
 PlayX._BookmarksPanelList = nil
 
@@ -115,28 +115,32 @@ local function SettingsPanel(panel)
                     Command = "playx_hide",
                 }):SetTooltip("This is a temporary disable.")
             
-                local button = panel:AddControl("Button", {
+                local resumeBt = panel:AddControl("Button", {
                     Label = "Re-initialize Player",
                     Command = "playx_resume",
                 })
-            
-                button:SetDisabled(true)
+            	
+            	if resumeBt != nil then
+                	resumeBt:SetDisabled(true)
+                end
             else
-                local button = panel:AddControl("Button", {
+                local stopBt = panel:AddControl("Button", {
                     Label = "Stop Play",
                     Command = "playx_hide",
                 }):SetTooltip("This is a temporary disable.")
                 
-                if not PlayX.Playing then
-                    button:SetDisabled(true)
+                if not PlayX.Playing and stopBt != nil then
+                    stopBt:SetDisabled(true)
                 end
                 
-                local button = panel:AddControl("Button", {
+                local resumeBt = panel:AddControl("Button", {
                     Label = "Resume Play",
                     Command = "playx_resume",
                 })
-            
-                button:SetDisabled(true)
+            	
+            	if resumeBt != nil then
+                	resumeBt:SetDisabled(true)
+                end
             end
             
             panel:AddControl("Label", {

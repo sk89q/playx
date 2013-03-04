@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
+-- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
 
 local Vimeo = {}
 
@@ -33,8 +33,8 @@ end
 function Vimeo.GetPlayer(uri, useJW)
     if uri:lower():find("^[0-9]+$") then
         return {
-            ["Handler"] = "IFrame",
-            ["URI"] = "http://player.vimeo.com/video/" .. uri .. "?api=1&player_id=player&autoplay=1",
+            ["Handler"] = "Vimeo",
+            ["URI"] = uri,
             ["ResumeSupported"] = false,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
@@ -42,8 +42,8 @@ function Vimeo.GetPlayer(uri, useJW)
             end,
             ["HandlerArgs"] = {
                 ["JSInitFunc"] = "vimeo_player_loaded",
-                ["JSVolumeFunc"] = "api_setVolume",
-                ["JSStartFunc"] = "api_seekTo",
+                ["JSVolumeFunc"] = "setVolume",
+                ["JSStartFunc"] = "seekTo",
             },
         }
     end

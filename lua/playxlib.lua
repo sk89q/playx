@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
+-- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
 
 playxlib = {}
 
@@ -373,6 +373,17 @@ function playxlib.EmptyToNil(s)
     return s
 end
 
+function playxlib.volumeFloat(volume)
+	if(volume == 100) then
+		volume = 1
+    elseif(volume >= 10) then
+    	volume = tonumber("0."..volume)
+    elseif(volume <= 9) then
+    	volume = tonumber("0.0"..volume)
+    end   
+    return volume
+end
+
 -- Handler result
 local HandlerResult = {}
 playxlib.HandlerResult = HandlerResult
@@ -385,7 +396,7 @@ end
 setmetatable(HandlerResult, mt)
 
 function HandlerResult:new(t, js, body, jsURL, center, url)
-    local css, volumeFunc
+    local css, volumeFunc, playFunc, pauseFunc
     
     if type(t) == 'table' then
         css = t.css
@@ -395,6 +406,8 @@ function HandlerResult:new(t, js, body, jsURL, center, url)
         center = t.center
         url = t.url
         volumeFunc = t.volumeFunc and t.volumeFunc or nil
+        playFunc = t.playFunc and t.playFunc or nil
+        pauseFunc = t.pauseFunc and t.pauseFunc or nil
     else
         css = t
     end
@@ -413,8 +426,16 @@ function HandlerResult:new(t, js, body, jsURL, center, url)
         ForceURL = url
     }
     
-    if volumeFunc then
+    if volumeFunc != nil then
         instance.GetVolumeChangeJS = volumeFunc
+    end
+    
+    if playFunc != nil then
+        instance.GetPlayJS = playFunc
+    end
+    
+    if pauseFunc != nil then
+        instance.GetPauseJS = pauseFunc
     end
 	    
     setmetatable(instance, self)
@@ -423,6 +444,14 @@ function HandlerResult:new(t, js, body, jsURL, center, url)
 end
 
 function HandlerResult:GetVolumeChangeJS(volume)
+    return nil
+end
+
+function HandlerResult:GetPlayJS()
+    return nil
+end
+
+function HandlerResult:GetPauseJS()
     return nil
 end
 

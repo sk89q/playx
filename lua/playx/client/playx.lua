@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
+-- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -673,29 +673,28 @@ local function PlayXRangeCheck()
 						PlayX.VideoRangeStatus = 0
 						
 						if ent.Browser != nil then
-							if !PlayX.CurrentMedia.Handler:find("YouTube") then
+							if ent.CurrentPage.GetPlayJS == nil then
 								ent.Browser:RunJavascript('document.body.innerHTML = ""')
 							else
-								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='1px';");
-								ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].pauseVideo();");
-								PlayX.Pause = 1
-								if showHints == 1 and PlayX.HintDelay == 0 then
-									PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
-									PlayX.HintDelay = 1
-								end		
+								ent.Browser:RunJavascript(ent.CurrentPage.GetPauseJS());
+								PlayX.Pause = 1								
 							end
+							
+							if showHints == 1 and PlayX.HintDelay == 0 then
+								PlayX.ShowHint("PlayX: You are now out of Range from Video Player!")
+								PlayX.HintDelay = 1
+							end		
 						end
 					elseif distance < radius and PlayX.VideoRangeStatus == 0 then
 						PlayX.VideoRangeStatus = 1
 						
 						if ent.Browser != nil then
-							if !PlayX.CurrentMedia.Handler:find("YouTube") or PlayX.StartPaused == 1 then
+							if ent.CurrentPage.GetPlayJS == nil or PlayX.StartPaused == 1 then
 								ent.Browser:RunJavascript("window.location.reload();");
 								PlayX.StartPaused = 0
 							else
 								if PlayX.Pause == 1 then
-									ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].style.width='100%'");
-									ent.Browser:RunJavascript("document.getElementsByTagName('embed')[0].playVideo();");
+									ent.Browser:RunJavascript(ent.CurrentPage.GetPlayJS());
 									PlayX.Pause = 0
 								end
 							end
@@ -709,14 +708,8 @@ local function PlayXRangeCheck()
 			end
 		end
 	elseif (PlayX.VideoRangeStatus == 0 and enabled == 0) then
-		entities = ents.FindByClass("gmod_playx")		
-				
-		if #entities >= 1 then
-			if entities[1]:IsValid() then
-				if entities[1]:GetClass() == "gmod_playx" then
-					ent = entities[1]
-				end
-			end
+		if PlayX.PlayerExists() then
+			ent = PlayX.GetInstance()
 		end
 		
 		if ent.Browser != nil then

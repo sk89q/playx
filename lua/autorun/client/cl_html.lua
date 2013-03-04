@@ -8,7 +8,7 @@
 	DHTML
 
 --]]
--- Version 2.7.3 by Nexus [BR] on 02-03-2013 01:50 PM
+-- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
 
 PANEL = {}
 
