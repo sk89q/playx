@@ -625,11 +625,11 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
     end
     
     local playFunc = function()
-        return [[jwplayer().play();document.getElementsByTagName('object')[0].style.width='100%';]]
+        return [[jwplayer().play();]]
     end
     
     local pauseFunc = function()
-        return [[jwplayer().pause();document.getElementsByTagName('object')[0].style.width='1px';]]
+        return [[jwplayer().pause();]]
     end
     
     return playxlib.HandlerResult{
@@ -639,7 +639,19 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
         playFunc = playFunc,
         pauseFunc = pauseFunc,
         js = [[
-jwplayer('player').setup({
+var provider = "]]..provider..[[";
+
+var settings_auto = {
+	file: "]]..uri..[[",
+	width: "]]..width..[[",
+	height: "]]..height..[[",
+	autostart: 1,
+	controls: false,
+	start: "]]..start..[[",
+	volume: ]]..volume..[[
+}
+
+var settings_with_provider = {
 	file: "]]..uri..[[",
 	width: "]]..width..[[",
 	height: "]]..height..[[",
@@ -647,8 +659,18 @@ jwplayer('player').setup({
 	autostart: 1,
 	controls: false,
 	start: "]]..start..[[",
-	volume: ]]..volume..[[,
-});
+	volume: ]]..volume..[[
+}
+
+var settings = {};
+
+if (provider == 'mp3'){
+	settings = settings_with_provider;	
+}else{
+	settings = settings_auto;
+}
+
+jwplayer('player').setup(settings);
   
 var knownState = "";
 

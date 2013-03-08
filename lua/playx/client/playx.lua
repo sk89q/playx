@@ -673,7 +673,7 @@ local function PlayXRangeCheck()
 						PlayX.VideoRangeStatus = 0
 						
 						if ent.Browser != nil then
-							if ent.CurrentPage.GetPlayJS == nil then
+							if ent.CurrentPage.GetPauseJS() == nil then
 								ent.Browser:RunJavascript('document.body.innerHTML = ""')
 							else
 								ent.Browser:RunJavascript(ent.CurrentPage.GetPauseJS());
@@ -689,7 +689,7 @@ local function PlayXRangeCheck()
 						PlayX.VideoRangeStatus = 1
 						
 						if ent.Browser != nil then
-							if ent.CurrentPage.GetPlayJS == nil or PlayX.StartPaused == 1 then
+							if ent.CurrentPage.GetPlayJS() == nil or PlayX.StartPaused == 1 then
 								ent.Browser:RunJavascript("window.location.reload();");
 								PlayX.StartPaused = 0
 							else
