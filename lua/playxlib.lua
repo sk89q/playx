@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
+-- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
 
 playxlib = {}
 
@@ -619,18 +619,37 @@ end
 -- @param provider JW player provider ("image", "audio", etc.)
 -- @return HTML
 function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
-    local flashURL = PlayX.JWPlayerURL
-    local flashVars = {
-        ["autostart"] = "true",
-        ["backcolor"] = "000000",
-        ["frontcolor"] = "444444",
-        ["start"] = start,
-        ["volume"] = volume,
-        ["file"] = uri,
-        ["playerready"] = "jwInit",
-    }
     
-    local js = [[
+    local volumeFunc = function(volume)
+        return [[jwplayer().setVolume(]] .. tostring(volume) .. [[);]]
+    end
+    
+    local playFunc = function()
+        return [[jwplayer().play();document.getElementsByTagName('object')[0].style.width='100%';]]
+    end
+    
+    local pauseFunc = function()
+        return [[jwplayer().pause();document.getElementsByTagName('object')[0].style.width='1px';]]
+    end
+    
+    return playxlib.HandlerResult{
+        url = PlayX.HostURL,
+        center = false,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc,
+        js = [[
+jwplayer('player').setup({
+	file: "]]..uri..[[",
+	width: "]]..width..[[",
+	height: "]]..height..[[",
+	type: "]]..provider..[[",
+	autostart: 1,
+	controls: false,
+	start: "]]..start..[[",
+	volume: ]]..volume..[[,
+});
+  
 var knownState = "";
 
 function sendPlayerData(data) {
@@ -641,36 +660,15 @@ function sendPlayerData(data) {
     playx.processPlayerData(str);
 }
 
-function handleState(a) {;
-    var msg = a.newstate
-    knownState = a.newstate;
-    sendPlayerData({ State: msg });
-}
-function handleTime(a) {
-    sendPlayerData({ State: knownState, Position: a.position, Duration: a.duration });
+function getStats(duration, position) {
+    sendPlayerData({ State: jwplayer().getState(), Position: position, Duration: duration });
 }
 
-function jwInit() {
-    player.addModelListener("STATE", "handleState");
-    player.addModelListener("TIME", "handleTime");
+jwplayer().onReady(function () {
+    jwplayer().onTime(getStats)
+});
+]]
 }
-]]
-    
-    if provider then
-        flashVars["provider"] = provider
-    end
-    
-    local result = playxlib.GenerateFlashPlayer(width, height, flashURL, flashVars, js)
-    
-    result.GetVolumeChangeJS = function(volume)
-        return [[
-try {
-  document.getElementById('player').sendEvent("VOLUME", "]] .. tostring(volume) .. [[");
-} catch(e) {}
-]]
-    end
-    
-    return result
 end
 
 --- Generates the HTML code for an included JavaScript file.

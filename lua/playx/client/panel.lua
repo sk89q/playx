@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
+-- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
 
 PlayX._BookmarksPanelList = nil
 

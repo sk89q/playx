@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.4 by Nexus [BR] on 04-03-2013 07:42 PM
+-- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -69,14 +69,14 @@ PlayX.Enabled = true
 PlayX.Playing = false
 PlayX.CurrentMedia = nil
 PlayX.SeenNotice = false
-PlayX.JWPlayerURL = "http://playx.googlecode.com/svn/jwplayer/player.swf"
-PlayX.HostURL = "http://sk89q.github.com/playx/host/host.html"
+PlayX.JWPlayerURL = GetConVarString("playx_jw_url")
+PlayX.HostURL = GetConVarString("playx_host_url")
 PlayX.ShowRadioHUD = true
 PlayX.HasChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.SupportsChrome = chrome ~= nil and chrome.NewBrowser ~= nil
 PlayX.Providers = {}
 PlayX._NavigatorWindow = nil
-PlayX.CrashDetected = file.Read("_playx_crash_detection.txt") == "BEGIN"
+PlayX.CrashDetected = file.Read("_playx_crash_detection.txt","DATA") == "BEGIN"
 PlayX.VideoRangeStatus = 1
 PlayX.HintDelay = 1
 PlayX.Pause = 0

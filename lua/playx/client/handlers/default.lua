@@ -29,7 +29,7 @@ list.Set("PlayXHandlers", "JWVideo", function(width, height, start, volume, uri,
 end)
 
 list.Set("PlayXHandlers", "JWAudio", function(width, height, start, volume, uri, handlerArgs)
-    return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "sound")
+    return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "mp3")
 end)
 
 list.Set("PlayXHandlers", "JWRTMP", function(width, height, start, volume, uri, handlerArgs)
@@ -90,11 +90,7 @@ list.Set("PlayXHandlers", "FlashAPI", function(width, height, start, volume, uri
             code = code .. "player." .. handlerArgs.JSStartFunc .. "(" .. 
                 tostring(jsStartMul * start) .. ");"
         end
-        
-        if handlerArgs.JSPlayFunc then
-            code = code .. "player." .. handlerArgs.JSPlayFunc .. "();"
-        end
-    
+
         if handlerArgs.RawInitJS ~= nil then
             code = code .. handlerArgs.RawInitJS
         end
