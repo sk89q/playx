@@ -223,9 +223,10 @@ local function ControlPanel(panel)
     end
     
 	if ULib != nil then	
-		panel:AddControl("Label", {
-	        Text = "User Groups allowed to Play Videos / Spawn PlayX [ULIB]"
+		local ppLabel = panel:AddControl("Label", {
+	        Text = "PlayX Permission Manager"
 		})
+		ppLabel:SetTooltip("User Groups allowed to Play Videos / Spawn PlayX [ULIB]")
 				
  		local groups = panel:AddControl("DListView", {})
 		groups:SetMultiSelect(true)

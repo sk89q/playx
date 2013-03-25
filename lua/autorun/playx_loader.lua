@@ -34,7 +34,7 @@ function loadingLog (text)
 end
 
 function debugTable( var, name )
-  if not name then name = "anonymous" end
+  if not name then name = "a" end
   if "table" ~= type( var ) then
     print( name .. " = " .. tostring( var ) )
   else
