@@ -121,15 +121,15 @@ function onPlayerStateChange(state) {
   var msg;
   
   if (state == -1) {
-    msg = "Loading...";
+    msg = "LOADING";
   } else if (state == 0) {
-    msg = "Playback complete.";
+    msg = "COMPLETED";
   } else if (state == 1) {
-    msg = "Playing...";
+    msg = "PLAYING";
   } else if (state == 2) {
-    msg = "Paused.";
+    msg = "PAUSED";
   } else if (state == 3) {
-    msg = "Buffering...";
+    msg = "BUFFERING";
   } else {
     msg = "Unknown state: " + state;
   }
@@ -222,7 +222,6 @@ list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume,
 			    msg = "Error: Media removed or now private";
 			  } else if (err == 101 || err = 150) {
 			    msg = "Error: Embedding not allowed";
-			    msg = "Buffering...";
 			  } else {
 			    msg = "Unknown error: " + err;
 			  }
@@ -235,15 +234,15 @@ list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume,
 			  var msg;
 			  
 			  if (state == -1) {
-			    msg = "Loading...";
+			    msg = "LOADING";
 			  } else if (state == 0) {
-			    msg = "Playback complete.";
+			    msg = "COMPLETED";
 			  } else if (state == 1) {
-			    msg = "Playing...";
+			    msg = "PLAYING";
 			  } else if (state == 2) {
-			    msg = "Paused.";
+			    msg = "PAUSED";
 			  } else if (state == 3) {
-			    msg = "Buffering...";
+			    msg = "BUFFERING";
 			  } else {
 			    msg = "Unknown state: " + state;
 			  }

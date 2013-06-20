@@ -76,19 +76,16 @@ list.Set("PlayXHandlers", "FlashAPI", function(width, height, start, volume, uri
         local jsStartMul = handlerArgs.JSStartMul and handlerArgs.JSStartMul or 1
         
         if handlerArgs.JSVolumeFunc then
-            code = code .. "player." .. handlerArgs.JSVolumeFunc .. "(" .. 
-                tostring(jsVolMul * volume) .. ");"
+            code = code .. "try { player." .. handlerArgs.JSVolumeFunc .. "(" .. 
+                tostring(jsVolMul * volume) .. "); } catch (e) {}"
             
             volChangeJSF = function(volume)
-                return "try { player." .. 
-                    handlerArgs.JSVolumeFunc .. "(" .. 
-                    tostring(jsVolMul * volume) .. "); } catch (e) {}"
+                return "try { player." .. handlerArgs.JSVolumeFunc .. "(" ..  tostring(jsVolMul * volume) .. "); } catch (e) {}"
             end
         end
         
         if handlerArgs.JSStartFunc then
-            code = code .. "player." .. handlerArgs.JSStartFunc .. "(" .. 
-                tostring(jsStartMul * start) .. ");"
+            code = "try { "..code .. "player." .. handlerArgs.JSStartFunc .. "(" .. tostring(jsStartMul * start) .. "); } catch (e) {}"
         end
 
         if handlerArgs.RawInitJS ~= nil then
@@ -97,12 +94,12 @@ list.Set("PlayXHandlers", "FlashAPI", function(width, height, start, volume, uri
         
         js = js .. [[
 var player;
-function ]] .. handlerArgs.JSInitFunc .. [[() {
-  try {
-    player = document.getElementById('player');
-]] .. code .. [[
-  } catch (e) {}
-}
+try {
+	function ]] .. handlerArgs.JSInitFunc .. [[() {  
+	    player = document.getElementById('player');
+	]] .. code .. [[
+	}
+} catch (e) {}
 ]]
     end
     

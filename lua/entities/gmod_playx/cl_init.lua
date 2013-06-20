@@ -199,7 +199,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 
     self.Browser.FinishedURL = function()
 		if not IsValid(self) then return end
-		MsgN("PlayX DEBUG: Page loaded, preparing to inject")		
+		MsgN("PlayX Info: Page loaded, preparing to inject")		
         self:InjectPage()
         if (PlayX.VideoRangeStatus == 0 and GetConVarNumber("playx_video_range_enabled") == 1) or (PlayX.Pause == 1 and GetConVarNumber("playx_video_range_enabled") == 1) then
 			self.Browser:RunJavascript('document.body.innerHTML = ""')
@@ -353,14 +353,14 @@ function ENT:DrawScreen(centerX, centerY)
                 elseif text == "PLAYING" then
                     text = "Playing"
                 elseif text == "ERROR" then
-                    text = "(ERROR)"
+                    text = "ERROR"
                 elseif text == "COMPLETED" then
-                    text = "(Ended)"
+                    text = "Playback Complete."
                     self:Stop()
                 elseif text == "STOPPED" then
-                    text = "(Stopped)"
+                    text = "Stopped"
                 elseif text == "PAUSED" then
-                    text = "(Paused)"
+                    text = "Paused"
                 end
             end
             
@@ -437,7 +437,7 @@ function ENT:HUDPaint()
         elseif text == "ERROR" then
             text = "ERROR"
         elseif text == "COMPLETED" then
-            text = "Ended"
+            text = "Playback Completed."
             self:Stop()
         elseif text == "STOPPED" then
             text = "Stopped"

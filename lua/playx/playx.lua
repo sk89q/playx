@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.6 by Nexus [BR] on 20-06-2013 10:04 AM
+-- Version 2.7.7 by Nexus [BR] on 20-06-2013 04:28 PM
 
 -- FCVAR_GAMEDLL makes cvar change detection work
 CreateConVar("playx_jw_url", "https://dl.dropbox.com/u/18850333/playx/jwplayer.flash.swf", {FCVAR_GAMEDLL})
@@ -33,7 +33,24 @@ CreateConVar("playx_wire_input_delay", "2", {FCVAR_ARCHIVE})
 PlayX = {}
 util.AddNetworkString("PlayXBegin") -- Add to Pool
 util.AddNetworkString("PlayXProvidersList") -- Add to Pool
-util.AddNetworkString("PlayXAllowedPlayerGroups") -- Add to Poll
+
+--- Checks for Admin Mods and Flags to Allow PlayX Access
+-- @return boolean
+function PlayX.AccessManager(ply)
+	-- Default is Deny
+	result = false
+	
+	-- Check if ULib
+	if ULib ~= nil then
+		result = ply:query("playx access")	
+	end
+	
+	if result == false then
+		result = ply:IsAdmin()
+	end
+	
+	return result
+end
 
 include("playxlib.lua")
 
@@ -49,15 +66,7 @@ end
 PlayX.CurrentMedia = nil
 PlayX.AdminTimeoutTimerRunning = false
 PlayX.LastOpenTime = 0
-PlayX.AllowedPlayerGroups = {}
 
-if file.Exists("playx_allowedplayergroups.txt","DATA") then
-	if file.Size("playx_allowedplayergroups.txt", "DATA") != -1 then
-		PlayX.AllowedPlayerGroups = von.deserialize(file.Read("playx_allowedplayergroups.txt", "DATA"))
-	end
-else
-	file.Write("playx_allowedplayergroups.txt", von.serialize({}))
-end
 
 --- Checks if a player instance exists in the game.
 -- @return Whether a player exists
@@ -115,11 +124,7 @@ function PlayX.IsPermitted(ply)
     if game.SinglePlayer() then
         result = true
     else
-	    if table.Count(PlayX.AllowedPlayerGroups) >= 1 then
-	    	result = PlayX.AllowedPlayerGroups[ply:GetUserGroup()] == true
-	    else
-	        result = ply:IsAdmin()
-	    end
+	    result = PlayX.AccessManager(ply)
     end
     
     return result
@@ -389,6 +394,7 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, ha
         ["ResumeSupported"] = resumeSupported,
         ["LowFramerate"] = lowFramerate,
         ["StopTime"] = nil,
+        ["CurrentPos"] = nil,
         ["HandlerArgs"] = handlerArgs,
         -- Filled by metadata functions
         ["Provider"] = nil,
@@ -646,17 +652,13 @@ function PlayerInitialSpawn(ply)
 		    end
         end
     end)
-    
-    net.Start("PlayXAllowedPlayerGroups")
-    net.WriteTable(PlayX.AllowedPlayerGroups)
-    net.Send(ply)
 end
 
 --- Called on game mode hook PlayerAuthed.
 function PlayerAuthed(ply, steamID, uniqueID)
     if PlayX.CurrentMedia and PlayX.AdminTimeoutTimerRunning then
         if PlayX.IsPermitted(ply) then
-            print("PlayX: Administrator authed (connecting); killing timeout")
+            print("PlayX: Allowed User authed (connecting); killing timeout")
             
             timer.Stop("PlayXAdminTimeout")
             PlayX.AdminTimeoutTimerRunning = false
@@ -689,22 +691,6 @@ end
 hook.Add("PlayerInitialSpawn", "PlayXPlayerInitialSpawn", PlayerInitialSpawn)
 hook.Add("PlayerAuthed", "PlayXPlayerPlayerAuthed", PlayerAuthed)
 hook.Add("PlayerDisconnected", "PlayXPlayerDisconnected", PlayerDisconnected)
-
-function DSUpdateAllowedPlayerGroups(len, ply)
-	if len > 0 then
-		if ply:IsAdmin() then
-			PlayX.AllowedPlayerGroups = net.ReadTable()
-		    net.Start("PlayXAllowedPlayerGroups")
-		    net.WriteTable(PlayX.AllowedPlayerGroups)
-		    net.Broadcast()
-		    file.Write("playx_allowedplayergroups.txt", von.serialize(PlayX.AllowedPlayerGroups))
-		else
-			ply:Ban(0,"Automatic Ban: Tried to Hack PlayX")
-		end	
-	end
-end
-
-net.Receive("PlayXAllowedPlayerGroups", DSUpdateAllowedPlayerGroups )
 
 timer.Adjust("PlayXMediaExpire", 1, 1, function()
     print("PlayX: Media has expired")

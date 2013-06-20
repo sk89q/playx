@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
+-- Version 2.7.7 by Nexus [BR] on 07-03-2013 04:29 PM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -82,8 +82,6 @@ PlayX.HintDelay = 1
 PlayX.Pause = 0
 PlayX.StartPaused = 0
 PlayX.NavigatorCapturedURL = ""
-PlayX.AllowedPlayerGroups = {}
-PlayX.UIGroups = nil
 
 local spawnWindow = nil
 
@@ -189,7 +187,7 @@ end
 
 --- Used to get the HTML, namely for debugging purposes.
 function PlayX.GetHTML()
-    if PlayX.PlayerExists() and PlayX.GetInstance().Browser != nil then
+    if PlayX.PlayerExists() and PlayX.GetInstance().Browser ~= nil then
         return PlayX.GetInstance().Browser:GetHTML()
     end
 end
@@ -666,13 +664,13 @@ local function PlayXRangeCheck()
 		end
 		
 		if ply:IsValid() then   
-			if ent != nil then
+			if ent ~= nil then
 				if ent:IsValid() then					
 					distance = ply:GetPos():Distance(ent:GetPos())
 					if distance > radius and PlayX.VideoRangeStatus == 1 then    
 						PlayX.VideoRangeStatus = 0
 						
-						if ent.Browser != nil then
+						if ent.Browser ~= nil then
 							if ent.CurrentPage.GetPauseJS() == nil then
 								ent.Browser:RunJavascript('document.body.innerHTML = ""')
 							else
@@ -688,7 +686,7 @@ local function PlayXRangeCheck()
 					elseif distance < radius and PlayX.VideoRangeStatus == 0 then
 						PlayX.VideoRangeStatus = 1
 						
-						if ent.Browser != nil then
+						if ent.Browser ~= nil then
 							if ent.CurrentPage.GetPlayJS() == nil or PlayX.StartPaused == 1 then
 								ent.Browser:RunJavascript("window.location.reload();");
 								PlayX.StartPaused = 0
@@ -712,26 +710,13 @@ local function PlayXRangeCheck()
 			ent = PlayX.GetInstance()
 		end
 		
-		if ent.Browser != nil then
+		if ent.Browser ~= nil then
 			ent.Browser:RunJavascript('window.location.reload()')
 			PlayX.VideoRangeStatus = 1
 		end
 	end	
 end
 
-function DSUpdateAllowedPlayerGroups(len)
-	PlayX.AllowedPlayerGroups = net.ReadTable()	
-	if PlayX.UIGroups != nil and ULib != nil then
-		PlayX.UIGroups:ClearSelection()
-		for _, group in pairs(PlayX.UIGroups:GetLines()) do
-			if PlayX.AllowedPlayerGroups[group:GetValue(1)] == true then
-	    		group:SetSelected(true)
-	    	end
-		end
-	end
-end
-
-net.Receive("PlayXAllowedPlayerGroups", DSUpdateAllowedPlayerGroups )
 net.Receive("PlayXBegin", DSBegin)
 net.Receive("PlayXProvidersList", DSProvidersList)
 usermessage.Hook("PlayXBegin", UMsgBegin)
@@ -743,8 +728,8 @@ usermessage.Hook("PlayXError", UMsgError)
 usermessage.Hook("PlayXMetadata", UMsgMetadata)
 usermessage.Hook("PlayXUse", UMsgUse)
 
-timer.Create( "hintDelay", 2, 999999, function() PlayX.HintDelay = 0 end  )
-timer.Create("PlayXRangeCheck", 0.500, 999999, PlayXRangeCheck)
+timer.Create( "hintDelay", 2, -1, function() PlayX.HintDelay = 0 end  )
+timer.Create("PlayXRangeCheck", 0.500, -1, PlayXRangeCheck)
 
 --- Called for concmd playx_resume.
 local function ConCmdResume()
@@ -820,22 +805,21 @@ local function ConCmdGUIBookmarkNavigator()
     if PlayX.NavigatorCapturedURL == "" then
         Derma_Message("No URI is entered.", "Error", "OK")
     else
-        Derma_StringRequest("Add Bookmark", "Enter a name for the bookmark", "",
-            function(title)
-                local title = title:Trim()
-                if title ~= "" then
-			        local result, err = PlayX.AddBookmark(title, "", PlayX.NavigatorCapturedURL, "",
-			                                              "", false)
+	    Derma_StringRequest("Add Bookmark", "Enter a name for the bookmark", "",
+	        function(title)
+	            local title = title:Trim()
+	            if title ~= "" then
+			        local result, err = PlayX.AddBookmark(title, "", PlayX.NavigatorCapturedURL, "", "", false)
 			        
 			        if result then
-                        Derma_Message("Bookmark added.", "Bookmark Added", "OK")
+	                    Derma_Message("Bookmark added.", "Bookmark Added", "OK")
 			            
 			            PlayX.SaveBookmarks()
 			        else
 			            Derma_Message(err, "Error", "OK")
 			        end
-                end
-            end)
+	            end
+	        end)
     end
 end
 

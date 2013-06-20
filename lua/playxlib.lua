@@ -426,15 +426,15 @@ function HandlerResult:new(t, js, body, jsURL, center, url)
         ForceURL = url
     }
     
-    if volumeFunc != nil then
+    if volumeFunc ~= nil then
         instance.GetVolumeChangeJS = volumeFunc
     end
     
-    if playFunc != nil then
+    if playFunc ~= nil then
         instance.GetPlayJS = playFunc
     end
     
-    if pauseFunc != nil then
+    if pauseFunc ~= nil then
         instance.GetPauseJS = pauseFunc
     end
 	    
@@ -621,15 +621,15 @@ end
 function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
     
     local volumeFunc = function(volume)
-        return [[jwplayer().setVolume(]] .. tostring(volume) .. [[);]]
+        return [[try { jwplayer().setVolume(]] .. tostring(volume) .. [[);} catch (e) {}]]
     end
     
     local playFunc = function()
-        return [[jwplayer().play();]]
+        return [[try {jwplayer().play();} catch (e) {}]]
     end
     
     local pauseFunc = function()
-        return [[jwplayer().pause();]]
+        return [[try { jwplayer().pause(); } catch (e) {}]]
     end
     
     return playxlib.HandlerResult{

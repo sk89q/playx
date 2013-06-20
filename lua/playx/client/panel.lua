@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.6 by Nexus [BR] on 20-06-2013 10:04 AM
+-- Version 2.7.7 by Nexus [BR] on 20-06-2013 02:43 PM
 
 PlayX._BookmarksPanelList = nil
 
@@ -120,7 +120,7 @@ local function SettingsPanel(panel)
                     Command = "playx_resume",
                 })
             	
-            	if resumeBt != nil then
+            	if resumeBt ~= nil then
                 	resumeBt:SetDisabled(true)
                 end
             else
@@ -129,7 +129,7 @@ local function SettingsPanel(panel)
                     Command = "playx_hide",
                 }):SetTooltip("This is a temporary disable.")
                 
-                if not PlayX.Playing and stopBt != nil then
+                if not PlayX.Playing and stopBt ~= nil then
                     stopBt:SetDisabled(true)
                 end
                 
@@ -138,7 +138,7 @@ local function SettingsPanel(panel)
                     Command = "playx_resume",
                 })
             	
-            	if resumeBt != nil then
+            	if resumeBt ~= nil then
                 	resumeBt:SetDisabled(true)
                 end
             end
@@ -221,50 +221,6 @@ local function ControlPanel(panel)
     if not PlayX.CurrentMedia then
         button:SetDisabled(true)
     end
-    
-	if ULib != nil then	
-		local ppLabel = panel:AddControl("Label", {
-	        Text = "PlayX Permission Manager"
-		})
-		ppLabel:SetTooltip("User Groups allowed to Play Videos / Spawn PlayX [ULIB]")
-				
- 		local groups = panel:AddControl("DListView", {})
-		groups:SetMultiSelect(true)
-		groups:AddColumn("Group")
-		groups:SetTall(200)
-		
-		groups.OnRowSelected = function( panel , line )
-			if LocalPlayer():IsAdmin() then
-				for _, line in pairs(panel:GetLines()) do
-					local lv = line:GetValue(1)
-					if !line:IsSelected() and PlayX.AllowedPlayerGroups[lv] == true then
-						PlayX.AllowedPlayerGroups[lv] = nil
-					elseif line:IsSelected() and PlayX.AllowedPlayerGroups[lv] == nil then
-						PlayX.AllowedPlayerGroups[lv] = true	
-					end
-				end
-				
-				net.Start("PlayXAllowedPlayerGroups")
-				net.WriteTable(PlayX.AllowedPlayerGroups)
-				net.SendToServer()
-			else
-				Derma_Message("Only Administrators are allowed to change this list", "Error", "OK")
-			end			
-		end
-		
-		PlayX.UIGroups = groups
-				
-		for group, _ in pairs(ULib.ucl.groups) do
-			if type(group) == "string" and group != nil then
-	        	line = groups:AddLine(group)
-	        	if PlayX.AllowedPlayerGroups[group] == true then
-	    			line:SetSelected(true)
-	    		end
-	        end
-	    end
-	else
-		print("PlayX Info: ULib not founded!")
-    end    
 end
 PANEL = {}
 vgui.Register( "dlistview", PANEL ,"DListView")
@@ -338,7 +294,7 @@ local function NavigatorPanel(panel)
     
     panel:SizeToContents(true)
     
-    if PlayX.NavigatorCapturedURL != "" and PlayX.CurrentMedia then
+    if PlayX.NavigatorCapturedURL ~= "" and PlayX.CurrentMedia then
 	    panel:AddControl("Label", {
 	        Text = "URI: "..PlayX.NavigatorCapturedURL
 	     })
