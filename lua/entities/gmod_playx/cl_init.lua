@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
+-- Version 2.7.6 by Nexus [BR] on 20-06-2013 10:12 AM
 
 include("shared.lua")
 
@@ -221,9 +221,11 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 end
 
 function ENT:Stop()
-    self:DestructBrowser()
-    self.Playing = false
-    self.PlayerData = {}
+	if self.Playing then
+	    self:DestructBrowser()
+	    self.Playing = false
+	    self.PlayerData = {}
+    end
 end
 
 function ENT:ChangeVolume(volume)
@@ -354,6 +356,7 @@ function ENT:DrawScreen(centerX, centerY)
                     text = "(ERROR)"
                 elseif text == "COMPLETED" then
                     text = "(Ended)"
+                    self:Stop()
                 elseif text == "STOPPED" then
                     text = "(Stopped)"
                 elseif text == "PAUSED" then
@@ -435,6 +438,7 @@ function ENT:HUDPaint()
             text = "ERROR"
         elseif text == "COMPLETED" then
             text = "Ended"
+            self:Stop()
         elseif text == "STOPPED" then
             text = "Stopped"
         elseif text == "PAUSED" then

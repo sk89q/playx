@@ -15,8 +15,9 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7 by Nexus [BR] on 23-02-2013 03:16 AM
+-- Version 2.7.6 by Nexus [BR] on 20-03-2013 09:38 AM
 
+-- Check if vON Library is Loaded Already
 if von == nil then
 	include("von.lua")
 end

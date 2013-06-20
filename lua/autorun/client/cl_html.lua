@@ -64,7 +64,7 @@ function PANEL:Init()
 	local oldFunc = self.OpenURL
 	self.OpenURL = function( panel, url, history )
 
-		if !history then
+		if not history then
 			-- Pop URLs from the stack
 			while #panel.History != panel.CurrentPage do
 				table.remove( panel.History )

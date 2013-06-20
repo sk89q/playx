@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.7.6 by Nexus [BR] on 20-03-2013 09:56 AM
 
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("cl_init.lua")
@@ -54,6 +55,7 @@ function ENT:Initialize()
             "URI [STRING]",
             "Start",
             "ActualStartTime",
+            "CurrentVidPos",
             "Length",
             "URL [STRING]",
             "Title [STRING]",
@@ -103,6 +105,7 @@ function ENT:ClearWireOutputs()
         Wire_TriggerOutput(self.Entity, "URI", "")
         Wire_TriggerOutput(self.Entity, "Start", -1)
         Wire_TriggerOutput(self.Entity, "ActualStartTime", -1)
+        Wire_TriggerOutput(self.Entity, "CurrentVidPos", -1)
         Wire_TriggerOutput(self.Entity, "Length", -1)
         Wire_TriggerOutput(self.Entity, "URL", "")
         Wire_TriggerOutput(self.Entity, "Title", "")
@@ -133,6 +136,7 @@ function ENT:SetWireMetadata(data)
         Wire_TriggerOutput(self.Entity, "URI", data.URI)
         Wire_TriggerOutput(self.Entity, "Start", data.StartAt)
         Wire_TriggerOutput(self.Entity, "ActualStartTime", data.StartTime + data.StartAt)
+        Wire_TriggerOutput(self.Entity, "CurrentVidPos", data.Position)
         Wire_TriggerOutput(self.Entity, "Length", data.Length and data.Length or -1)
         Wire_TriggerOutput(self.Entity, "URL", data.URL and data.URL or "")
         Wire_TriggerOutput(self.Entity, "Title", data.Title and data.Title or "")

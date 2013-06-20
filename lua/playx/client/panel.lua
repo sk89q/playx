@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
+-- Version 2.7.6 by Nexus [BR] on 20-06-2013 10:04 AM
 
 PlayX._BookmarksPanelList = nil
 
@@ -263,7 +263,7 @@ local function ControlPanel(panel)
 	        end
 	    end
 	else
-		print("ULib not founded!")
+		print("PlayX Info: ULib not founded!")
     end    
 end
 PANEL = {}

@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
+-- Version 2.7.6 by Nexus [BR] on 20-03-2013 09:38 AM
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -27,24 +27,26 @@ list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, ha
         js = [[
 var m = document.head.innerHTML.match(/\/embed\/([^"]+)"/);
 if (m) {
-    document.body.style.overflow = 'hidden';
-    var id = m[1];
-    document.body.innerHTML = '<div id="player-container"></div>'
-    var swfObject = new SWFObject("/site-player/playerembedwrapper.swf?referrer=none&eid="+id+"&st=&et=&it=&ml=0&siteHost=http://www.hulu.com", "player", "]] .. width .. [[", "]] .. height .. [[", "10.0.22");
-    swfObject.useExpressInstall("/expressinstall.swf");
-    swfObject.setAttribute("style", "position:fixed;top:0;left:0;width:1024px;height:512px;z-index:99999;");
-    swfObject.addParam("allowScriptAccess", "always");
-    swfObject.addParam("allowFullscreen", "true");
-    swfObject.addVariable("popout", "true");
-    swfObject.addVariable("plugins", "1");
-    swfObject.addVariable("modes", 4);
-    swfObject.addVariable("initMode", 4);
-    swfObject.addVariable("sortBy", "");
-    swfObject.addVariable("continuous_play_on", "false");
-    swfObject.addVariable("st", ]] .. start .. [[);
-    swfObject.addVariable("stage_width", "]] .. width .. [[");
-    swfObject.addVariable("stage_height", "]] .. height .. [[");
-    swfObject.write("player-container");
+	try{
+	    document.body.style.overflow = 'hidden';
+	    var id = m[1];
+	    document.body.innerHTML = '<div id="player-container"></div>'
+	    var swfObject = new SWFObject("/site-player/playerembedwrapper.swf?referrer=none&eid="+id+"&st=&et=&it=&ml=0&siteHost=http://www.hulu.com", "player", "]] .. width .. [[", "]] .. height .. [[", "10.0.22");
+	    swfObject.useExpressInstall("/expressinstall.swf");
+	    swfObject.setAttribute("style", "position:fixed;top:0;left:0;width:1024px;height:512px;z-index:99999;");
+	    swfObject.addParam("allowScriptAccess", "always");
+	    swfObject.addParam("allowFullscreen", "true");
+	    swfObject.addVariable("popout", "true");
+	    swfObject.addVariable("plugins", "1");
+	    swfObject.addVariable("modes", 4);
+	    swfObject.addVariable("initMode", 4);
+	    swfObject.addVariable("sortBy", "");
+	    swfObject.addVariable("continuous_play_on", "false");
+	    swfObject.addVariable("st", ]] .. start .. [[);
+	    swfObject.addVariable("stage_width", "]] .. width .. [[");
+	    swfObject.addVariable("stage_height", "]] .. height .. [[");
+	    swfObject.write("player-container");
+    } catch (e) {}
 } else {
     document.body.innerHTML = 'Failure to detect ID.'
 }
@@ -66,15 +68,29 @@ end)
 list.Set("PlayXHandlers", "Vimeo", function(width, height, start, volume, uri, handlerArgs)
     
     local volumeFunc = function(volume)	    
-        return [[document.getElementsByTagName('object')[0].api_setVolume(]]..playxlib.volumeFloat(volume)..[[);]]
+        return [[
+        	try {
+        		document.getElementsByTagName('object')[0].api_setVolume(]]..playxlib.volumeFloat(volume)..[[);
+        	} catch (e) {}
+        ]]
     end
 
     local playFunc = function(volume)
-        return [[document.getElementsByTagName('object')[0].api_play();document.getElementsByTagName('object')[0].style.width='100%';]]
+        return [[
+        	try {
+        		document.getElementsByTagName('object')[0].api_play();
+        		document.getElementsByTagName('object')[0].style.width='100%';
+        	} catch (e) {}
+        ]]
     end
 
     local pauseFunc = function(volume)
-        return [[document.getElementsByTagName('object')[0].api_pause();document.getElementsByTagName('object')[0].style.width='1px';]]
+        return [[
+        	try {
+	        	document.getElementsByTagName('object')[0].api_pause();
+	        	document.getElementsByTagName('object')[0].style.width='1px';
+        	} catch (e) {}
+        ]]
     end
 	    
     return playxlib.HandlerResult{
@@ -135,12 +151,14 @@ function onPause(){
 }
 
 function playerReady() {  
-  player.api_setVolume(]] .. playxlib.volumeFloat(volume) .. [[);
-  player.api_addEventListener('finish', 'onFinish');
-  player.api_addEventListener('play', 'onPlay');
-  player.api_addEventListener('pause', 'onPause');
-  player.api_seekTo(]]..start..[[);
-  setInterval(updateState, 250);
+  try {
+	  player.api_setVolume(]] .. playxlib.volumeFloat(volume) .. [[);
+	  player.api_addEventListener('finish', 'onFinish');
+	  player.api_addEventListener('play', 'onPlay');
+	  player.api_addEventListener('pause', 'onPause');
+	  player.api_seekTo(]]..start..[[);
+	  setInterval(updateState, 250);
+  } catch (e) {}
 }
 ]]
 }
@@ -148,15 +166,29 @@ end)
 
 list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume, uri, handlerArgs)
     local volumeFunc = function(volume)
-        return [[document.getElementsByTagName('embed')[0].setVolume(]] .. volume .. [[);]]
+        return [[
+        	try {
+        		document.getElementsByTagName('embed')[0].setVolume(]] .. volume .. [[);
+        	} catch (e) {}
+        ]]
     end
     
     local playFunc = function(volume)
-        return [[document.getElementsByTagName('embed')[0].playVideo();document.getElementsByTagName('embed')[0].style.width='100%';]]
+        return [[
+        	try {
+	        	document.getElementsByTagName('embed')[0].playVideo();
+	        	document.getElementsByTagName('embed')[0].style.width='100%';
+			} catch (e) {}
+      	]]
     end
     
     local pauseFunc = function(volume)
-        return [[document.getElementsByTagName('embed')[0].pauseVideo();document.getElementsByTagName('embed')[0].style.width='1px';]]
+        return [[
+        	try {
+        		document.getElementsByTagName('embed')[0].pauseVideo();
+        		document.getElementsByTagName('embed')[0].style.width='1px';
+        	} catch (e) {}
+        ]]
     end
 	    
     return playxlib.HandlerResult{
@@ -167,66 +199,70 @@ list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume,
         pauseFunc = pauseFunc,
 
         js = [[
-var checkReady = setInterval(function(){ if(document.readyState === "complete"){ playerReady(); clearInterval(checkReady);} }, 10);
-var knownState = "Loading...";
-var player = document.getElementsByTagName('embed')[0];
-
-function sendPlayerData(data) {
-    var str = "";
-    for (var key in data) {
-        str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
-    }
-    playx.processPlayerData(str);
-}
-
-function onError(err) {
-  var msg;
-  
-  if (err == 2) {
-    msg = "Error: Invalid media ID";
-  } else if (err == 100) {
-    msg = "Error: Media removed or now private";
-  } else if (err == 101 || err = 150) {
-    msg = "Error: Embedding not allowed";
-    msg = "Buffering...";
-  } else {
-    msg = "Unknown error: " + err;
-  }
-  
-  knownState = msg;  
-  sendPlayerData({ State: msg });
-}
-
-function onPlayerStateChange(state) {
-  var msg;
-  
-  if (state == -1) {
-    msg = "Loading...";
-  } else if (state == 0) {
-    msg = "Playback complete.";
-  } else if (state == 1) {
-    msg = "Playing...";
-  } else if (state == 2) {
-    msg = "Paused.";
-  } else if (state == 3) {
-    msg = "Buffering...";
-  } else {
-    msg = "Unknown state: " + state;
-  }
-  
-  knownState = msg;  
-  sendPlayerData({ State: msg, Position: player.getCurrentTime(), Duration: player.getDuration() });
-}
-
-function updateState() {
-  sendPlayerData({ Title: "test", State: knownState, Position: player.getCurrentTime(), Duration: player.getDuration() });
-}
-
-function playerReady() {  
-  player.addEventListener('onError', 'onError');
-  player.addEventListener('onStateChange', 'onPlayerStateChange');
-  player.setVolume(]] .. volume .. [[);
-  setInterval(updateState, 250);
-}
+			try {
+				var checkReady = setInterval(function(){ if(document.readyState === "complete"){ playerReady(); clearInterval(checkReady);} }, 10);
+				var knownState = "Loading...";
+				var player = document.getElementsByTagName('embed')[0];
+			} catch (e) {}
+			
+			function sendPlayerData(data) {
+			    var str = "";
+			    for (var key in data) {
+			        str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
+			    }
+			    playx.processPlayerData(str);
+			}
+			
+			function onError(err) {
+			  var msg;
+			  
+			  if (err == 2) {
+			    msg = "Error: Invalid media ID";
+			  } else if (err == 100) {
+			    msg = "Error: Media removed or now private";
+			  } else if (err == 101 || err = 150) {
+			    msg = "Error: Embedding not allowed";
+			    msg = "Buffering...";
+			  } else {
+			    msg = "Unknown error: " + err;
+			  }
+			  
+			  knownState = msg;  
+			  sendPlayerData({ State: msg });
+			}
+			
+			function onPlayerStateChange(state) {
+			  var msg;
+			  
+			  if (state == -1) {
+			    msg = "Loading...";
+			  } else if (state == 0) {
+			    msg = "Playback complete.";
+			  } else if (state == 1) {
+			    msg = "Playing...";
+			  } else if (state == 2) {
+			    msg = "Paused.";
+			  } else if (state == 3) {
+			    msg = "Buffering...";
+			  } else {
+			    msg = "Unknown state: " + state;
+			  }
+			  
+			  knownState = msg;  
+			  sendPlayerData({ State: msg, Position: player.getCurrentTime(), Duration: player.getDuration() });
+			}
+			
+			function updateState() {
+			  sendPlayerData({ Title: "test", State: knownState, Position: player.getCurrentTime(), Duration: player.getDuration() });
+			}
+			
+			function playerReady() {  
+			  try {
+				  player.addEventListener('onError', 'onError');
+				  player.addEventListener('onStateChange', 'onPlayerStateChange');
+				  player.setVolume(]] .. volume .. [[);
+				  setInterval(updateState, 250);
+			  } catch (e) {}
+			}
 ]]}
 end)
