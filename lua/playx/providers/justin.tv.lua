@@ -33,13 +33,16 @@ function JustinTV.GetPlayer(uri, useJW)
     if uri:lower():find("^[a-zA-Z0-9_/]+$") then
         return {
             ["Handler"] = "justin.tv",
-            ["URI"] = uri,
+            ["URI"] = GetConVarString("playx_host_url"),
             ["ResumeSupported"] = true,
             ["LowFramerate"] = false,
             ["MetadataFunc"] = function(callback, failCallback)
                 JustinTV.QueryMetadata(uri, callback, failCallback)
             end,
-        }
+            ["HandlerArgs"] = {
+                ["URL"] = uri           
+            }
+    }
     end
 end
 

@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.7 by Nexus [BR] on 10-07-2013 10:00 AM
+-- Version 2.7.8 by Nexus [BR] on 10-07-2013 10:50 AM
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -54,6 +54,7 @@ if (m) {
 end)
 
 list.Set("PlayXHandlers", "justin.tv", function(width, height, start, volume, uri, handlerArgs)
+	uri = handlerArgs["URL"]
 	if uri:find("/b/") then
 		uri = uri:split("/b/")
 		uri = uri[1].."&archive_id="..uri[2]
@@ -61,7 +62,7 @@ list.Set("PlayXHandlers", "justin.tv", function(width, height, start, volume, ur
 	
     return playxlib.HandlerResult{
         center = true,      
-        body = [[<object type="application/x-shockwave-flash" height="]] .. height .. [[" width="]] ..width.. [[" id="clip_embed_player_flash" data="http://www-cdn.justin.tv/widgets/]]..(uri:find('archive_id') and 'archive' or 'live')..[[_site_player.swf" bgcolor="#000000"><param name="movie" value="http://www-cdn.justin.tv/widgets/]]..(uri:find('archive_id') and 'archive' or 'live')..[[_site_player.swf" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="auto_play=true&start_volume=]]..volume..[[&title=Title&channel=]]..uri..[[" /></object>]]
+        body = [[<object type="application/x-shockwave-flash" height="]] .. height .. [[" width="]] ..width.. [[" id="clip_embed_player_flash" data="]]..(uri:find('archive_id') and 'http://www-cdn.justin.tv/widgets/archive_site' or 'http://www.justin.tv/widgets/live_embed')..[[_player.swf" bgcolor="#000000"><param name="movie" value="]]..(uri:find('archive_id') and 'http://www-cdn.justin.tv/widgets/archive_site' or 'http://www.justin.tv/widgets/live_embed')..[[_player.swf?channel=]]..uri..[[" /><param name="allowScriptAccess" value="deny" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="auto_play=true&start_volume=]]..volume..[[&title=Title&channel=]]..uri..[[" /></object>]]
     }
 end)
 
@@ -355,7 +356,7 @@ list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, ur
     local html_live = [[
 <object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=]]..channelID..[[" bgcolor="#000000">
 	<param name="allowFullScreen" value="true" />
-	<param name="allowScriptAccess" value="always" />
+	<param name="allowScriptAccess" value="deny" />
 	<param name="allowNetworking" value="all" />
 	<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" />
 	<param name="flashvars" value="hostname=www.twitch.tv&channel=]]..channelID..[[&auto_play=true&start_volume=]]..volume..[[" />
@@ -363,7 +364,7 @@ list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, ur
 
 	local html_archived = [[
 <object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www-cdn.jtvnw.net/widgets/archive_site_player.swf" bgcolor="#000000"> 
-  <param name="allowScriptAccess" value="always" /> 
+  <param name="allowScriptAccess" value="deny" /> 
   <param name="allowNetworking" value="all" /> 
   <param name="allowFullScreen" value="true" /> 
   <param name="movie" value="http://www-cdn.jtvnw.net/widgets/archive_site_player.swf" /> 
