@@ -18,8 +18,8 @@
 -- Version 2.7.7 by Nexus [BR] on 20-06-2013 04:28 PM
 
 -- FCVAR_GAMEDLL makes cvar change detection work
-CreateConVar("playx_jw_url", "https://dl.dropbox.com/u/18850333/playx/jwplayer.flash.swf", {FCVAR_GAMEDLL})
-CreateConVar("playx_host_url", "https://dl.dropbox.com/u/18850333/playx/host.html",        {FCVAR_GAMEDLL})
+CreateConVar("playx_jw_url", "http://dl.dropbox.com/u/18850333/playx/jwplayer.flash.swf", {FCVAR_GAMEDLL})
+CreateConVar("playx_host_url", "http://dl.dropbox.com/u/18850333/playx/host.html",        {FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
@@ -631,7 +631,7 @@ function PlayerInitialSpawn(ply)
 			["List"] = list.Get("PlayXProvidersList"),
 		})
 	net.Send(ply)
-    
+   
     local origMedia = PlayX.CurrentMedia
     
     -- Tell the user the playing media in three seconds

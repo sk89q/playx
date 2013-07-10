@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.6 by Nexus [BR] on 20-03-2013 09:38 AM
+-- Version 2.7.7 by Nexus [BR] on 10-07-2013 10:00 AM
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -264,4 +264,124 @@ list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume,
 			  } catch (e) {}
 			}
 ]]}
+end)
+
+
+list.Set("PlayXHandlers", "Livestream", function(width, height, start, volume, uri, handlerArgs)
+    local volumeFunc = function(volume)
+        return [[
+        	try {
+        		document.lsplayer.setVolume(]] .. playxlib.volumeFloat(volume) .. [[);
+        	} catch (e) {}
+        ]]
+    end
+    
+    local playFunc = function(volume)
+        return [[
+        	try {
+	        	document.lsplayer.setPlay();
+	        	document.getElementById("lsplayer").style.width='100%';
+			} catch (e) {}
+      	]]
+    end
+    
+    local pauseFunc = function(volume)
+        return [[
+        	try {
+        		document.lsplayer.setPause();
+        		document.getElementById("lsplayer").style.width='1px';
+        	} catch (e) {}
+        ]]
+    end
+	    
+    return playxlib.HandlerResult{
+        url = playxlib.JSEscape(uri),
+        center = false,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc,
+
+        js = [[	        			      
+			try {
+				var checkReady = setInterval(function(){ if(document.readyState === "complete"){ playerReady(); clearInterval(checkReady);} }, 10);
+			} catch (e) {}
+			
+			function sendPlayerData(data) {
+			    var str = "";
+			    for (var key in data) {
+			        str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&"
+			    }
+			    playx.processPlayerData(str);
+			}
+			
+			function livestreamPlayerCallback(event) {
+			  var msg;
+			  
+			  if (event == 'chromelessPlayerLoadedEvent') {
+			    msg = "LOADING";
+			  } else if (event == 'playbackCompleteEvent') {
+			    msg = "COMPLETED";
+			  } else if (event == 'playbackEvent') {
+			    msg = "PLAYING";
+			  } else if (event == 'pauseEvent') {
+			    msg = "PAUSED";
+			  } else if (event == 'connectionEvent') {
+			    msg = "BUFFERING";
+			  }else{
+			  	msg = "..."
+			  }
+			  
+			  sendPlayerData({ State: msg, Position: document.lsplayer.getTime(), Duration: document.lsplayer.getDuration() });
+			}
+			
+			function updateState() {
+			  sendPlayerData({Title: document.lsplayer.getCurrentContentTitle(), Position: document.lsplayer.getTime(), Duration: document.lsplayer.getDuration() });
+			}
+			
+			function playerReady() {  
+			  try {
+				  document.lsplayer.setVolume(]] .. playxlib.volumeFloat(volume) .. [[);
+				  setInterval(updateState, 250);
+			  } catch (e) {}
+			}
+	]]}
+end)
+
+list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, uri, handlerArgs)
+	
+	local channelID = handlerArgs["ChannelID"];
+	local chapterID = handlerArgs["ChapterID"];
+    
+    local html_live = [[
+<object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=]]..channelID..[[" bgcolor="#000000">
+	<param name="allowFullScreen" value="true" />
+	<param name="allowScriptAccess" value="always" />
+	<param name="allowNetworking" value="all" />
+	<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" />
+	<param name="flashvars" value="hostname=www.twitch.tv&channel=]]..channelID..[[&auto_play=true&start_volume=]]..volume..[[" />
+</object>]];
+
+	local html_archived = [[
+<object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www-cdn.jtvnw.net/widgets/archive_site_player.swf" bgcolor="#000000"> 
+  <param name="allowScriptAccess" value="always" /> 
+  <param name="allowNetworking" value="all" /> 
+  <param name="allowFullScreen" value="true" /> 
+  <param name="movie" value="http://www-cdn.jtvnw.net/widgets/archive_site_player.swf" /> 
+  <param name="flashvars" value="channel=]]..channelID..[[&start_volume=]]..volume..[[&auto_play=true&chapter_id=]]..chapterID..[[&videoId=c]]..chapterID..[[" />
+</object>
+]]
+
+	local html = "";
+	
+	if chapterID ~= 0 then
+	 	html = html_archived;
+	else
+		html = html_live;
+	end
+	    
+    return playxlib.HandlerResult{
+        url = playxlib.JSEscape(uri),
+        center = false,
+        body = html
+	}
 end)

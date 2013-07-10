@@ -55,7 +55,7 @@ function ENT:Initialize()
             "URI [STRING]",
             "Start",
             "ActualStartTime",
-            "CurrentPos",
+            --"CurrentPos",
             "Length",
             "URL [STRING]",
             "Title [STRING]",
@@ -105,7 +105,7 @@ function ENT:ClearWireOutputs()
         Wire_TriggerOutput(self.Entity, "URI", "")
         Wire_TriggerOutput(self.Entity, "Start", -1)
         Wire_TriggerOutput(self.Entity, "ActualStartTime", -1)
-        Wire_TriggerOutput(self.Entity, "CurrentPos", -1)
+        --Wire_TriggerOutput(self.Entity, "CurrentPos", -1)
         Wire_TriggerOutput(self.Entity, "Length", -1)
         Wire_TriggerOutput(self.Entity, "URL", "")
         Wire_TriggerOutput(self.Entity, "Title", "")
@@ -131,13 +131,12 @@ end
 
 function ENT:SetWireMetadata(data)
     if WireAddon then
-    	debugTable(data)
         Wire_TriggerOutput(self.Entity, "Provider", data.Provider and data.Provider or "")
         Wire_TriggerOutput(self.Entity, "Handler", data.Handler)
         Wire_TriggerOutput(self.Entity, "URI", data.URI)
         Wire_TriggerOutput(self.Entity, "Start", data.StartAt)
         Wire_TriggerOutput(self.Entity, "ActualStartTime", data.StartTime + data.StartAt)
-        Wire_TriggerOutput(self.Entity, "CurrentPos", data.Position)
+        --Wire_TriggerOutput(self.Entity, "CurrentPos", data.Position)
         Wire_TriggerOutput(self.Entity, "Length", data.Length and data.Length or -1)
         Wire_TriggerOutput(self.Entity, "URL", data.URL and data.URL or "")
         Wire_TriggerOutput(self.Entity, "Title", data.Title and data.Title or "")

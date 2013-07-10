@@ -1,14 +1,21 @@
---[[   _                                
-	( )                               
-   _| |   __   _ __   ___ ___     _ _ 
- /'_` | /'__`\( '__)/' _ ` _ `\ /'_` )
-( (_| |(  ___/| |   | ( ) ( ) |( (_| |
-`\__,_)`\____)(_)   (_) (_) (_)`\__,_) 
-
-	DHTML
-
---]]
--- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
+-- PlayX
+-- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
+-- 
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 2 of the License, or
+-- (at your option) any later version.
+-- 
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+-- 
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-- 
+-- $Id$
+-- Version 2.7.7 by Nexus [BR] on 09-07-2013 11:46 AM
 
 PANEL = {}
 
@@ -36,8 +43,8 @@ function PANEL:Init()
 	--
 	-- Implement a console.log - because awesomium doesn't provide it for us anymore.
 	--
-	self:AddFunction( "console", "log", function( param ) self:ConsoleMessage( param ) end )
-	self:AddFunction( "console", "error", function( param ) self:ConsoleMessage( param ) end )
+	self:AddFunction( "gmod", "log", function( param ) self:ConsoleMessage( param ) end )
+	self:AddFunction( "console", "getHTML", function( param ) self:GetHTML( param ) end )
 
     self:AddFunction( "playx", "processPlayerData", function( query )
     	local playx = PlayX.GetInstance()
@@ -66,7 +73,7 @@ function PANEL:Init()
 
 		if not history then
 			-- Pop URLs from the stack
-			while #panel.History != panel.CurrentPage do
+			while #panel.History ~= panel.CurrentPage do
 				table.remove( panel.History )
 			end
 			table.insert( panel.History, url )
@@ -87,13 +94,13 @@ function PANEL:Think()
 			self.LoadedContent = false
 		end
 	else
-		if !self.LoadedContent then
+		if not self.LoadedContent then
 			self:RunJavascript("gmod.getUrl(window.location.href, true);")
 			self.LoadedContent = true
 		end
 	end
 
-	if ( self.JS && !self:IsLoading() ) then
+	if ( self.JS and not self:IsLoading() ) then
 
 		for k, v in pairs( self.JS ) do
 
@@ -153,6 +160,11 @@ function PANEL:ConsoleMessage( msg )
 	MsgC( Color( 255, 160, 255 ), "[HTML] " );
 	MsgC( Color( 255, 255, 255 ), msg, "\n" )	
 
+end
+
+function PANEL:GetHTML( msg )
+	if ( !isstring( msg ) ) then msg = "" end
+	PlayX._SourceCodeText:SetText(msg);
 end
 
 --

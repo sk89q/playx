@@ -373,6 +373,9 @@ function playxlib.EmptyToNil(s)
     return s
 end
 
+--- Converts a decimal Volume to a Float Volume
+-- @param volume String
+-- @return number
 function playxlib.volumeFloat(volume)
 	if(volume == 100) then
 		volume = 1
@@ -718,4 +721,86 @@ body {
 ]]
     
     return playxlib.HandlerResult(css, js, body, url)
+end
+
+--- Parse URL Query
+-- @param query String
+-- @return table
+function playxlib.ParseURLQuery(query)
+	local parsed = {}
+	local pos = 0
+	
+	query = string.gsub(query, "&amp;", "&")
+	query = string.gsub(query, "&lt;", "<")
+	query = string.gsub(query, "&gt;", ">")
+	
+	local function ginsert(qstr)
+		local first, last = string.find(qstr, "=")
+		if first then
+			parsed[string.sub(qstr, 0, first-1)] = string.sub(qstr, first+1)
+		end
+	end
+	
+	while true do
+		local first, last = string.find(query, "&", pos)
+		if first then
+			ginsert(string.sub(query, pos, first-1));
+			pos = last+1
+		else
+			ginsert(string.sub(query, pos));
+			break;
+		end
+	end
+	
+	return parsed
+end
+
+--- Parse URL
+-- @param url String
+-- @param default String
+-- @return Table
+function playxlib.ParseURL(url, default)
+    -- initialize default parameters
+    local parsed = {}
+    for i,v in _G.pairs(default or parsed) do parsed[i] = v end
+    -- remove whitespace
+    -- url = string.gsub(url, "%s", "")
+    -- get fragment
+    url = string.gsub(url, "#(.*)$", function(f)
+        parsed.fragment = f
+        return ""
+    end)
+    -- get scheme. Lower-case according to RFC 3986 section 3.1.
+    url = string.gsub(url, "^([%w][%w%+%-%.]*)%:",
+        function(s) parsed.scheme = string.lower(s); return "" end)
+    -- get authority
+    url = string.gsub(url, "^//([^/]*)", function(n)
+        parsed.authority = n
+        return ""
+    end)
+    -- get query stringing
+    url = string.gsub(url, "%?(.*)", function(q)
+        parsed.query = playxlib.ParseURLQuery(q)
+        return ""
+    end)
+    -- get params
+    url = string.gsub(url, "%;(.*)", function(p)
+        parsed.params = p
+        return ""
+    end)
+    -- path is whatever was left
+    parsed.path = url
+    local authority = parsed.authority
+    if not authority then return parsed end
+    authority = string.gsub(authority,"^([^@]*)@",
+        function(u) parsed.userinfo = u; return "" end)
+    authority = string.gsub(authority, ":([0-9]*)$",
+        function(p) if p ~= "" then parsed.port = p end; return "" end)
+    if authority ~= "" then parsed.host = authority end
+    local userinfo = parsed.userinfo
+    if not userinfo then return parsed end
+    userinfo = string.gsub(userinfo, ":([^:]*)$",
+        function(p) parsed.password = p; return "" end)
+    parsed.user = userinfo
+    return parsed
 end

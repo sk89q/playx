@@ -188,7 +188,7 @@ end
 --- Used to get the HTML, namely for debugging purposes.
 function PlayX.GetHTML()
     if PlayX.PlayerExists() and PlayX.GetInstance().Browser ~= nil then
-        return PlayX.GetInstance().Browser:GetHTML()
+        PlayX.GetInstance().Browser:Exec("console.getHTML(document.documentElement.outerHTML)");
     end
 end
 
@@ -823,9 +823,39 @@ local function ConCmdGUIBookmarkNavigator()
     end
 end
 
---- Called for concmd playx_dump_html.
+local sourceCodeWin = nil
 local function ConCmdDumpHTML()
-    print(PlayX.GetHTML())
+    if sourceCodeWin then
+        sourceCodeWin:SetVisible(true)
+        sourceCodeWin:MakePopup()
+        sourceCodeWin:InvalidateLayout(true, true)
+        return
+    end
+    
+    local frame = vgui.Create("DFrame")
+    frame:SetTitle("PlayX HTML Code Viewer")
+    frame:SetDeleteOnClose(false)
+    frame:SetScreenLock(true)
+    frame:SetSize(ScrW() * 0.8, ScrH() * 0.9)
+    frame:SetSizable(true)
+    frame:Center()
+    frame:MakePopup()
+    
+    local text = vgui.Create("DTextEntry", frame)
+    text:SetMultiline(true)
+
+    -- Layout
+    local oldPerform = frame.PerformLayout
+    frame.PerformLayout = function()
+        oldPerform(frame)
+        text:StretchToParent(5, 26, 5, 5)
+    end
+    
+    frame:InvalidateLayout(true, true)
+    PlayX._SourceCodeText = text
+    
+    sourceCodeWin = frame
+    timer.Create("PlayXHTMLCodeUpdater",1 , -1, PlayX.GetHTML)
 end
 
 --- Called for concmd playx_update_window.
