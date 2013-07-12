@@ -1,0 +1,19 @@
+{
+	"title"		:	"PlayX",
+	"type"		:	"tool",
+	"tags"		:	[ "movie", "fun" ],
+	"description":	"PlayX is a Lua-Based Media player.",
+	"ignore"	:
+	[
+		"*.psd",
+		"*.vcproj",
+		"*.svn*",
+		"*.txt",
+		".git*",
+		".gitignore",
+		"git-hooks-pre-commit",
+		"gitrid.sh",
+		"LICENSE",
+		"README.md"
+	]
+}
