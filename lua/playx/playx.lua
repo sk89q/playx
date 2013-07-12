@@ -1,5 +1,5 @@
 -- PlayX
--- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -15,7 +15,8 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.7 by Nexus [BR] on 20-06-2013 04:28 PM
+-- Version 2.7.9 by Nexus [BR] on 12-07-2013 02:48 PM
+
 
 -- FCVAR_GAMEDLL makes cvar change detection work
 CreateConVar("playx_jw_url", "http://dl.dropbox.com/u/18850333/playx/jwplayer.flash.swf", {FCVAR_GAMEDLL})
@@ -38,11 +39,21 @@ util.AddNetworkString("PlayXProvidersList") -- Add to Pool
 -- @return boolean
 function PlayX.AccessManager(ply)
 	-- Default is Deny
-	result = false
+	local result = false
 	
-	-- Check if ULib
+	-- Check if ULib is loaded
 	if ULib ~= nil then
-		result = ply:query("playx access")	
+		result = ply:query("PlayX Access")	
+	end
+	
+	-- Check if exsto is loaded
+	if exsto ~= nil then
+		result = ply:IsAllowed("playxaccess")
+	end
+	
+	-- Check if Evolve is Loaded
+	if evolve ~= nil then
+		result = ply:EV_HasPrivilege( "PlayX Access" )
 	end
 	
 	if result == false then

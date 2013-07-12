@@ -15,10 +15,12 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.6 by Nexus [BR] on 07-03-2013 09:02 PM
+-- Version 2.7.9 by Nexus [BR] on 12-07-2013 02:48 PM
 
-if SERVER then
-	if ULib ~= nil then
-		ULib.ucl.registerAccess("PlayX Access", {"admin", "superadmin"}, "Give access to PlayX", "PlayX")
-	end
-end
+local PLUGIN = {}
+PLUGIN.Title = "PlayX"
+PLUGIN.Description = "Give access to a Player to use PlayX."
+PLUGIN.Author = "Nexus [BR]"
+PLUGIN.Privileges = { "PlayX Access" }
+
+evolve:RegisterPlugin( PLUGIN )
