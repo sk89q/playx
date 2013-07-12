@@ -5,12 +5,13 @@
 	"description":	"PlayX is a Lua-Based Media player.",
 	"ignore"	:
 	[
-		"*.psd",
-		"*.vcproj",
 		"*.svn*",
 		"*.txt",
 		".git*",
+		".project",
 		".gitignore",
+		".buildpath",
+		".settings*",
 		"git-hooks-pre-commit",
 		"gitrid.sh",
 		"LICENSE",
