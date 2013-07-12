@@ -52,7 +52,7 @@ PlayX = {}
 
 include("playxlib.lua")
 include("playx/client/bookmarks.lua")
-include("playx/client/vgui/PlayXBrowser.lua")
+include("playx/client/vgui/playx_browser.lua")
 
 -- Load handlers
 local p = file.Find("playx/client/handlers/*.lua","LUA")
