@@ -205,7 +205,9 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 			self.Browser:RunJavascript('document.body.innerHTML = ""')
 			PlayX.StartPaused = 1
 			PlayX.Pause = 0
-		end		
+		end	
+		
+		timer.Create("playxVolumeFix", 1, 10, function () self:ChangeVolume(GetConVarNumber("playx_volume")) end)	
     end
     
     self.Playing = true
