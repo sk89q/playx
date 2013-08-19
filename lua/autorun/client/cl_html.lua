@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.7 by Nexus [BR] on 09-07-2013 11:46 AM
+-- Version 2.8.0 by Nexus [BR] on 19-08-2013 10:04 AM
 
 PANEL = {}
 
@@ -234,4 +234,4 @@ function PANEL:Remove()
 	self.BaseClass.Remove( self )
 end
 
-derma.DefineControl( "PlayXHTML", "Extended HTML", PANEL, "DHTML" )
+derma.DefineControl( "PlayXHTML", "Extended HTML", PANEL, "Awesomium" )
