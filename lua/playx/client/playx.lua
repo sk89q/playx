@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.7 by Nexus [BR] on 07-03-2013 04:29 PM
+-- Version 2.8.2 by Nexus [BR] on 28-08-2013 08:14 PM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -573,7 +573,7 @@ end
 --- Called on PlayXProvidersList user message.
 local function DSProvidersList(len)
 	local decoded = net.ReadTable()
-    Msg("PlayX DEBUG: Providers list received\n")
+    Msg("PlayX: Providers list received\n")
     
     local list = decoded.List
     
@@ -604,7 +604,7 @@ end
 
 --- Called on PlayXJWURL user message.
 local function UMsgJWURL(um)
-    Msg("PlayX DEBUG: JW URL set\n")
+    Msg("PlayX: JW URL set\n")
     
     PlayX.JWPlayerURL = um:ReadString()
     
@@ -613,7 +613,7 @@ end
 
 --- Called on PlayXHostURL user message.
 local function UMsgHostURL(um)
-    Msg("PlayX DEBUG: Host URL set\n")
+    Msg("PlayX: Host URL set\n")
     
     PlayX.HostURL = um:ReadString()
     
@@ -630,7 +630,7 @@ end
 --- Called on PlayXMetadata user message, which gets sent on standard metadata
 -- information (title).
 local function UMsgMetadata(um)
-    Msg("PlayX DEBUG: Metadata received\n")
+    Msg("PlayX: Metadata received\n")
     
     local title = um:ReadString()
     

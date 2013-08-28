@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.6 by Nexus [BR] on 20-06-2013 10:12 AM
+-- Version 2.8.2 by Nexus [BR] on 28-08-2013 08:14 PM
 
 include("shared.lua")
 
@@ -201,7 +201,7 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 
     self.Browser.FinishedURL = function()
 		if not IsValid(self) then return end
-		MsgN("PlayX Info: Page loaded, preparing to inject")		
+		MsgN("PlayX: Page loaded, preparing to inject")		
         self:InjectPage()
         if (PlayX.VideoRangeStatus == 0 and GetConVarNumber("playx_video_range_enabled") == 1) or (PlayX.Pause == 1 and GetConVarNumber("playx_video_range_enabled") == 1) then
 			self.Browser:RunJavascript('document.body.innerHTML = ""')
@@ -233,10 +233,12 @@ function ENT:Stop()
 end
 
 function ENT:ChangeVolume(volume)
-    local js = self.CurrentPage.GetVolumeChangeJS(volume)
+	local js = ""
+	
+    pcall(function () js = self.CurrentPage.GetVolumeChangeJS(volume) end)
     
-    if js then
-        self.Browser:Exec(js)
+    if js and self.Browser ~= nil then
+        pcall(function () self.Browser:Exec(js) end)
         return true
     end
     
