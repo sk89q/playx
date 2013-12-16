@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.2 by Nexus [BR] on 28-08-2013 08:14 PM
+-- Version 2.8.3 by Nexus [BR] on 16-12-2013 07:00 PM (-02:00 GMT)
 
 include("shared.lua")
 
@@ -209,7 +209,8 @@ function ENT:Play(handler, uri, start, volume, handlerArgs)
 			PlayX.Pause = 0
 		end	
 		
-		timer.Create("playxVolumeFix", 1, 10, function () self:ChangeVolume(GetConVarNumber("playx_volume")) end)	
+		-- Initial Volume Change Fix
+		timer.Create("playxVolumeFix", 0.5, 5, function () if IsValid(self) then self:ChangeVolume(GetConVarNumber("playx_volume"))  end end)	
     end
     
     self.Playing = true

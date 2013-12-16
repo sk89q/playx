@@ -15,13 +15,14 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.8.3 by Nexus [BR] on 16-12-2013 07:00 PM (-02:00 GMT)
 
 local PANEL = {}
 
 function PANEL:Init()
 	self.Chrome = vgui.Create("PlayXHTMLControls", self);
 	self.Chrome:Dock(TOP)
-    self.Chrome.HomeURL = "http://www.youtube.com"
+    self.Chrome.HomeURL = "http://www.youtube.com/"
 end
 
 function PANEL:OpeningVideo(provider, uri)

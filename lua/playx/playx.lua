@@ -15,12 +15,12 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.9 by Nexus [BR] on 12-07-2013 02:48 PM
+-- Version 2.8.3 by Nexus [BR] on 16-12-2013 07:00 PM (-02:00 GMT)
 
 
 -- FCVAR_GAMEDLL makes cvar change detection work
-CreateConVar("playx_jw_url", "http://dl.dropbox.com/u/18850333/playx/jwplayer.flash.swf", {FCVAR_GAMEDLL})
-CreateConVar("playx_host_url", "http://dl.dropbox.com/u/18850333/playx/host.html",        {FCVAR_GAMEDLL})
+CreateConVar("playx_jw_url", "http://nexbr.github.io/playx/swf/jwplayer.flash.swf", {FCVAR_GAMEDLL})
+CreateConVar("playx_host_url", "http://nexbr.github.io/playx/host.html",        {FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
@@ -43,7 +43,7 @@ function PlayX.AccessManager(ply)
 	
 	-- Check if ULib is loaded
 	if ULib ~= nil then
-		result = ply:query("PlayX Access")	
+		result = ULib.ucl.query(ply, "PlayX Access")	
 	end
 	
 	-- Check if exsto is loaded
