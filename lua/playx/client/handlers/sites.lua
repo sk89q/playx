@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.8 by Nexus [BR] on 10-07-2013 10:50 AM
+-- Version 2.8.4 by Nexus [BR] on 09-01-2014 06:54 PM (-02:00 GMT)
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -193,7 +193,8 @@ list.Set("PlayXHandlers", "YouTubePopup", function(width, height, start, volume,
     end
 	    
     return playxlib.HandlerResult{
-        url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri) .. '&enablejsapi=1&version=3&start=' .. start,
+        --url = "http://www.youtube.com/watch_popup?v=" .. playxlib.JSEscape(uri) .. '&enablejsapi=1&autoplay=1&version=3&start=' .. start,
+        url = "http://www.youtube.com/embed/" .. playxlib.JSEscape(uri) .. "?enablejsapi=1&autoplay=1&version=3&start=" .. start,
         center = false,
         volumeFunc = volumeFunc,
         playFunc = playFunc,

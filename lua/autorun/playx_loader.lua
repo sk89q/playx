@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.3 by Nexus [BR] on 16-12-2013 07:00 PM (-02:00 GMT)
+-- Version 2.8.4 by Nexus [BR] on 09-01-2014 06:54 PM (-02:00 GMT)
 
 --Setup Loading Log Formatation
 function loadingLog (text)
@@ -69,7 +69,7 @@ end
 Msg( "\n/====================================\\\n")
 Msg( "||               PlayX              ||\n" )
 Msg( "||----------------------------------||\n" )
-loadingLog("Version 2.8.3")
-loadingLog("Updated on 16-12-2013 07:00 PM")
+loadingLog("Version 2.8.4")
+loadingLog("Updated on 09-01-2014 06:54 PM")
 loadingLog("Last Patch by Nexus [BR]")
 Msg( "\\====================================/\n\n" )
