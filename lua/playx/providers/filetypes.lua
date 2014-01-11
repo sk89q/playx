@@ -15,6 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
 
 local Shoutcast = {}
 
@@ -63,6 +64,47 @@ end
 
 list.Set("PlayXProviders", "Shoutcast", Shoutcast)
 list.Set("PlayXProvidersList", "Shoutcast", {"Shoutcast"})
+
+-- RTMP
+local RTMP = {}
+
+function RTMP.Detect(uri)
+    local m = playxlib.FindMatch(uri, {
+        "^rtmp://.+$",
+        "^rtmp://.+$",
+    })
+    
+    if m then
+        return uri
+    end
+end
+
+function RTMP.GetPlayer(uri, useJW)
+    local m = playxlib.FindMatch(uri, {
+        "^rtmp://.+$",
+    })
+    
+    if m then       
+        return {
+            ["Handler"] = "JWRTMP",
+            ["URI"] = uri,
+            ["ResumeSupported"] = true,
+            ["LowFramerate"] = false,
+            ["MetadataFunc"] = function(callback, failCallback)
+                RTMP.QueryMetadata(uri, callback, failCallback)
+            end,
+        }
+    end
+end
+
+function RTMP.QueryMetadata(uri, callback, failCallback)
+    callback({
+        ["URL"] = uri,
+    })
+end
+
+list.Set("PlayXProviders", "RTMP", RTMP)
+list.Set("PlayXProvidersList", "RTMP", {"RTMP"})
 
 local MP3 = {}
 

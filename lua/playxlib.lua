@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
+-- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
 
 playxlib = {}
 
@@ -642,19 +642,7 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
         playFunc = playFunc,
         pauseFunc = pauseFunc,
         js = [[
-var provider = "]]..provider..[[";
-
-var settings_auto = {
-	file: "]]..uri..[[",
-	width: "]]..width..[[",
-	height: "]]..height..[[",
-	autostart: 1,
-	controls: false,
-	start: "]]..start..[[",
-	volume: ]]..volume..[[
-}
-
-var settings_with_provider = {
+jwplayer('player').setup({
 	file: "]]..uri..[[",
 	width: "]]..width..[[",
 	height: "]]..height..[[",
@@ -663,17 +651,7 @@ var settings_with_provider = {
 	controls: false,
 	start: "]]..start..[[",
 	volume: ]]..volume..[[
-}
-
-var settings = {};
-
-if (provider == 'mp3'){
-	settings = settings_with_provider;	
-}else{
-	settings = settings_auto;
-}
-
-jwplayer('player').setup(settings);
+});
   
 var knownState = "";
 

@@ -15,17 +15,22 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
 
 list.Set("PlayXHandlers", "IFrame", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.GenerateIFrame(width, height, uri)
 end)
 
-list.Set("PlayXHandlers", "JW", function(width, height, start, volume, uri)
+list.Set("PlayXHandlers", "JW", function(width, height, start, volume, uri, handlerArgs)
      return playxlib.GenerateJWPlayer(width, height, start, volume, uri, handlerArgs)
 end)
 
 list.Set("PlayXHandlers", "JWVideo", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "video")
+end)
+
+list.Set("PlayXHandlers", "JWYoutube", function(width, height, start, volume, uri, handlerArgs)
+    return playxlib.GenerateJWPlayer(width, height, start, volume, "http://www.youtube.com/watch?v="..uri, "youtube")
 end)
 
 list.Set("PlayXHandlers", "JWAudio", function(width, height, start, volume, uri, handlerArgs)

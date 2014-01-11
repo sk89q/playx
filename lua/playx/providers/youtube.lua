@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.6 by Nexus [BR] on 20-03-2013 09:38 AM
+-- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
 
 local apiKey = "AI39si79-V-ltHhNyYvyTeaiJeexopkZoiUA56Sk-W8Z5alYUkgntdwvkmu1" ..
                "avAWGNixM_DuLx8-Jai6qy1am7HhbhYvWERzWA"
@@ -41,7 +41,7 @@ function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
         if useJW then
             return {
-                ["Handler"] = "YouTubePopup",
+                ["Handler"] = "JWYoutube",
                 ["URI"] = uri,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
