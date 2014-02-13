@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.4 by Nexus [BR] on 09-01-2014 06:54 PM (-02:00 GMT)
+-- Version 2.8.6 - soundcloud by xerasin on 13-02-2014 12:56 PM (-02:00 GMT)
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -282,4 +282,17 @@ list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, ur
         center = false,
         body = html
 	}
+end)
+
+-- Soundcloud by Xerasin
+list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, adjVol, uri, handlerArgs, callback)
+    if start > 2 then
+      start = start + 4 -- Lets account for buffer time...
+    end
+  volume = adjVol
+    local result = playxlib.GenerateIFrame(width, height, "http://nexbr.github.io/playx/soundcloud.html?url="..playxlib.URLEscape(uri).."&t="..tostring(start*1000).."&vol="..tostring(volume))
+  result.GetVolumeChangeJS = function(volume)
+    return "SC.Widget(document.getElementById('player')).setVolume("..tostring(volume)..");"
+  end
+  callback(result)
 end)
