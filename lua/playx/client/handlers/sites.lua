@@ -284,12 +284,11 @@ list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, ur
 	}
 end)
 
-list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, adjVol, uri, handlerArgs, callback)
+-- Initial soundcloud handler by Xerasin, I fixed and make it better for my PlayX version.
+list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, uri, handlerArgs)
   if start > 2 then
     start = start + 4 -- Lets account for buffer time...
   end
-  
-  volume = adjVol
   
   local volumeFunc = function(volume)
     return "SC.Widget(document.querySelector('iframe')).setVolume("..tostring(volume)..");"
@@ -304,7 +303,7 @@ list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, a
   end
   
   return playxlib.HandlerResult{
-    url =  playxlib.JSEscape("http://nexbr.github.io/playx/soundcloud.html?url="..uri.."&t="..tostring(start).."&vol="..tostring(volume)),
+    url =  playxlib.JSEscape("http://nexbr.github.io/playx/soundcloud.html?url="..uri.."&t="..tostring(start*1000).."&vol="..tostring(volume)),
     volumeFunc = volumeFunc,
     playFunc = playFunc,
     pauseFunc = pauseFunc

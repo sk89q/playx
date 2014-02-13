@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.6 by Xerasin on 13-02-2014 12:58 PM (-02:00 GMT)
+-- Version 2.8.6 by Xerasin on 13-02-2014 02:00 PM (-02:00 GMT)
 
 --Setup Loading Log Formatation
 function loadingLog (text)
@@ -70,6 +70,6 @@ Msg( "\n/====================================\\\n")
 Msg( "||               PlayX              ||\n" )
 Msg( "||----------------------------------||\n" )
 loadingLog("Version 2.8.6")
-loadingLog("Updated on 13-02-2014 12:58 PM")
-loadingLog("Last Patch by Xerasin")
+loadingLog("Updated on 13-02-2014 02:00 PM")
+loadingLog("Last Patch by Nexus")
 Msg( "\\====================================/\n\n" )
