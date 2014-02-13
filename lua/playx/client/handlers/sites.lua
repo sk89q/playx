@@ -277,22 +277,36 @@ list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, ur
 		html = html_live;
 	end
 	    
-    return playxlib.HandlerResult{
-        url = playxlib.JSEscape(uri),
-        center = false,
-        body = html
+  return playxlib.HandlerResult{
+    url = playxlib.JSEscape(uri),
+    center = false,
+    body = html
 	}
 end)
 
--- Soundcloud by Xerasin
 list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, adjVol, uri, handlerArgs, callback)
-    if start > 2 then
-      start = start + 4 -- Lets account for buffer time...
-    end
-  volume = adjVol
-    local result = playxlib.GenerateIFrame(width, height, "http://nexbr.github.io/playx/soundcloud.html?url="..playxlib.URLEscape(uri).."&t="..tostring(start*1000).."&vol="..tostring(volume))
-  result.GetVolumeChangeJS = function(volume)
-    return "SC.Widget(document.getElementById('player')).setVolume("..tostring(volume)..");"
+  if start > 2 then
+    start = start + 4 -- Lets account for buffer time...
   end
-  callback(result)
+  
+  volume = adjVol
+  
+  local volumeFunc = function(volume)
+    return "SC.Widget(document.querySelector('iframe')).setVolume("..tostring(volume)..");"
+  end
+  
+  local playFunc = function()
+    return "SC.Widget(document.querySelector('iframe')).play();"
+  end
+  
+  local pauseFunc = function()
+    return "SC.Widget(document.querySelector('iframe')).pause();"
+  end
+  
+  return playxlib.HandlerResult{
+    url =  playxlib.JSEscape("http://nexbr.github.io/playx/soundcloud.html?url="..uri.."&t="..tostring(start).."&vol="..tostring(volume)),
+    volumeFunc = volumeFunc,
+    playFunc = playFunc,
+    pauseFunc = pauseFunc
+  }
 end)
