@@ -22,7 +22,7 @@ AddCSLuaFile("cl_init.lua")
 
 include("shared.lua")
 
-resource.AddFile("materials/vgui/entities/gmod_playx.vmt")
+--resource.AddFile("materials/vgui/entities/gmod_playx.vmt")
 
 ENT.InputProvider = ""
 ENT.InputURI = ""

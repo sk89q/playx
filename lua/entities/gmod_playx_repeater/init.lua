@@ -21,7 +21,7 @@ AddCSLuaFile("cl_init.lua")
 
 include("shared.lua")
 
-resource.AddFile("materials/vgui/entities/gmod_playx_repeater.vmt")
+--resource.AddFile("materials/vgui/entities/gmod_playx_repeater.vmt")
 
 function ENT:Initialize()
     self.Entity:PhysicsInit(SOLID_VPHYSICS)
