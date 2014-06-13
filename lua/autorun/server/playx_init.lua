@@ -22,6 +22,8 @@ if von == nil then
 	include("von.lua")
 end
 
+resource.AddWorkshop("106516163")
+
 AddCSLuaFile("autorun/client/playx_init.lua")
 AddCSLuaFile("playxlib.lua")
 AddCSLuaFile("playx/client/playx.lua")
