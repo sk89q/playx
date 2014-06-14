@@ -15,12 +15,12 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.3 by Nexus [BR] on 16-12-2013 07:00 PM (-02:00 GMT)
+-- Version 2.8.7 by Nexus on 2014-06-14 09:00 PM (-03:00 GMT)
 
 
 -- FCVAR_GAMEDLL makes cvar change detection work
-CreateConVar("playx_jw_url", "http://nexbr.github.io/playx/swf/jwplayer.flash.swf", {FCVAR_GAMEDLL})
-CreateConVar("playx_host_url", "http://nexbr.github.io/playx/host.html",        {FCVAR_GAMEDLL})
+CreateConVar("playx_jw_url", "http://ziondevelopers.github.io/playx/swf/jwplayer.flash.swf", {FCVAR_GAMEDLL})
+CreateConVar("playx_host_url", "http://ziondevelopers.github.io/playx/host.html",        {FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
