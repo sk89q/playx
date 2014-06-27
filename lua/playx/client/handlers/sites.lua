@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.6 - soundcloud by xerasin on 13-02-2014 12:56 PM (-02:00 GMT)
+-- Version 2.8.8 - soundcloud by xerasin on 13-02-2014 12:56 PM (-02:00 GMT)
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -303,7 +303,7 @@ list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, u
   end
   
   return playxlib.HandlerResult{
-    url =  playxlib.JSEscape("http://nexbr.github.io/playx/soundcloud.html?url="..uri.."&t="..tostring(start*1000).."&vol="..tostring(volume)),
+    url =  playxlib.JSEscape("http://ziondevelopers.github.io/playx/soundcloud.html?url="..uri.."&t="..tostring(start*1000).."&vol="..tostring(volume)),
     volumeFunc = volumeFunc,
     playFunc = playFunc,
     pauseFunc = pauseFunc
