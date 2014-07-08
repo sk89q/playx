@@ -116,7 +116,7 @@ local function SearchYouTube(q, successF, failureF)
     http.Fetch(url, function(result, size)
         if size > 0 then
             local title = nil
-            local videoID = string.match(result, "http://www%.youtube%.com/watch%?v=([A-Za-z0-9_%-]+)")
+            local videoID = string.match(result, "https?://www%.youtube%.com/watch%?v=([A-Za-z0-9_%-]+)")
             
             if videoID then
                 for m in string.gmatch(result, "<title type='text'>([^<]+)</title>") do
@@ -168,7 +168,7 @@ hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, 
                 end
                 
                 for _, v in pairs(player.GetAll()) do
-                    v:ChatPrint(string.format("YouTube query: Query '%s': http://www.youtube.com/watch?v=%s (%s).",
+                    v:ChatPrint(string.format("YouTube query: Query '%s': https?://www.youtube.com/watch?v=%s (%s).",
                                               m[2], videoID, title))
                 end
             end
@@ -202,11 +202,11 @@ hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, 
     end
     
     local m = FindMatch(text, {
-        "http://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
-        "http://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
-        "http://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
-        "http://youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
-        "http://[A-Za-z0-9%.%-]*%.youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "https?://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "https?://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "https?://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
+        "https?://youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "https?://[A-Za-z0-9%.%-]*%.youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
     })
     
     if m then

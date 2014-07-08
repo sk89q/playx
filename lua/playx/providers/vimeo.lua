@@ -21,8 +21,8 @@ local Vimeo = {}
 
 function Vimeo.Detect(uri, useJW)
     local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
-        "^http://[A-Za-z0-9%.%-]*%.vimeo%.com/([0-9]+)",
-        "^http://vimeo%.com/([0-9]+)",
+        "^https?://[A-Za-z0-9%.%-]*%.vimeo%.com/([0-9]+)",
+        "^https?://vimeo%.com/([0-9]+)",
     })
     
     if m then

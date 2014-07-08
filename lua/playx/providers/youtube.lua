@@ -24,12 +24,12 @@ local YouTube = {}
 
 function YouTube.Detect(uri)    
     local m = playxlib.FindMatch(uri, {
-        "^http://youtu%.be/([A-Za-z0-9_%-]+)",
-        "^http://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
-        "^http://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
-        "^http://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
-        "^http://youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
-        "^http://[A-Za-z0-9%.%-]*%.youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "^https?://youtu%.be/([A-Za-z0-9_%-]+)",
+        "^https?://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "^https?://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "^https?://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
+        "^https?://youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "^https?://[A-Za-z0-9%.%-]*%.youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
     })
     
     if m then
