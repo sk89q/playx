@@ -21,8 +21,8 @@ local Shoutcast = {}
 
 function Shoutcast.Detect(uri)
     local m = playxlib.FindMatch(uri, {
-        "^http://[^:/]+/;stream%.nsv$",
-        "^http://[^:/]+:[0-9]+/?$",
+        "^https?://[^:/]+/;stream%.nsv$",
+        "^https?://[^:/]+:[0-9]+/?$",
     })
     
     if m then
@@ -32,7 +32,7 @@ end
 
 function Shoutcast.GetPlayer(uri, useJW)
     local m = playxlib.FindMatch(uri, {
-        "^http://.+$",
+        "^https?://.+$",
     })
     
     if m then
@@ -110,8 +110,8 @@ local MP3 = {}
 
 function MP3.Detect(uri)
     local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
-        "^http://.+%.mp3$",
-        "^http://.+%.MP3$",
+        "^https?://.+%.mp3$",
+        "^https?://.+%.MP3$",
     })
     
     if m then
@@ -120,7 +120,7 @@ function MP3.Detect(uri)
 end
 
 function MP3.GetPlayer(uri, useJW)
-    if uri:lower():find("^http://") then
+    if uri:lower():find("^https?://") then
         return {
             ["Handler"] = "JWAudio",
             ["URI"] = uri,
@@ -146,12 +146,12 @@ local FlashVideo = {}
 
 function FlashVideo.Detect(uri)
     local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
-        "^http://.+%.flv$",
-        "^http://.+%.FLV$",
-        "^http://.+%.mp4$",
-        "^http://.+%.MP4$",
-        "^http://.+%.aac$",
-        "^http://.+%.AAC$",
+        "^https?://.+%.flv$",
+        "^https?://.+%.FLV$",
+        "^https?://.+%.mp4$",
+        "^https?://.+%.MP4$",
+        "^https?://.+%.aac$",
+        "^https?://.+%.AAC$",
     })
     
     if m then
@@ -160,7 +160,7 @@ function FlashVideo.Detect(uri)
 end
 
 function FlashVideo.GetPlayer(uri, useJW)
-    if uri:lower():find("^http://") then
+    if uri:lower():find("^https?://") then
         return {
             ["Handler"] = "JWVideo",
             ["URI"] = uri,
@@ -200,7 +200,7 @@ function Image.Detect(uri)
 end
 
 function Image.GetPlayer(uri, useJW)
-    if uri:lower():find("^http://") then
+    if uri:lower():find("^https?://") then
         return {
             ["Handler"] = "Image",
             ["URI"] = uri,

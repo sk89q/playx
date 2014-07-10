@@ -20,8 +20,8 @@ local JustinTV = {}
 
 function JustinTV.Detect(uri)
     local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
-        "^http://www%.justin%.tv/([a-zA-Z0-9_/]+)$",
-        "^http://justin%.tv/([a-zA-Z0-9_/]+)$",
+        "^https?://www%.justin%.tv/([a-zA-Z0-9_/]+)$",
+        "^https?://justin%.tv/([a-zA-Z0-9_/]+)$",
     })
     
     if m then

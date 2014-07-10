@@ -23,7 +23,7 @@ function StaticWeb.Detect(uri)
 end
 
 function StaticWeb.GetPlayer(uri, useJW)
-    if uri:find("^http://") then
+    if uri:find("^https?://") then
         return {
             ["Handler"] = "IFrame",
             ["URI"] = uri,

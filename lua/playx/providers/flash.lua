@@ -23,7 +23,7 @@ function Flash.Detect(uri)
 end
 
 function Flash.GetPlayer(uri, useJW)
-    if uri:lower():find("^http://") then
+    if uri:lower():find("^https?://") then
         return {
             ["Handler"] = "Flash",
             ["URI"] = uri,
@@ -49,8 +49,8 @@ local FlashMovie = {}
 
 function FlashMovie.Detect(uri)
     local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
-        "^http://.+%.swf$",
-        "^http://.+%.SWF$",
+        "^https?://.+%.swf$",
+        "^https?://.+%.SWF$",
     })
     
     if m then
@@ -59,7 +59,7 @@ function FlashMovie.Detect(uri)
 end
 
 function FlashMovie.GetPlayer(uri, useJW)
-    if uri:lower():find("^http://") then
+    if uri:lower():find("^https?://") then
         return {
             ["Handler"] = "Flash",
             ["URI"] = uri,
