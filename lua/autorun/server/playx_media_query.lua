@@ -168,7 +168,7 @@ hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, 
                 end
                 
                 for _, v in pairs(player.GetAll()) do
-                    v:ChatPrint(string.format("YouTube query: Query '%s': https?://www.youtube.com/watch?v=%s (%s).",
+                    v:ChatPrint(string.format("YouTube query: Query '%s': http://www.youtube.com/watch?v=%s (%s).",
                                               m[2], videoID, title))
                 end
             end
