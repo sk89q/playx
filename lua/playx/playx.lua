@@ -436,10 +436,6 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, ha
                                        lowFramerate, handlerArgs,
                                        PlayX.CurrentMedia})
     
-    if length then
-        PlayX.SetCurrentMediaLength(length)
-    end
-    
     PlayX.SendBeginDStream()
 end
 
