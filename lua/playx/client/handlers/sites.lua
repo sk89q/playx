@@ -251,20 +251,20 @@ list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, ur
 	local chapterID = handlerArgs["ChapterID"];
     
     local html_live = [[
-<object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=]]..channelID..[[" bgcolor="#000000">
+<object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www-cdn.jtvnw.net/swflibs/TwitchPlayer.r068ef0c78e9334456fad81bde4ed8870c222aef1.swf?channel=]]..channelID..[[" bgcolor="#000000">
 	<param name="allowFullScreen" value="true" />
 	<param name="allowScriptAccess" value="deny" />
 	<param name="allowNetworking" value="all" />
-	<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" />
+	<param name="movie" value="http://www-cdn.jtvnw.net/swflibs/TwitchPlayer.r068ef0c78e9334456fad81bde4ed8870c222aef1.swf" />
 	<param name="flashvars" value="hostname=www.twitch.tv&channel=]]..channelID..[[&auto_play=true&start_volume=]]..volume..[[" />
 </object>]];
 
 	local html_archived = [[
-<object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www-cdn.jtvnw.net/widgets/archive_site_player.swf" bgcolor="#000000"> 
+<object type="application/x-shockwave-flash" height="]]..height..[[" width="]]..width..[[" data="http://www-cdn.jtvnw.net/swflibs/TwitchPlayer.r068ef0c78e9334456fad81bde4ed8870c222aef1.swf" bgcolor="#000000"> 
   <param name="allowScriptAccess" value="deny" /> 
   <param name="allowNetworking" value="all" /> 
   <param name="allowFullScreen" value="true" /> 
-  <param name="movie" value="http://www-cdn.jtvnw.net/widgets/archive_site_player.swf" /> 
+  <param name="movie" value="http://www-cdn.jtvnw.net/swflibs/TwitchPlayer.r068ef0c78e9334456fad81bde4ed8870c222aef1.swf" /> 
   <param name="flashvars" value="channel=]]..channelID..[[&start_volume=]]..volume..[[&auto_play=true&chapter_id=]]..chapterID..[[&videoId=c]]..chapterID..[[" />
 </object>
 ]]
