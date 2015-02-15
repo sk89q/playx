@@ -47,15 +47,15 @@ function TwitchTV.GetPlayer(url, useJW)
 				chapterID = chapterID[2]
 				fullURL = "http://www.twitch.tv/"..channelID.."/c/"..chapterID;
 			else
-				fullURL = "http://www.twitch.tv/"..channelID;
+				fullURL = "http://www.twitch.tv/"..channelID..'/embed';
 			end	
 		end	
 	    
 	    if uri:lower():find("^[a-zA-Z0-9_]+$") then        
 	        return {
-	            ["Handler"] = "twitch.tv",
-	            ["URI"] =  GetConVarString("playx_host_url"),
-	            ["ResumeSupported"] = true,
+	            ["Handler"] = "IFrame",
+	            ["URI"] =  fullURL,
+	            ["ResumeSupported"] = false,
 	            ["LowFramerate"] = false,
 	            ["MetadataFunc"] = function(callback, failCallback)
 	                TwitchTV.QueryMetadata(fullURL, callback, failCallback)
