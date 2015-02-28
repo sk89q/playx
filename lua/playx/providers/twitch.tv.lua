@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.7.7 by Nexus [BR] on 10-07-2013 10:00 AM
+-- Version 2.8.14 by Nexus on 2015-02-28 07:39 PM (-03:00 UTC)
 
 local TwitchTV = {}
 
@@ -55,7 +55,7 @@ function TwitchTV.GetPlayer(url, useJW)
 	        return {
 	            ["Handler"] = "IFrame",
 	            ["URI"] =  fullURL,
-	            ["ResumeSupported"] = false,
+	            ["ResumeSupported"] = true,
 	            ["LowFramerate"] = false,
 	            ["MetadataFunc"] = function(callback, failCallback)
 	                TwitchTV.QueryMetadata(fullURL, callback, failCallback)
