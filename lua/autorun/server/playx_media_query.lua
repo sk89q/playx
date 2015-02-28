@@ -27,6 +27,7 @@
 -- To install, drop this file into your lua/autorun/server folder.
 --
 -- $Id$
+-- Version 2.8.15 by thegrb93 on 2015-02-28 08:00 PM (-03:00 UTC)
 
 local lastResult = nil
 
@@ -135,6 +136,7 @@ end
 
 local function Play(ply, provider, uri, lowFramerate)
     if PlayX.IsPermitted(ply) then
+        PrintMessage(HUD_PRINTCONSOLE, ply:Nick().." started a video!")
         local result, err = PlayX.OpenMedia(provider, uri, 0, lowFramerate, true, false)
         if not result then
             ply:ChatPrint("PlayX ERROR: " .. err)

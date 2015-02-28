@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.7 by Nexus on 2014-06-14 09:00 PM (-03:00 GMT)
+-- Version 2.8.15 by thegrb93 on 2015-02-28 08:00 PM (-03:00 UTC)
 
 
 -- FCVAR_GAMEDLL makes cvar change detection work
@@ -466,7 +466,7 @@ end
 function PlayX.SendBeginDStream(ply)
     local filter = nil
     
-    if ply then
+    if IsValid(ply) then
         filter = ply
     else
         --filter = RecipientFilter()
@@ -580,6 +580,7 @@ local function ConCmdOpen(ply, cmd, args)
         elseif start < 0 then
             PlayX.SendError(ply, "A non-negative start time is required")
         else
+            PrintMessage(HUD_PRINTCONSOLE, ply:Nick().." started a video!")
             local result, err = PlayX.OpenMedia(provider, uri, start,
                                                 forceLowFramerate, useJW,
                                                 ignoreLength)

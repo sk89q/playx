@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.1 by Nexus [BR] on 20-08-2013 11:40 
+-- Version 2.8.15 by thegrb93 on 2015-02-28 08:00 PM (-03:00 UTC)
 
 PANEL = {}
 
@@ -48,7 +48,7 @@ function PANEL:Init()
 
     self:AddFunction( "playx", "processPlayerData", function( query )
     	local playx = PlayX.GetInstance()
-		if query and playx:IsValid() then
+		if query and IsValid(playx) then
 		    -- Unavailable on entity removal
 		    if playx.ProcessPlayerData then
 		        playx:ProcessPlayerData(playxlib.ParseQuery(query))
