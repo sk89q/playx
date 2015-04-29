@@ -1,7 +1,7 @@
 -- PlayX Media Query Extension
 -- Copyright (c) 2009 sk89q <http://www.sk89q.com>
 -- Licensed under the GNU General Public License v2
--- 
+--
 -- This extension allows you to control PlayX, as well as search YouTube
 -- from chat. Anyone can invoke the YouTube functions, but only those
 -- permitted to do so can control PlayX.
@@ -18,7 +18,7 @@
 --   !play <URI> - Plays a piece of media (provider is auto-detected)
 --   !link <URI> - Alias of !play
 --   !playx <URI> - Alias of !play
--- 
+--
 -- In addition to that, a user can also just paste a YouTube URL anywhere
 -- in his or her message and the title of the video will be looked up and
 -- printed to chat. It will also set the "last result" as the URL, so you
@@ -44,7 +44,7 @@ end
 local function URLEncode(s)
     s = tostring(s)
     local new = ""
-    
+
     for i = 1, #s do
         local c = s:sub(i, i)
         local b = c:byte()
@@ -56,17 +56,17 @@ local function URLEncode(s)
             new = new .. string.format("%%%X", b)
         end
     end
-    
+
     return new
 end
 
 local function URLEncodeTable(vars)
     local str = ""
-    
+
     for k, v in pairs(vars) do
         str = str .. URLEncode(k) .. "=" .. URLEncode(v) .. "&"
     end
-    
+
     return str:sub(1, -2)
 end
 
@@ -75,58 +75,38 @@ local function FindMatch(str, patterns)
         local m = {str:match(pattern)}
         if m[1] then return m end
     end
-    
+
     return nil
-end
-
-local function QueryYouTubeTitle(id, successF, failureF)
-    local vars = URLEncodeTable({
-        ["alt"] = "atom",
-        ["key"] = "AI39si7XNJTicSx18de-aAVYNq20Z0BVFwRo3l8xHu9s6L0YHFgmIlmuR8sabsj1WCghhfxdMzFgCYJapPfP3xTVdPdkTsxhXQ",
-        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
-    })
-    local url = "http://gdata.youtube.com/feeds/api/videos/" .. id .."?" .. vars
-
-    http.Fetch(url, function(result, size)
-        if size > 0 then
-            local title = string.match(result, "<title type='text'>([^<]+)</title>")
-            
-            if title then
-                successF(id, UnHTMLEncode(title))
-            else
-                failureF("Failed to fetch video.")
-            end
-        else
-            failureF("An error occurred while querying YouTube.")
-        end
-    end)
 end
 
 local function SearchYouTube(q, successF, failureF)
     local vars = URLEncodeTable({
-        ["alt"] = "atom",
         ["q"] = q,
         ["orderby"] = "relevance",
-        ["max-results"] = "1",
+        ["fields"] = "items(id,snippet(title,thumbnails(default(url))))",
+        ["maxResults"] = "1",
         -- ["format"] = "5", -- We can now play embedded videos!
-        ["key"] = "AI39si7XNJTicSx18de-aAVYNq20Z0BVFwRo3l8xHu9s6L0YHFgmIlmuR8sabsj1WCghhfxdMzFgCYJapPfP3xTVdPdkTsxhXQ",
-        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["part"] = "snippet",
+        ["key"] = "AIzaSyA8OmKcw2DMNkJicyCJ0vqvf90xgeH52zE"
     })
-    local url = "http://gdata.youtube.com/feeds/api/videos?" .. vars
+    local url = "https://www.googleapis.com/youtube/v3/search?" .. vars
 
     http.Fetch(url, function(result, size)
         if size > 0 then
-            local title = nil
-            local videoID = string.match(result, "https?://www%.youtube%.com/watch%?v=([A-Za-z0-9_%-]+)")
-            
-            if videoID then
-                for m in string.gmatch(result, "<title type='text'>([^<]+)</title>") do
-                    title = m
+            local searchTable = util.JSONToTable(result)
+
+            if(searchTable.items) then
+                if(searchTable.items[1]) then
+                    if(searchTable.items[1].id) then
+                        successF(searchTable.items[1].id.videoId,searchTable.items[1].snippet.title)
+                    else
+                        failureF("An error occurred while querying YouTube.")
+                    end
+                else
+                    failureF("An error occurred while querying YouTube.")
                 end
-            
-                successF(videoID, UnHTMLEncode(title))
             else
-                failureF("No results found.")
+                failureF("An error occurred while querying YouTube.")
             end
         else
             failureF("An error occurred while querying YouTube.")
@@ -148,9 +128,9 @@ end
 
 hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, death)
     if teamchat then return end
-    
+
     text = text:TrimRight()
-    
+
     local m = FindMatch(text, {
         "^[!%.](yt) (.+)",
         "^[!%.](ytplay) (.+)",
@@ -159,26 +139,26 @@ hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, 
         "^[!%.](ytlisten)",
         "^[!%.](ytlast)",
     })
-    
+
     if m then
         if m[1] == "yt" or (m[1] == "ytplay" and m[2]) or (m[1] == "ytlisten" and m[2]) then
             local function successF(videoID, title)
                 lastResult = videoID
-                
+
                 if m[1] ~= "yt" then -- Play
                     Play(ply, "YouTube", videoID, m[1] == "ytlisten")
                 end
-                
+
                 for _, v in pairs(player.GetAll()) do
                     v:ChatPrint(string.format("YouTube query: Query '%s': http://www.youtube.com/watch?v=%s (%s).",
                                               m[2], videoID, title))
                 end
             end
-            
+
             local function failureF(msg)
                 ply:ChatPrint(string.format("YouTube query: No video found for query '%s'.", q))
             end
-            
+
             SearchYouTube(m[2], successF, failureF)
         elseif m[1] == "ytplay" or m[1] == "ytlisten" or m[1] == "ytlast" then -- Play last
             if lastResult then
@@ -187,22 +167,22 @@ hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, 
                 ply:ChatPrint("ERROR: No last result exists!")
             end
         end
-        
+
         return nil
     end
-    
+
     local m = FindMatch(text, {
         "^[!%.]play (.+)",
         "^[!%.]link (.+)",
         "^[!%.]playx (.+)",
     })
-    
+
     if m then
         Play(ply, "", m[1], false)
-        
+
         return nil
     end
-    
+
     local m = FindMatch(text, {
         "https?://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "https?://[A-Za-z0-9%.%-]*%.youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
@@ -210,23 +190,23 @@ hook.Add("PlayerSay", "PlayXMediaQueryPlayerSay", function(ply, text, teamchat, 
         "https?://youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "https?://[A-Za-z0-9%.%-]*%.youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
     })
-    
+
     if m then
         lastResult = m[1]
-        
+
         local function successF(videoID, title)
             lastResult = videoID
-            
+
             for _, v in pairs(player.GetAll()) do
                 v:ChatPrint(string.format("YouTube video %s: \"%s\"",
                                           videoID, title))
             end
         end
-        
-        QueryYouTubeTitle(m[1], successF, function() end)
-        
+
+        SearchYouTube(m[1], successF, function() end)
+
         return nil
     end
-    
+
     return nil
 end)
