@@ -1,28 +1,27 @@
 -- PlayX
 -- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
--- 
+--
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
 -- the Free Software Foundation, either version 2 of the License, or
 -- (at your option) any later version.
--- 
+--
 -- This program is distributed in the hope that it will be useful,
 -- but WITHOUT ANY WARRANTY; without even the implied warranty of
 -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 -- GNU General Public License for more details.
--- 
+--
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
--- 
+--
 -- $Id$
 -- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
 
-local apiKey = "AI39si79-V-ltHhNyYvyTeaiJeexopkZoiUA56Sk-W8Z5alYUkgntdwvkmu1" ..
-               "avAWGNixM_DuLx8-Jai6qy1am7HhbhYvWERzWA"
+local apiKey = "AIzaSyD74kTqDqj6YQQdKYH9n5-6kG-l_oX_41A"
 
 local YouTube = {}
 
-function YouTube.Detect(uri)    
+function YouTube.Detect(uri)
     local m = playxlib.FindMatch(uri, {
         "^https?://youtu%.be/([A-Za-z0-9_%-]+)",
         "^https?://youtube%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
@@ -31,7 +30,7 @@ function YouTube.Detect(uri)
         "^https?://youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^https?://[A-Za-z0-9%.%-]*%.youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
     })
-    
+
     if m then
         return m[1]
     end
@@ -60,9 +59,9 @@ function YouTube.GetPlayer(uri, useJW)
                 ["enablejsapi"] = "1",
                 ["version"] = "3"
             }
-            
+
             local url = Format("http://www.youtube.com/v/%s&%s", uri, playxlib.URLEscapeTable(vars))
-            
+
             return {
                 ["Handler"] = "FlashAPI",
                 ["URI"] = url,
@@ -83,51 +82,59 @@ end
 
 function YouTube.QueryMetadata(uri, callback, failCallback)
     local vars = playxlib.URLEscapeTable({
-        ["alt"] = "atom",
+        ["part"] = "snippet,statistics,contentDetails",
         ["key"] = apiKey,
-        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString()),
+        ["maxResults"] = "1",
+        ["id"] = uri,
+        ["client"] = game.SinglePlayer() and "SP" or ("MP:" .. GetConVar("hostname"):GetString())
     })
-    
-    local url = Format("http://gdata.youtube.com/feeds/api/videos/%s?%s", uri, vars)
+
+    local url = Format("https://www.googleapis.com/youtube/v3/videos?%s", vars)
 
     http.Fetch(url, function(result, size)
         if size == 0 then
             failCallback("HTTP request failed (size = 0)")
             return
         end
-        
-        local title = playxlib.HTMLUnescape(string.match(result, "<title type='text'>([^<]+)</title>"))
-        local desc = playxlib.HTMLUnescape(string.match(result, "<content type='text'>([^<]+)</content>"))
-        local submitter = playxlib.HTMLUnescape(string.match(result, "<author><name>([^<]+)</name>"))
-        
+        local resultsTable = util.JSONToTable(result)
+
+        local title = resultsTable.items[1].snippet.title
+        local desc = resultsTable.items[1].snippet.description
+        local submitter = resultsTable.items[1].snippet.channelTitle
+
         local publishedDate = nil
-        local y, mo, d, h, m, s = string.match(result, "<published>([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z</published>")
+        local y, mo, d, h, m, s = string.match(resultsTable.items[1].snippet.publishedAt, "([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z")
         if y then
             publishedDate = playxlib.UTCTime({year=tonumber(y), month=tonumber(m),
                                            day=tonumber(d), hour=tonumber(h),
                                            min=tonumber(m), sec=tonumber(s)})
         end
-        
+
         local modifiedDate = nil
-        local y, mo, d, h, m, s = string.match(result, "<updated>([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z</updated>")
+        --No modifiedDate available in the v3 API, as far as I'm aware.
+        local y, mo, d, h, m, s = string.match(resultsTable.items[1].snippet.publishedAt, "([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)%.000Z")
         if y then
             modifiedDate = playxlib.UTCTime({year=tonumber(y), month=tonumber(mo),
                                           day=tonumber(d), hour=tonumber(h),
                                           min=tonumber(m), sec=tonumber(s)})
         end
-        
-        local length = tonumber(string.match(result, "<yt:duration seconds='([0-9]+)'"))
-        local tags = playxlib.ParseTags(playxlib.HTMLUnescape(string.match(result, "<media:keywords>([^<]+)</media:keywords>")), ",")
-        local thumbnail = playxlib.HTMLUnescape(string.match(result, "<media:thumbnail url='([^']+)' height='360' width='480' time='[^']+'/>"))
-        local comments = tonumber(string.match(result, "<gd:comments><gd:feedLink href='[^']+' countHint='([0-9]+)'/>"))
-        
-        local faves, views = string.match(result, "<yt:statistics favoriteCount='([0-9]+)' viewCount='([0-9]+)'/>")
-        faves, views = tonumber(faves), tonumber(views)
-        
-        local rating, numRaters = string.match(result, "<gd:rating average='([0-9%.]+)'[^R]+numRaters='([0-9]+)'")
-        rating, numRaters = tonumber(rating), tonumber(numRaters)
-        if rating then rating = rating / 5.0 end
-        
+
+
+        --length is in ISO
+        local length_raw = resultsTable.items[1].contentDetails.duration
+        --Thanks Wyozi/Wiox
+        local length = tonumber(length_raw:match("(%d+)S") or 0) + tonumber(length_raw:match("(%d+)M") or 0)*60 + tonumber(length_raw:match("(%d+)H") or 0)*3600
+        local tags = resultsTable.items[1].snippet.tags or {}
+        local thumbnail = resultsTable.items[1].snippet.thumbnails.standard.url
+        local comments = resultsTable.items[1].statistics.commentCount
+
+        local faves = resultsTable.items[1].statistics.favoriteCount
+        local views = resultsTable.items[1].statistics.viewCount
+
+        local likes = resultsTable.items[1].statistics.likeCount
+        local numRaters = likes + resultsTable.items[1].statistics.dislikeCount
+        local rating = likes/numRaters * 5
+
         if length then
             callback({
                 ["URL"] = "http://www.youtube.com/watch?v=" .. uri,
