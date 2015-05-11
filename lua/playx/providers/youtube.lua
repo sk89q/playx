@@ -60,11 +60,11 @@ function YouTube.GetPlayer(uri, useJW)
                 ["version"] = "3"
             }
 
-            local url = Format("http://www.youtube.com/v/%s&%s", uri, playxlib.URLEscapeTable(vars))
+            local url = Format("http://www.youtube.com/embed/%s?%s", uri, playxlib.URLEscapeTable(vars))
 
             return {
-                ["Handler"] = "FlashAPI",
-                ["URI"] = url,
+                ["Handler"] = "JWYoutube",
+                ["URI"] = uri,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
                 ["MetadataFunc"] = function(callback, failCallback)
@@ -97,7 +97,14 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
             return
         end
         local resultsTable = util.JSONToTable(result)
-
+        
+        -- Do a check to avoid error
+        if resultsTable.pageInfo.resultsPerPage == 0 then
+          PrintMessage(HUD_PRINTTALK, "The Youtube video \""..uri.."\" that you tried to play is unavailable!")
+          return false
+        end
+        
+        
         local title = resultsTable.items[1].snippet.title
         local desc = resultsTable.items[1].snippet.description
         local submitter = resultsTable.items[1].snippet.channelTitle
