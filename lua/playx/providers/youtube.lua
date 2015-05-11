@@ -125,7 +125,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
         --Thanks Wyozi/Wiox
         local length = tonumber(length_raw:match("(%d+)S") or 0) + tonumber(length_raw:match("(%d+)M") or 0)*60 + tonumber(length_raw:match("(%d+)H") or 0)*3600
         local tags = resultsTable.items[1].snippet.tags or {}
-        local thumbnail = resultsTable.items[1].snippet.thumbnails.standard.url
+        local thumbnail = resultsTable.items[1].snippet.thumbnails.default.url
         local comments = resultsTable.items[1].statistics.commentCount
 
         local faves = resultsTable.items[1].statistics.favoriteCount
