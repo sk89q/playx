@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 -- $Id$
--- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
+-- Version 2.8.17 by SwadicalRag on 2015-05-11 07:26 PM (-03:00 UTC)
 
 local apiKey = "AIzaSyD74kTqDqj6YQQdKYH9n5-6kG-l_oX_41A"
 
