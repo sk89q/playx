@@ -613,6 +613,17 @@ setInterval(function() {
     return result
 end
 
+function playxlib.url(str)
+   if (str) then
+      str = string.gsub (str, "\n", "\r\n")
+      str = string.gsub (str, "([^%w ])",
+         function (c) return string.format ("%%%02X", string.byte(c)) end)
+      str = string.gsub (str, " ", "+")
+   end
+   return str    
+end
+
+
 --- Generate the HTML page for the JW player.
 -- @param width
 -- @param height
@@ -636,7 +647,7 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
     end
     
     return playxlib.HandlerResult{
-        url = PlayX.HostURL .. '?ytid=' .. uri,
+        url = PlayX.HostURL .. '?url=' .. playxlib.url(uri),
         center = false,
         volumeFunc = volumeFunc,
         playFunc = playFunc,
