@@ -636,23 +636,12 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
     end
     
     return playxlib.HandlerResult{
-        url = PlayX.HostURL,
+        url = PlayX.HostURL .. '?ytid=' .. uri,
         center = false,
         volumeFunc = volumeFunc,
         playFunc = playFunc,
         pauseFunc = pauseFunc,
-        js = [[
-jwplayer('player').setup({
-	file: "]]..uri..[[",
-	width: "]]..width..[[",
-	height: "]]..height..[[",
-	type: "]]..provider..[[",
-	autostart: 1,
-	controls: false,
-	start: "]]..start..[[",
-	volume: ]]..volume..[[
-});
-  
+        js = [[  
 var knownState = "";
 
 function sendPlayerData(data) {
