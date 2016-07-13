@@ -43,3 +43,5 @@ Thumbs.db
 .project
 .settings
 /nbproject/private/
+*.xml
+nbproject/project.properties
