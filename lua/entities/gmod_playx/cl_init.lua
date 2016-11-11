@@ -37,6 +37,9 @@ function ENT:Initialize()
     self.DrawCenter = false
     self.NoScreen = false
     self.PlayerData = {}
+	self.Forward = 1
+	self.Right = 1
+	self.Up = 1
     
     self:UpdateScreenBounds()
 end
@@ -255,9 +258,9 @@ function ENT:GetProjectorTrace()
     local excludeEntities = player.GetAll()
     table.insert(excludeEntities, self.Entity)
 
-    local dir = self.Entity:GetForward() * 4000 +
-                self.Entity:GetRight() * 4000 +
-                self.Entity:GetUp() * 4000
+    local dir = self.Entity:GetForward() * self.Forward * 4000 +
+                self.Entity:GetRight() * self.Right * 4000 +
+                self.Entity:GetUp() * self.Up * 4000
     local tr = util.QuickTrace(self.Entity:LocalToWorld(self.Entity:OBBCenter()),
                                dir, excludeEntities)
     
