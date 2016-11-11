@@ -254,10 +254,10 @@ function ENT:GetProjectorTrace()
     -- Potential GC bottleneck?
     local excludeEntities = player.GetAll()
     table.insert(excludeEntities, self.Entity)
-    
-    local dir = self.Entity:GetForward() * self.Forward * 4000 +
-                self.Entity:GetRight() * self.Right * 4000 +
-                self.Entity:GetUp() * self.Up * 4000
+
+    local dir = self.Entity:GetForward() * 4000 +
+                self.Entity:GetRight() * 4000 +
+                self.Entity:GetUp() * 4000
     local tr = util.QuickTrace(self.Entity:LocalToWorld(self.Entity:OBBCenter()),
                                dir, excludeEntities)
     
