@@ -270,26 +270,3 @@ list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, u
     pauseFunc = pauseFunc
   }
 end)
-
--- Fixed Twitch.TV Updated to the new API
-list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, uri, handlerArgs)
-  local volumeFunc = function(volume)	
-    local volumeFloat = playxlib.volumeFloat(volume)
-    return "window.twitchPlayerAPI.setVolume(" .. tostring(volumeFloat) .. ");"
-  end
-  
-  local playFunc = function()
-    return "window.twitchPlayerAPI.play();"
-  end
-  
-  local pauseFunc = function()
-    return "window.twitchPlayerAPI.pause();"
-  end 
-  
-  return playxlib.HandlerResult{
-    url = playxlib.JSEscape("http://ziondevelopers.github.io/playx/twitch.html?channel=" .. uri),
-    volumeFunc = volumeFunc,
-    playFunc = playFunc,
-    pauseFunc = pauseFunc
-  }
-end)
