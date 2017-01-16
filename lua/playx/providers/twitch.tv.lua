@@ -31,7 +31,7 @@ end
 
 function TwitchTV.GetPlayer(url, useJW)
 	local channelID = "";
-	local chapterID = 0;
+	local videoID = 0;
 	local fullURL = "";
 	
 	local uri = playxlib.FindMatch(url:gsub("%?.*$", ""), {
@@ -42,18 +42,18 @@ function TwitchTV.GetPlayer(url, useJW)
 		if uri[1] ~= nil then
 			channelID = uri[1];
 			uri = uri[1]
-			if string.find(url, "/c/") then
-				chapterID = url:split("/c/");
-				chapterID = chapterID[2]
-				fullURL = "http://www.twitch.tv/"..channelID.."/c/"..chapterID;
+			if string.find(url, "/v/") then
+				videoID = url:split("/v/");
+				videoID = videoID[2]
+				fullURL = "http://player.twitch.tv/?autoplay=true&muted=false&channel=" .. channelID .. "&video="..videoID;
 			else
-				fullURL = "http://www.twitch.tv/"..channelID..'/embed';
+				fullURL = "http://player.twitch.tv/?autoplay=true&muted=false&channel=" .. channelID;
 			end	
 		end	
 	    
 	    if uri:lower():find("^[a-zA-Z0-9_]+$") then        
 	        return {
-	            ["Handler"] = "IFrame",
+	            ["Handler"] = "twitch.tv",
 	            ["URI"] =  fullURL,
 	            ["ResumeSupported"] = true,
 	            ["LowFramerate"] = false,
@@ -63,7 +63,7 @@ function TwitchTV.GetPlayer(url, useJW)
 	            ["HandlerArgs"] = {
 	                ["VolumeMul"] = 50,
 	                ["ChannelID"] = channelID,
-	                ["ChapterID"] = chapterID           
+	                ["videoID"] = videoID           
 	            },
 	        }
 	    end
