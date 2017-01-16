@@ -245,13 +245,6 @@ list.Set("PlayXHandlers", "Livestream", function(width, height, start, volume, u
 	]]}
 end)
 
-list.Set("PlayXHandlers", "twitch.tv", function(width, height, start, volume, uri, handlerArgs)
-	
-	local channelID = handlerArgs["ChannelID"];
-	local chapterID = handlerArgs["ChapterID"];
-
-end)
-
 -- Initial soundcloud handler by Xerasin, I fixed and make it better for my PlayX version.
 list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, uri, handlerArgs)
   if start > 2 then
@@ -272,6 +265,29 @@ list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, u
   
   return playxlib.HandlerResult{
     url =  playxlib.JSEscape("http://ziondevelopers.github.io/playx/soundcloud.html?url="..uri.."&t="..tostring(start*1000).."&vol="..tostring(volume)),
+    volumeFunc = volumeFunc,
+    playFunc = playFunc,
+    pauseFunc = pauseFunc
+  }
+end)
+
+-- Fixed Twitch.TV Updated to the new API
+list.Set("PlayXHandlers", "TwitchTV-New", function(width, height, start, volume, uri, handlerArgs)  
+  local volumeFunc = function(volume)	
+	local volumeFloat = playxlib.volumeFloat(volume)
+    return "window.twitchPlayerAPI.setVolume(" .. tostring(volumeFloat) .. ");"
+  end
+  
+  local playFunc = function()
+    return "window.twitchPlayerAPI.play();"
+  end
+  
+  local pauseFunc = function()
+    return "window.twitchPlayerAPI.pause();"
+  end
+  
+  return playxlib.HandlerResult{
+    url = "http://ziondevelopers.github.io/playx/twitch.html?channel=" .. handlerArgs["Channel"],
     volumeFunc = volumeFunc,
     playFunc = playFunc,
     pauseFunc = pauseFunc
