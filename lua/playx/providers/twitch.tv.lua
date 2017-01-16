@@ -15,19 +15,24 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
+-- Version 2.8.21 by Nexus [BR] on 2017-01-16 01:26 AM (-03:00 UTC)
 
 local TwitchTV = {}
 
 function TwitchTV.Detect(uri)
     local m = playxlib.FindMatch(uri, {
-        "^http[s]?://twitch.tv/([a-zA-Z0-9]+)",
-		"^http[s]?://www.twitch.tv/([a-zA-Z0-9]+)",	
-		"^twitch.tv/([a-zA-Z0-9]+)$"
+        "^http[s]?://twitch%.tv/([a-zA-Z0-9%-]+)",
+		"^http[s]?://www.twitch%.tv/([a-zA-Z0-9%-]+)",	
+		"^twitch%.tv/([a-zA-Z0-9%-]+)$"
     })
-
+	
     if m then
-        return m[1]
-    end
+		if m[1] != nil then
+			return m[1]		
+		end
+    end	
+	
+	return false
 end
 
 function TwitchTV.QueryMetadata(uri, callback, failCallback)
@@ -37,9 +42,11 @@ function TwitchTV.QueryMetadata(uri, callback, failCallback)
 end
 
 function TwitchTV.GetPlayer(uri, useJW)
+
     if uri then
         return {
-            ["Handler"] = "TwitchTV-New",            
+            ["Handler"] = "twitch.tv",  
+			["URI"] = uri,
             ["ResumeSupported"] = true,
             ["LowFramerate"] = false,
 			["MetadataFunc"] = function(callback, failCallback)
