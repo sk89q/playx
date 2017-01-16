@@ -99,7 +99,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
         local resultsTable = util.JSONToTable(result)
         
         -- Do a check to avoid error
-        if resultsTable.pageInfo.resultsPerPage == 0 then
+        if resultsTable.pageInfo.resultsPerPage == 0 or resultsTable.items[1] == nil then
           PrintMessage(HUD_PRINTTALK, "The Youtube video \""..uri.."\" that you tried to play is unavailable!")
           return false
         end
