@@ -21,15 +21,16 @@ local TwitchTV = {}
 
 function TwitchTV.Detect(uri)
     local m = playxlib.FindMatch(uri, {
-        "^http[s]?://twitch%.tv/([a-zA-Z0-9%-]+)",
-		"^http[s]?://www.twitch%.tv/([a-zA-Z0-9%-]+)",	
-		"^twitch%.tv/([a-zA-Z0-9%-]+)$"
+      "^http[s]?://twitch%.tv/([a-zA-Z0-9%-]+)",
+  		"^http[s]?://www%.twitch%.tv/([a-zA-Z0-9%-]+)",	
+  		"^twitch%.tv/([a-zA-Z0-9%-]+)$",
+  		"^www%.twitch%.tv/([a-zA-Z0-9%-]+)$"
     })
 	
     if m then
-		if m[1] != nil then
-			return m[1]		
-		end
+  		if m[1] then
+  			return m[1]		
+  		end
     end	
 	
 	return false
@@ -42,19 +43,15 @@ function TwitchTV.QueryMetadata(uri, callback, failCallback)
 end
 
 function TwitchTV.GetPlayer(uri, useJW)
-
-    if uri then
-        return {
-            ["Handler"] = "twitch.tv",  
-			["URI"] = uri,
-            ["ResumeSupported"] = true,
-            ["LowFramerate"] = false,
+  if uri then
+    return {
+      ["Handler"] = "twitch.tv",  
+      ["URI"] = uri,
+      ["ResumeSupported"] = true,
+      ["LowFramerate"] = false,
 			["MetadataFunc"] = function(callback, failCallback)
-				TwitchTV.QueryMetadata(uri, callback, failCallback)
-            end,
-            ["HandlerArgs"] = {
-                ["Channel"] = uri
-            }
+        TwitchTV.QueryMetadata(uri, callback, failCallback)
+      end
     }
     end
 end
