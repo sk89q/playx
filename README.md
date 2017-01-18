@@ -1,7 +1,12 @@
 PlayX
 =====
 
-PlayX is a media player for Garry's Mod that can play YouTube videos and more.
+PlayX is a media player for [Garry's Mod][] that can play YouTube videos and more.
+
+Workshop Ready!
+------------
+
+PlayX is now available via the Steam Workshop! Go to [its Workshop page][workshop] and press `Subscribe`, and it will automatically appear in Garry's Mod.
 
 Contributing
 ------------
@@ -17,6 +22,6 @@ This work is licensed under the Creative Commons Attribution-NonCommercial-Share
 To view a copy of this license, visit [Common Creative's Website][License].
 
 [Garry's Mod]: <http://garrysmod.com/>
-[workshop]: <http://steamcommunity.com/sharedfiles/filedetails/?id=734208849>
+[workshop]: <http://steamcommunity.com/sharedfiles/filedetails/?id=106516163>
 [Exsto]: <https://github.com/prefanatic/exsto>
 [License]: <https://creativecommons.org/licenses/by-nc-sa/4.0/>
