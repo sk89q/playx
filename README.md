@@ -10,7 +10,8 @@ We happily accept contributions. The best way to do this is to fork PlayX
 on GitHub, add your changes, and then submit a pull request. We'll look at it,
 make comments, and merge it into PlayX if everything works out.
 
-#### License
+License
+------------
 
 This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 To view a copy of this license, visit [Common Creative's Website][License].
