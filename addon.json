@@ -15,8 +15,9 @@
 		"git-hooks-pre-commit",
 		"gitrid.sh",
 		"LICENSE",
-		"README.md",
+		"*.md",
 		"*.bat",
-		"nbproject*"
+		"nbproject*",
+		"COPYING"
 	]
 }
