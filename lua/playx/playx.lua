@@ -386,6 +386,7 @@ end
 -- @Param identifier Identifies video URL/etc, used for wire outputs & metadata, optional
 -- @Param title Used for wire outputs & metadata, optional
 function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
+    PlayX.EndMedia() --Closes anything playing so that the args are refreshed
     timer.Stop("PlayXMediaExpire")
     timer.Stop("PlayXAdminTimeout")
     PlayX.LastOpenTime = CurTime()
