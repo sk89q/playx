@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
+-- Version 2.8.6 by Science on 04-07-2017 10:29 PM (-06:00 GMT)
 
 playxlib = {}
 
@@ -667,6 +667,8 @@ function getStats(duration, position) {
     sendPlayerData({ State: jwplayer().getState(), Position: position, Duration: duration });
 }
 
+jwplayer().seek(]] .. tostring(start) .. [[);
+		
 jwplayer().onReady(function () {
     jwplayer().onTime(getStats)
 });
