@@ -144,9 +144,11 @@ function PANEL:ConsoleMessage( msg )
 		SELF = nil
 		return
 	end
-
-	MsgC( Color( 255, 160, 255 ), "[HTML] " )
-	MsgC( Color( 255, 255, 255 ), msg, "\n" )
+	
+	if GetConVar("playx_debug"):GetBool() then
+		MsgC( Color( 255, 160, 255 ), "[HTML] " )
+		MsgC( Color( 255, 255, 255 ), msg, "\n" )
+	end
 end
 
 function PANEL:GetHTML( msg )
