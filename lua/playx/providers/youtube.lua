@@ -38,45 +38,50 @@ end
 
 function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-        if useJW then
+        --if useJW then
+        --    return {
+        --        ["Handler"] = "JWYoutube",
+        --        ["URI"] = uri,
+        --        ["ResumeSupported"] = true,
+        --        ["LowFramerate"] = false,
+        --        ["MetadataFunc"] = function(callback, failCallback)
+        --            YouTube.QueryMetadata(uri, callback, failCallback)
+        --        end,
+        --    }
+        --else
+            --local vars = {
+            --    ["autoplay"] = "1",
+            --    ["rel"] = "0",
+            --    ["hd"] = "0",
+            --    ["showsearch"] = "0",
+            --    ["showinfo"] = "0",
+            --    ["enablejsapi"] = "1",
+            --    ["version"] = "3",
+            --    ["controls"] = "0",
+            --    ["iv_load_policy"] = "3"
+            --}
+
+            --local url = (GetConVar("playx_youtubehost_url"):GetString():Trim().."?url=https://youtube.com/watch?v="..uri)
+
+            --local url = Format("https://www.youtube.com/embed/%s?%s", uri, playxlib.URLEscapeTable(vars))
+
+            url = GetConVarString("playx_youtubehost_url") .. "?url=https://youtube.com/watch?v=" .. uri
+
             return {
-                ["Handler"] = "JWYoutube",
-                ["URI"] = uri,
+                ["Handler"] = "YoutubeNative",
+                ["URI"] = url,
                 ["ResumeSupported"] = true,
                 ["LowFramerate"] = false,
                 ["MetadataFunc"] = function(callback, failCallback)
                     YouTube.QueryMetadata(uri, callback, failCallback)
-                end,
+                end
+                --["HandlerArgs"] = {
+                --    ["JSInitFunc"] = "onYouTubePlayerReady",
+                --    ["JSVolumeFunc"] = "setVolume",
+                --    ["StartMul"] = 1,
+                --},
             }
-        else
-            local vars = {
-                ["autoplay"] = "1",
-                ["start"] = "__start__",
-                ["rel"] = "0",
-                ["hd"] = "0",
-                ["showsearch"] = "0",
-                ["showinfo"] = "0",
-                ["enablejsapi"] = "1",
-                ["version"] = "3"
-            }
-
-            local url = Format("http://www.youtube.com/embed/%s?%s", uri, playxlib.URLEscapeTable(vars))
-
-            return {
-                ["Handler"] = "JWYoutube",
-                ["URI"] = uri,
-                ["ResumeSupported"] = true,
-                ["LowFramerate"] = false,
-                ["MetadataFunc"] = function(callback, failCallback)
-                    YouTube.QueryMetadata(uri, callback, failCallback)
-                end,
-                ["HandlerArgs"] = {
-                    ["JSInitFunc"] = "onYouTubePlayerReady",
-                    ["JSVolumeFunc"] = "setVolume",
-                    ["StartMul"] = 1,
-                },
-            }
-        end
+        --end
     end
 end
 
@@ -144,7 +149,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
 
         if length then
             callback({
-                ["URL"] = "http://www.youtube.com/watch?v=" .. uri,
+                ["URL"] = "https://www.youtube.com/watch?v=" .. uri,
                 ["Title"] = title,
                 ["Description"] = desc,
                 ["Length"] = length,
@@ -152,7 +157,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
                 ["DatePublished"] = publishedDate,
                 ["DateModified"] = modifiedDate,
                 ["Submitter"] = submitter,
-                ["SubmitterURL"] = submitter and "http://www.youtube.com/" .. submitter or nil,
+                ["SubmitterURL"] = submitter and "https://www.youtube.com/" .. submitter or nil,
                 ["NumFaves"] = faves,
                 ["NumViews"] = views,
                 ["NumComments"] = comments,
@@ -162,7 +167,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
             })
         else
             callback({
-                ["URL"] = "http://www.youtube.com/watch?v=" .. uri,
+                ["URL"] = "https://www.youtube.com/watch?v=" .. uri,
             })
         end
     end)
