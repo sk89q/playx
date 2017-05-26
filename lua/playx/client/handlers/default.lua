@@ -21,6 +21,10 @@ list.Set("PlayXHandlers", "IFrame", function(width, height, start, volume, uri, 
     return playxlib.GenerateIFrame(width, height, uri)
 end)
 
+list.Set("PlayXHandlers", "YoutubeNative", function(width, height, start, volume, uri, handlerArgs)
+    return playxlib.GenerateYoutubeEmbed(width, height, start, volume, uri, "youtube")
+end)
+
 list.Set("PlayXHandlers", "JW", function(width, height, start, volume, uri, handlerArgs)
      return playxlib.GenerateJWPlayer(width, height, start, volume, uri, handlerArgs)
 end)
@@ -29,9 +33,9 @@ list.Set("PlayXHandlers", "JWVideo", function(width, height, start, volume, uri,
     return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "video")
 end)
 
-list.Set("PlayXHandlers", "JWYoutube", function(width, height, start, volume, uri, handlerArgs)
-    return playxlib.GenerateJWPlayer(width, height, start, volume, "http://www.youtube.com/watch?v="..uri, "youtube")
-end)
+--list.Set("PlayXHandlers", "JWYoutube", function(width, height, start, volume, uri, handlerArgs)
+--    return playxlib.GenerateJWPlayer(width, height, start, volume, "http://www.youtube.com/watch?v="..uri, "youtube")
+--end)
 
 list.Set("PlayXHandlers", "JWAudio", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.GenerateJWPlayer(width, height, start, volume, uri, "mp3")
