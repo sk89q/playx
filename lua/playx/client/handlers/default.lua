@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.5 by Nexus [BR] on 10-01-2014 09:25 PM (-02:00 GMT)
+-- Version 2.8.23 by Science on 5-26-2017 04:40 PM (-06:00 GMT)
 
 list.Set("PlayXHandlers", "IFrame", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.GenerateIFrame(width, height, uri)
