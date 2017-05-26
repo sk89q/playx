@@ -391,8 +391,6 @@ function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, ha
     timer.Stop("PlayXAdminTimeout")
     PlayX.LastOpenTime = CurTime()
     
-    if PlayX.Playing then PlayX.EndMedia() end
-
     print(string.format("PlayX: Beginning media %s with handler %s, start at %ss",
                         uri, handler, start))
     
