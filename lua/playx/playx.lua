@@ -15,12 +15,13 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.22 by Science on 2017-04-07 10:36 PM (-06:00 UTC)
+-- Version 2.8.23 by Science on 2017-05-26 04:55 PM (-06:00 UTC)
 
 
 -- FCVAR_GAMEDLL makes cvar change detection work
 CreateConVar("playx_jw_url", "http://ziondevelopers.github.io/playx/swf/jwplayer.flash.swf", {FCVAR_GAMEDLL})
 CreateConVar("playx_host_url", "http://ziondevelopers.github.io/playx/host.html",        {FCVAR_GAMEDLL})
+CreateConVar("playx_youtubehost_url", "http://ziondevelopers.github.io/playx/youtubehost.html",        {FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
@@ -386,11 +387,12 @@ end
 -- @Param identifier Identifies video URL/etc, used for wire outputs & metadata, optional
 -- @Param title Used for wire outputs & metadata, optional
 function PlayX.BeginMedia(handler, uri, start, resumeSupported, lowFramerate, handlerArgs)
-    if handler == "JWYoutube" then PlayX.SendEndUMsg() end --Closes anything playing so that the args are refreshed -TEMP FIX-
     timer.Stop("PlayXMediaExpire")
     timer.Stop("PlayXAdminTimeout")
     PlayX.LastOpenTime = CurTime()
     
+    if PlayX.Playing then PlayX.EndMedia() end
+
     print(string.format("PlayX: Beginning media %s with handler %s, start at %ss",
                         uri, handler, start))
     
