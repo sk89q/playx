@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.22 by Science on 04-07-2017 10:29 PM (-06:00 GMT)
+-- Version 2.8.23 by Science on 05-26-2017 04:45 PM (-06:00 GMT)
 
 playxlib = {}
 
@@ -623,6 +623,32 @@ function playxlib.url(str)
    return str    
 end
 
+--- Generates the HTML for the Youtube Native Embed
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateYoutubeEmbed(width, height, start, volume, uri, provider)
+    local volumeFunc = function(volume)
+        return [[player.setVolume(]] .. tostring(volume) .. [[)]]
+    end
+    local playFunc = function()
+        return [[player.playVideo()]]
+    end
+    
+    local pauseFunc = function()
+        return [[player.pauseVideo()]]
+    end
+	
+    return playxlib.HandlerResult{
+        url = uri .. "&start=" .. start,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc
+    }
+    --return playxlib.HandlerResult(nil, nil, nil, nil, false, uri)
+end
+
 
 --- Generate the HTML page for the JW player.
 -- @param width
@@ -645,7 +671,7 @@ function playxlib.GenerateJWPlayer(width, height, start, volume, uri, provider)
     local pauseFunc = function()
         return [[try { jwplayer().pause(); } catch (e) {}]]
     end
-    
+	
     return playxlib.HandlerResult{
         url = PlayX.HostURL .. '?url=' .. playxlib.url(uri),
         center = false,
@@ -667,15 +693,16 @@ function getStats(duration, position) {
     sendPlayerData({ State: jwplayer().getState(), Position: position, Duration: duration });
 }
 
-jwplayer().seek(]] .. tostring(start) .. [[);
-		
 jwplayer().onReady(function () {
     jwplayer().onTime(getStats)
 });
+
+jwplayer().seek(]] .. tostring(start) .. [[);
+
 ]]
 }
 end
-
+--
 --- Generates the HTML code for an included JavaScript file.
 -- @param width
 -- @param height
