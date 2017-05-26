@@ -15,7 +15,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
--- Version 2.8.2 by Nexus [BR] on 28-08-2013 08:14 PM
+-- Version 2.8.23 by Science on 26-05-2017 06:00 PM
 
 CreateClientConVar("playx_enabled", 1, true, false)
 CreateClientConVar("playx_fps", 14, true, false)
@@ -31,6 +31,7 @@ CreateClientConVar("playx_error_windows", 1, true, false)
 CreateClientConVar("playx_video_range_enabled", 1, true, false)
 CreateClientConVar("playx_video_range_hints_enabled", 1, true, false)
 CreateClientConVar("playx_video_radius", 1000, true, false)
+CreateClientConVar("playx_debug", 0, true, false, "Enable Error Messages From Playx In Console")
 
 surface.CreateFont( "HUDNumber",{
 	font="Trebuchet MS",
