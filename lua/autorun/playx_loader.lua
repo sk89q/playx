@@ -69,6 +69,6 @@ end
 Msg( "\n/====================================\\\n")
 Msg( "||               PlayX              ||\n" )
 Msg( "||----------------------------------||\n" )
-loadingLog("Version 2.8.22")
-loadingLog("Updated on 2017-04-07 10:50 PM")
+loadingLog("Version 2.8.23")
+loadingLog("Updated on 2017-05-26 06:00 PM")
 Msg( "\\====================================/\n\n" )
