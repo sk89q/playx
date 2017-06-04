@@ -2,7 +2,7 @@ E2Lib.RegisterExtension("playx", true, "Allows E2 chips to connect with the Play
 
 --// check if the player has permission to use PlayX and if there is a valid player on the map
 local function canUsePlayX(ply)
-	if(!PlayX.IsPermitted(ply)) then
+	if(ply~=nil and !PlayX.IsPermitted(ply)) then
 		ply:ChatPrint("You don't have permission to use PlayX.")
 		return false
 	end
@@ -25,38 +25,38 @@ end
 --@param number useJW
 --@param number ignoreLength -does this even work? PlayX.OpenMedia(...) never uses the variable
 e2function void pxOpenMedia(string url)
-	if !canUsePlayX then end
+	if !canUsePlayX(self.player) then end
 	PlayX.OpenMedia( "", url,0,nil,nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider)
-	if !canUsePlayX then end
+	if !canUsePlayX(self.player) then end
 	PlayX.OpenMedia( provider, url,0,nil,nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime)
-	if !canUsePlayX then end
+	if !canUsePlayX(self.player) then end
 	PlayX.OpenMedia( provider, url,starttime,nil,nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime,number forceLowFramerate)
-	if !canUsePlayX then end
+	if !canUsePlayX(self.player) then end
 	PlayX.OpenMedia( provider, url,starttime,(forceLowFramerate!=0),nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime,number forceLowFramerate,number useJW)
-	if !canUsePlayX then end
+	if !canUsePlayX(self.player) then end
 	PlayX.OpenMedia( provider, url,starttime,(forceLowFramerate!=0),(useJW!=0),nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime,number forceLowFramerate,number useJW,number ignoreLength)
-	if !canUsePlayX then end
+	if !canUsePlayX(self.player) then end
 	PlayX.OpenMedia( provider, url,starttime,(forceLowFramerate!=0),(useJW!=0),(ignoreLength!=0))
 end
 
 ---Stops the media
 e2function void pxStopMedia()
-	if !canUsePlayX then end
+	if !canUsePlayX(self.player) then end
 	PlayX.CloseMedia()
 end
 ---------------------------------------------\\ MEDIA CONTOLLER FUNCTIONS //---------------------------------------------
@@ -144,7 +144,7 @@ end
 --Checks wheter a player is permitted to use PlayX
 --@return number
 e2function number pxIsPermitted(entity player)
-	if PlayX.IsPermitted(ply) then
+	if player~= nil and PlayX.IsPermitted(player) then
 		return 1
 	end
 	return 0
@@ -166,7 +166,7 @@ end
 
 --Spawns a PlayX player or PlayX repeater with default cam model "models/dav0r/camera.mdl"
 e2function void pxSpawn()
-	if !PlayX.IsPermitted(ply) then end
+	if self.player~= nil and !PlayX.IsPermitted(self.player) then end
 	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , false)
 	if success then
 --		self.player:ChatPrint("Successfully spawned PlayX")
@@ -178,7 +178,7 @@ end
 --Spawns a PlayX player or PlayX repeater with default cam model "models/dav0r/camera.mdl"
 --@param number repeater
 e2function void pxSpawn(number repeater)
-	if !PlayX.IsPermitted(ply) then end
+	if self.player~= nil and !PlayX.IsPermitted(self.player) then end
 	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , repeater!=0)
 	if success then
 --		self.player:ChatPrint("Successfully spawned PlayX")
@@ -192,7 +192,7 @@ end
 --@param string model
 --@param number repeater
 e2function void pxSpawn(string model,number repeater)
-	if !PlayX.IsPermitted(ply) then end
+	if self.player~= nil and !PlayX.IsPermitted(self.player) then end
 	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, model , repeater!=0)
 	if success then
 --		self.player:ChatPrint("Successfully spawned PlayX")
