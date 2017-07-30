@@ -2,31 +2,16 @@ E2Lib.RegisterExtension("playx", true, "Allows E2 chips to connect with the Play
 
 --// check if the player has permission to use PlayX and if there is a valid player on the map
 local function canUsePlayX(ply)
-	if(ply~=nil and !PlayX.IsPermitted(ply)) then
-		ply:ChatPrint("You don't have permission to use PlayX.")
+	if ply == nil then return false end
+	if !PlayX.IsPermitted(ply) then
 		return false
 	end
-	if (!PlayX.PlayerExists()) then 
-		ply:ChatPrint("There is no PlayX player.")
+	if !PlayX.PlayerExists() then
 		return false
 	end
 	return true
 end
-
-
 ---------------------------------------------// MEDIA CONTOLLER FUNCTIONS \\---------------------------------------------
-local lastError = CurTime()
-local function errorMsg(ply,msg) --the popup window with the error would crash the people if they use runOnTick/interval 
-	if ply~=nil and msg != "" then
-		if CurTime() - lastError < 100 then --called faster than 100 milllisec probably runOnTick(1)/interval(100) used
-			ply:ChatPrint(msg .. "\nPlease don't use pxOpenMedia inside runOnTick or interval.")
-		else
-			ply:ChatPrint(msg)
-		end
-	lastError = CurTime()
-	end
-end
-
 --open the given link and play the song
 --@param string url
 --@param string provider e.g. "YouTube"
@@ -35,54 +20,48 @@ end
 --@param number useJW
 --@param number ignoreLength -does this even work? PlayX.OpenMedia(...) never uses the variable
 e2function void pxOpenMedia(string url)
-	if !canUsePlayX(self.player) then end
+	if !canUsePlayX(self.player) then return end
 	if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
-	    errorMsg(self.player, "Another video/media selection was started too recently.")
 	    return
 	end
 	PlayX.OpenMedia( "", url,0,nil,nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider)
-	if !canUsePlayX(self.player) then end
+	if !canUsePlayX(self.player) then return end
 	if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
-	    errorMsg(self.player, "Another video/media selection was started too recently.")
 	    return
 	end
 	PlayX.OpenMedia( provider, url,0,nil,nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime)
-	if !canUsePlayX(self.player) then end
+	if !canUsePlayX(self.player) then return end
 	if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
-	    errorMsg(self.player, "Another video/media selection was started too recently.")
 	    return
 	end
 	PlayX.OpenMedia( provider, url,starttime,nil,nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime,number forceLowFramerate)
-	if !canUsePlayX(self.player) then end
+	if !canUsePlayX(self.player) then return end
 	if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
-	    errorMsg(self.player, "Another video/media selection was started too recently.")
 	    return
 	end
 	PlayX.OpenMedia( provider, url,starttime,(forceLowFramerate!=0),nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime,number forceLowFramerate,number useJW)
-	if !canUsePlayX(self.player) then end
+	if !canUsePlayX(self.player) then return end
 	if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
-	    errorMsg(self.player, "Another video/media selection was started too recently.")
 	    return
 	end
 	PlayX.OpenMedia( provider, url,starttime,(forceLowFramerate!=0),(useJW!=0),nil)
 end
 
 e2function void pxOpenMedia(string url,string provider,number starttime,number forceLowFramerate,number useJW,number ignoreLength)
-	if !canUsePlayX(self.player) then end
+	if !canUsePlayX(self.player) then return end
 	if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
-	    errorMsg(self.player, "Another video/media selection was started too recently.")
 	    return
 	end
 	PlayX.OpenMedia( provider, url,starttime,(forceLowFramerate!=0),(useJW!=0),(ignoreLength!=0))
@@ -90,13 +69,12 @@ end
 
 ---Stops the media
 e2function void pxStopMedia()
-	if !canUsePlayX(self.player) then end
+	if !canUsePlayX(self.player) then return end
 	PlayX.CloseMedia()
 end
 ---------------------------------------------\\ MEDIA CONTOLLER FUNCTIONS //---------------------------------------------
 
 ---------------------------------------------// EASY ACCESS FUNCTIONS \\---------------------------------------------
-
 --Check if a media player is already spawned
 --@return number 1 if there is a playX player on the map
 e2function number pxExists()
@@ -107,7 +85,7 @@ e2function number pxExists()
 end
 
 --Finds the PlayX player on the map
---@return entity or nil 
+--@return entity or nil
 e2function entity pxInstance()
 	return PlayX.GetInstance()
 end
@@ -122,7 +100,7 @@ end
 --@return number
 e2function number pxStartTime()
 	if !PlayX.CurrentMedia then return 0 end
-	return PlayX.CurrentMedia.StartTime 
+	return PlayX.CurrentMedia.StartTime
 end
 
 --Length of the media currently playing in seconds
@@ -192,24 +170,18 @@ e2function number pxCurrentTime() --TODO: better way to calculate this
 	if !PlayX.CurrentMedia then return 0 end
 	return CurTime() - PlayX.CurrentMedia.StartTime
 end
-
-
 ---------------------------------------------\\ EASY ACCESS FUNCTIONS //---------------------------------------------
 
 ---------------------------------------------// SPAWNING FUNCTIONS \\---------------------------------------------
-
 --Spawns a PlayX player or PlayX repeater with default cam model "models/dav0r/camera.mdl". Returns the playX entity
 --@return entity
 e2function entity pxSpawn()
-	if self.player~= nil and !PlayX.IsPermitted(self.player) then end
+	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
 	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , false)
 	if success then
 		local playXplayer = PlayX.GetInstance()
 		self.data.spawnedProps[ playXplayer ] = true
 		return playXplayer
---		self.player:ChatPrint("Successfully spawned PlayX")
-	else
-		self.player:ChatPrint("Can't spawn PlayX.\n"..errorMsg)
 	end
 	return nil
 end
@@ -218,41 +190,33 @@ end
 --@param number repeater
 --@return entity
 e2function entity pxSpawn(number repeater)
-	if self.player~= nil and !PlayX.IsPermitted(self.player) then end
+	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
 	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , repeater!=0)
 	if success then
 		local playXplayer = PlayX.GetInstance()
 		self.data.spawnedProps[ playXplayer ] = true
 		return playXplayer
---		self.player:ChatPrint("Successfully spawned PlayX")
-	else
-		self.player:ChatPrint("Can't spawn PlayX.\n"..errorMsg)
 	end
 	return nil
 end
-
 
 --Spawns a PlayX player or PlayX repeater with a seleced model. Returns the playX entity
 --@param string model
 --@param number repeater
 --@return entity
 e2function entity pxSpawn(string model,number repeater)
-	if self.player~= nil and !PlayX.IsPermitted(self.player) then end
+	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
 	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, model , repeater!=0)
 	if success then
 		local playXplayer = PlayX.GetInstance()
 		self.data.spawnedProps[ playXplayer ] = true
 		return playXplayer
---		self.player:ChatPrint("Successfully spawned PlayX")
-	else
-		self.player:ChatPrint("Can't spawn PlayX.\n"..errorMsg)
 	end
 	return nil
 end
 ---------------------------------------------\\ SPAWNING FUNCTIONS //---------------------------------------------
 
 ---------------------------------------------// MEDIA DATA FUNCTIONS \\---------------------------------------------
-
 --converts a lua table into a E2 table
 --@param lua-table data
 --@return e2-table
@@ -297,6 +261,7 @@ end
 --Points the PlayX player to the given vector
 --@param vector
 e2function void pxPointAt(vector point)
+	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
 	if point == nil then return end
 	if type(point) == "vector" then
 		point = point and point or Vector()
@@ -313,7 +278,8 @@ end
 --@param vector
 --@param number
 e2function void pxPointAt(vector point,number inverted)
-	if point == nil and inverted == nil then return end
+	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
+	if point == nil or inverted == nil then return end
 	if type(point) == "vector" then
 		point = point and point or Vector()
 	elseif type(point) == "table" then
@@ -321,10 +287,10 @@ e2function void pxPointAt(vector point,number inverted)
 	end
 
 	if PlayX.PlayerExists() then
-		if inverted~=0 then
-			PlayX.GetInstance():SetAngles((point - PlayX.GetInstance():GetPos()):Angle())
-		else 
+		if inverted == 1 then
 			PlayX.GetInstance():SetAngles((PlayX.GetInstance():GetPos() - point):Angle())
+		else 
+			PlayX.GetInstance():SetAngles((point - PlayX.GetInstance():GetPos()):Angle())
 		end
 	end
 end
