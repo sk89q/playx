@@ -172,7 +172,7 @@ end
 
 function ENT:CreateBrowser()
     self.Browser = vgui.Create("PlayXHTML")
-    self.Browser:SetMouseInputEnabled(true)        
+    self.Browser:SetMouseInputEnabled(false)        
     self.Browser:SetSize(self.HTMLWidth, self.HTMLHeight)
     self.Browser:SetPaintedManually(true)
     self.Browser:SetVerticalScrollbarEnabled(false)
