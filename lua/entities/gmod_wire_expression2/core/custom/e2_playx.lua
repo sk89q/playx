@@ -1,5 +1,4 @@
 E2Lib.RegisterExtension("playx", true, "Allows E2 chips to connect with the PlayX camera","Everyone can play songs")
-
 --// check if the player has permission to use PlayX and if there is a valid player on the map
 local function canUsePlayX(ply)
 	if ply == nil then return false end
@@ -24,7 +23,7 @@ e2function void pxOpenMedia(string url)
 	if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) < GetConVar("playx_race_protection"):GetFloat() then
 	    return
 	end
-	PlayX.OpenMedia( "", url,0,nil,nil,nil)
+	PlayX.OpenMedia("", url,0,nil,nil,nil)
 end
 
 e2function void pxOpenMedia(string url,string provider)
@@ -65,6 +64,17 @@ e2function void pxOpenMedia(string url,string provider,number starttime,number f
 	    return
 	end
 	PlayX.OpenMedia( provider, url,starttime,(forceLowFramerate!=0),(useJW!=0),(ignoreLength!=0))
+end
+
+
+
+e2function number pxCanQuery()
+	if PlayX.PlayerExists() then
+		if GetConVar("playx_race_protection"):GetFloat() > 0 and (CurTime() - PlayX.LastOpenTime) > GetConVar("playx_race_protection"):GetFloat() then
+		    return 1
+		end
+	end
+	return 0
 end
 
 ---Stops the media
@@ -112,9 +122,9 @@ end
 
 --Checks whether the PlayX is currently playing
 --@return number
-e2function number pxPlaying()
-	if !PlayX.CurrentMedia then return 0 end
-	return 1
+e2function number pxIsPlaying()
+	if PlayX.CurrentMedia then return 1 end
+	return 0
 end
 
 --Checks whether the playX is using JW
@@ -162,8 +172,7 @@ e2function number pxIsPermitted(entity player)
 	return 0
 end
 
---shitty way of getting the current time position of the video. Doesn't work correctly when
---pausing the game in singleplayer
+--shitty way of getting the current time position of the video. Doesn't work correctly when pausing the game in singleplayer
 --returns time in seconds
 --@return number
 e2function number pxCurrentTime() --TODO: better way to calculate this
@@ -177,40 +186,40 @@ end
 --@return entity
 e2function entity pxSpawn()
 	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
-	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , false)
+	local success, errorMsg, ent =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , false)
 	if success then
-		local playXplayer = PlayX.GetInstance()
-		self.data.spawnedProps[ playXplayer ] = true
-		return playXplayer
+		local instance = ent
+		self.data.spawnedProps[ instance ] = true
+		return instance
 	end
 	return nil
 end
 
 --Spawns a PlayX player or PlayX repeater with default cam model "models/dav0r/camera.mdl". Returns the playX entity
---@param number repeater
+--@param number isRepeater
 --@return entity
-e2function entity pxSpawn(number repeater)
+e2function entity pxSpawn(number isRepeater)
 	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
-	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , repeater!=0)
+	local success, errorMsg, ent =  PlayX.SpawnForPlayer(self.player, "models/dav0r/camera.mdl" , isRepeater ~= 0)
 	if success then
-		local playXplayer = PlayX.GetInstance()
-		self.data.spawnedProps[ playXplayer ] = true
-		return playXplayer
+		local instance = ent
+		self.data.spawnedProps[ instance ] = true
+		return instance
 	end
 	return nil
 end
 
 --Spawns a PlayX player or PlayX repeater with a seleced model. Returns the playX entity
 --@param string model
---@param number repeater
+--@param number isRepeater
 --@return entity
-e2function entity pxSpawn(string model,number repeater)
+e2function entity pxSpawn(string model,number isRepeater)
 	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
-	local success,errorMsg =  PlayX.SpawnForPlayer(self.player, model , repeater!=0)
+	local success, errorMsg, ent =  PlayX.SpawnForPlayer(self.player, model , isRepeater ~= 0)
 	if success then
-		local playXplayer = PlayX.GetInstance()
-		self.data.spawnedProps[ playXplayer ] = true
-		return playXplayer
+		local instance = ent
+		self.data.spawnedProps[ instance ] = true
+		return instance
 	end
 	return nil
 end
@@ -240,7 +249,7 @@ local function tableToE2Table(data)
 			e2table.ntypes[k] = "s"
 			e2table.n[k] = v
 		else
-			print("Unknown type detected key:"..vtype.." value"..v)
+			ErrorNoHalt("Unknown type detected key:"..vtype.." value"..v)
 		end
 	end
 	e2table.size = size
@@ -257,46 +266,66 @@ end
 ---------------------------------------------\\ MEDIA DATA FUNCTIONS //---------------------------------------------
 
 
----------------------------------------------// PLAYX ENTITY FUNCTIONS \\---------------------------------------------
---Points the PlayX player to the given vector
---@param vector
-e2function void pxPointAt(vector point)
-	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
-	if point == nil then return end
-	if type(point) == "vector" then
-		point = point and point or Vector()
-	elseif type(point) == "table" then
-		point = Vector(point[1],point[2],point[3])
-	end
+local registered_chips = {}
+local mediastart = 0
+local mediastop = 0
 
-	if PlayX.PlayerExists() then
-		PlayX.GetInstance():SetAngles((point - PlayX.GetInstance():GetPos()):Angle())
-	end
-end
-
---Points the PlayX player to the given vector. Inverts the direction. Useful if the player is not a camera, but a screen.
---@param vector
---@param number
-e2function void pxPointAt(vector point,number inverted)
-	if self.player == nil or !PlayX.IsPermitted(self.player) then return end
-	if point == nil or inverted == nil then return end
-	if type(point) == "vector" then
-		point = point and point or Vector()
-	elseif type(point) == "table" then
-		point = Vector(point[1],point[2],point[3])
-	end
-
-	if PlayX.PlayerExists() then
-		if inverted == 1 then
-			PlayX.GetInstance():SetAngles((PlayX.GetInstance():GetPos() - point):Angle())
-		else 
-			PlayX.GetInstance():SetAngles((point - PlayX.GetInstance():GetPos()):Angle())
+hook.Add("PlayXMetadataReceived","PlayX.TriggerE2.StartMedia",function()
+//hook.Add("PlayXMediaBegun","PlayX.TriggerE2",function()
+	local ents = {}
+	local i = 1
+	for entity,_ in pairs(registered_chips) do
+		if entity:IsValid() then 
+			ents[i] = entity
+			i = i + 1
 		end
 	end
+
+	mediastart = 1
+	for _,entity in ipairs(ents) do
+		entity:Execute()
+	end
+	mediastart = 0
+end)
+
+hook.Add("PlayXMediaEnded","PlayX.TriggerE2.StopMedia",function()
+	local ents = {}
+	local i = 1
+	for entity,_ in pairs(registered_chips) do
+		if entity:IsValid() then 
+			ents[i] = entity
+			i = i + 1
+		end
+	end
+
+	mediastop = 1
+	for _,entity in ipairs(ents) do
+		entity:Execute()
+	end
+	mediastop = 0
+end)
+
+--Executes the e2 when a media begins to play
+e2function void runOnPlayX(number active)
+    if active ~= 0 then
+        registered_chips[self.entity] = true
+    else
+		registered_chips[self.entity] = nil
+    end
+
 end
----------------------------------------------\\PLAYX ENTITY FUNCTIONS //---------------------------------------------
 
+--Returns 1 if a media just started playing
+--@return number
+e2function number pxClk()
+	return mediastart
+end
 
+--Returns 1 if a media stopped playing
+--@return number
+e2function number pxClkStop()
+	return mediastop
+end
 
 
 

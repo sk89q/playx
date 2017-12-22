@@ -150,11 +150,11 @@ end
 -- @return Success, and error message
 function PlayX.SpawnForPlayer(ply, model, repeater)
     if not repeater and PlayX.PlayerExists() then
-        return false, "There is already a PlayX player somewhere on the map"
+        return false, "There is already a PlayX player somewhere on the map", nil
     end
     
     if not util.IsValidModel(model) then
-        return false, "The server doesn't have the selected model"
+        return false, "The server doesn't have the selected model", nil
     end
     
     local tr = ply.GetEyeTraceNoCursor and ply:GetEyeTraceNoCursor() or
@@ -222,7 +222,7 @@ function PlayX.SpawnForPlayer(ply, model, repeater)
 	    undo.Finish()
     end
     
-    return true
+    return true, "" , ent
 end
 
 --- Resolves a provider.
