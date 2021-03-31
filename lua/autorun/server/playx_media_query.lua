@@ -27,7 +27,7 @@
 -- To install, drop this file into your lua/autorun/server folder.
 --
 -- $Id$
--- Version 2.8.16 by SwadicalRag on 2015-04-29 07:00 PM (-03:00 UTC)
+-- Version 2.8.25 by Dathus on 2021-03-31 06:06 PM (-03:00 GMT)
 
 local lastResult = nil
 
@@ -87,7 +87,8 @@ local function SearchYouTube(q, successF, failureF)
         ["maxResults"] = "1",
         -- ["format"] = "5", -- We can now play embedded videos!
         ["part"] = "snippet",
-        ["key"] = "AIzaSyCLKZU-TS5J98Q-w97PLO7oqZytJnxVUHk"
+        ["key"] = "AIzaSyCLKZU-TS5J98Q-w97PLO7oqZytJnxVUHk",
+        ["type"] = "video"
     })
     local url = "https://www.googleapis.com/youtube/v3/search?" .. vars
 
