@@ -87,7 +87,7 @@ local function SearchYouTube(q, successF, failureF)
         ["maxResults"] = "1",
         -- ["format"] = "5", -- We can now play embedded videos!
         ["part"] = "snippet",
-        ["key"] = "AIzaSyD74kTqDqj6YQQdKYH9n5-6kG-l_oX_41A"
+        ["key"] = "AIzaSyCLKZU-TS5J98Q-w97PLO7oqZytJnxVUHk"
     })
     local url = "https://www.googleapis.com/youtube/v3/search?" .. vars
 
