@@ -15,9 +15,9 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 -- $Id$
--- Version 2.8.23 by Science on 5-26-2017 04:40 PM (-06:00 GMT)
+-- Version 2.8.24 by Dathus on 2021-03-31 5:15 PM (-03:00 GMT)
 
-local apiKey = "AIzaSyD74kTqDqj6YQQdKYH9n5-6kG-l_oX_41A"
+local apiKey = "AIzaSyCLKZU-TS5J98Q-w97PLO7oqZytJnxVUHk"
 
 local YouTube = {}
 
