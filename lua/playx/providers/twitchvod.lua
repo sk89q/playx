@@ -38,7 +38,7 @@ end
 
 function TwitchVod.QueryMetadata(uri, callback, failCallback)   
       callback({
-          ["URL"] = "https://www.twitch.tv/" .. uri,
+          ["URL"] = "https://www.twitch.tv/videos/" .. uri,
       })
 end
 
