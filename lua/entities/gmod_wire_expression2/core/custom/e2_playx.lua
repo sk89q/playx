@@ -1,3 +1,10 @@
+-- PlayX
+-- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2011 - 2021 DathusBR <https://www.juliocesar.me>
+-- 
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+-- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
+-- 
 E2Lib.RegisterExtension("playx", true, "Allows E2 chips to connect with the PlayX camera","Everyone can play songs")
 --// check if the player has permission to use PlayX and if there is a valid player on the map
 local function canUsePlayX(ply)
