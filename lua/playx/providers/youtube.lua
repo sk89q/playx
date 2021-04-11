@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.24 by Dathus on 2021-03-31 5:15 PM (-03:00 GMT)
+-- Version 2.8.27 by Dathus on 2021-04-11 8:36 PM (-03:00 GMT)
 
 local apiKey = "AIzaSyCLKZU-TS5J98Q-w97PLO7oqZytJnxVUHk"
 
@@ -29,7 +29,7 @@ end
 
 function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-            local url = GetConVarString("playx_youtubehost_url") .. "?url=https://youtube.com/watch?v=" .. uri
+            local url = GetConVarString("playx_youtubehost_url") .. "?v=" .. uri
 
             return {
                 ["Handler"] = "YoutubeNative",
@@ -39,13 +39,7 @@ function YouTube.GetPlayer(uri, useJW)
                 ["MetadataFunc"] = function(callback, failCallback)
                     YouTube.QueryMetadata(uri, callback, failCallback)
                 end
-                --["HandlerArgs"] = {
-                --    ["JSInitFunc"] = "onYouTubePlayerReady",
-                --    ["JSVolumeFunc"] = "setVolume",
-                --    ["StartMul"] = 1,
-                --},
             }
-        --end
     end
 end
 
@@ -72,8 +66,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
           PrintMessage(HUD_PRINTTALK, "The Youtube video \""..uri.."\" that you tried to play is unavailable!")
           return false
         end
-        
-        
+                
         local title = resultsTable.items[1].snippet.title
         local desc = resultsTable.items[1].snippet.description
         local submitter = resultsTable.items[1].snippet.channelTitle
