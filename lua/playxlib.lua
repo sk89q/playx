@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.23 by Science on 05-26-2017 04:45 PM (-06:00 GMT)
+-- Version 2.8.26 by Dathus on 2021-04-11 05:29 PM (-03:00 GMT)
 
 playxlib = {}
 
@@ -614,6 +614,32 @@ function playxlib.url(str)
    return str    
 end
 
+--- Generates the HTML for the Twitch Embed
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateTwitchEmbed(width, height, start, volume, uri, provider)
+    local volumeFunc = function(volume)
+        return [[player.setVolume(]] .. tostring(playxlib.volumeFloat(volume)) .. [[)]]
+    end
+    local playFunc = function()
+        return [[player.play()]]
+    end
+    
+    local pauseFunc = function()
+        return [[player.pause()]]
+    end
+	
+    return playxlib.HandlerResult{
+        url = uri .. "&start=" .. start,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc
+    }
+end
+
+
 --- Generates the HTML for the Youtube Native Embed
 -- @param width
 -- @param height
@@ -630,7 +656,7 @@ function playxlib.GenerateYoutubeEmbed(width, height, start, volume, uri, provid
     local pauseFunc = function()
         return [[player.pauseVideo()]]
     end
-	
+  
     return playxlib.HandlerResult{
         url = uri .. "&start=" .. start,
         volumeFunc = volumeFunc,

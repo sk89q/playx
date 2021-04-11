@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.23 by Science on 5-26-2017 04:40 PM (-06:00 GMT)
+-- Version 2.8.26 by Dathus on 2021-04-11 05:29 PM (-03:00 GMT)
 
 list.Set("PlayXHandlers", "IFrame", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.GenerateIFrame(width, height, uri)
@@ -14,6 +14,14 @@ end)
 
 list.Set("PlayXHandlers", "YoutubeNative", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.GenerateYoutubeEmbed(width, height, start, volume, uri, "youtube")
+end)
+
+list.Set("PlayXHandlers", "Twitch", function(width, height, start, volume, uri, handlerArgs)
+    return playxlib.GenerateTwitchEmbed(width, height, start, volume, uri, "twitch")
+end)
+
+list.Set("PlayXHandlers", "TwitchVod", function(width, height, start, volume, uri, handlerArgs)
+    return playxlib.GenerateTwitchEmbed(width, height, start, volume, uri, "twitchvod")
 end)
 
 list.Set("PlayXHandlers", "JW", function(width, height, start, volume, uri, handlerArgs)

@@ -29,34 +29,7 @@ end
 
 function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-        --if useJW then
-        --    return {
-        --        ["Handler"] = "JWYoutube",
-        --        ["URI"] = uri,
-        --        ["ResumeSupported"] = true,
-        --        ["LowFramerate"] = false,
-        --        ["MetadataFunc"] = function(callback, failCallback)
-        --            YouTube.QueryMetadata(uri, callback, failCallback)
-        --        end,
-        --    }
-        --else
-            --local vars = {
-            --    ["autoplay"] = "1",
-            --    ["rel"] = "0",
-            --    ["hd"] = "0",
-            --    ["showsearch"] = "0",
-            --    ["showinfo"] = "0",
-            --    ["enablejsapi"] = "1",
-            --    ["version"] = "3",
-            --    ["controls"] = "0",
-            --    ["iv_load_policy"] = "3"
-            --}
-
-            --local url = (GetConVar("playx_youtubehost_url"):GetString():Trim().."?url=https://youtube.com/watch?v="..uri)
-
-            --local url = Format("https://www.youtube.com/embed/%s?%s", uri, playxlib.URLEscapeTable(vars))
-
-            url = GetConVarString("playx_youtubehost_url") .. "?url=https://youtube.com/watch?v=" .. uri
+            local url = GetConVarString("playx_youtubehost_url") .. "?url=https://youtube.com/watch?v=" .. uri
 
             return {
                 ["Handler"] = "YoutubeNative",
