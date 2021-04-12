@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.26 by Dathus on 2021-04-11 05:29 PM (-03:00 GMT)
+-- Version 2.8.28 by Dathus on 2021-04-12 4:51 PM (-03:00 GMT)
 
 playxlib = {}
 
@@ -658,12 +658,11 @@ function playxlib.GenerateYoutubeEmbed(width, height, start, volume, uri, provid
     end
   
     return playxlib.HandlerResult{
-        url = uri .. "&start=" .. start,
+        url = uri .. "&start=" .. tostring(math.floor(start)),
         volumeFunc = volumeFunc,
         playFunc = playFunc,
         pauseFunc = pauseFunc
-    }
-    --return playxlib.HandlerResult(nil, nil, nil, nil, false, uri)
+    }    
 end
 
 

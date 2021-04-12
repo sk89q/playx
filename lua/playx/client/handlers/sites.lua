@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.26 by Dathus on 2021-04-11 05:29 PM (-03:00 GMT)
+-- Version 2.8.28 by Dathus on 2021-04-12 4:51 PM (-03:00 GMT)
 
 list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.HandlerResult{
@@ -42,19 +42,6 @@ if (m) {
     document.body.innerHTML = 'Failure to detect ID.'
 }
 ]]}
-end)
-
-list.Set("PlayXHandlers", "justin.tv", function(width, height, start, volume, uri, handlerArgs)
-	uri = handlerArgs["URL"]
-	if uri:find("/b/") then
-		uri = uri:split("/b/")
-		uri = uri[1].."&archive_id="..uri[2]
-	end
-	
-    return playxlib.HandlerResult{
-        center = true,      
-        body = [[<object type="application/x-shockwave-flash" height="]] .. height .. [[" width="]] ..width.. [[" id="clip_embed_player_flash" data="]]..(uri:find('archive_id') and 'http://www-cdn.justin.tv/widgets/archive_site' or 'http://www.justin.tv/widgets/live_embed')..[[_player.swf" bgcolor="#000000"><param name="movie" value="]]..(uri:find('archive_id') and 'http://www-cdn.justin.tv/widgets/archive_site' or 'http://www.justin.tv/widgets/live_embed')..[[_player.swf?channel=]]..uri..[[" /><param name="allowScriptAccess" value="deny" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="auto_play=true&start_volume=]]..volume..[[&title=Title&channel=]]..uri..[[" /></object>]]
-    }
 end)
 
 list.Set("PlayXHandlers", "Vimeo", function(width, height, start, volume, uri, handlerArgs)
@@ -260,4 +247,16 @@ list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, u
     playFunc = playFunc,
     pauseFunc = pauseFunc
   }
+end)
+
+list.Set("PlayXHandlers", "YoutubeNative", function(width, height, start, volume, uri, handlerArgs)
+    return playxlib.GenerateYoutubeEmbed(width, height, start, volume, uri, "youtube")
+end)
+
+list.Set("PlayXHandlers", "Twitch", function(width, height, start, volume, uri, handlerArgs)
+    return playxlib.GenerateTwitchEmbed(width, height, start, volume, uri, "twitch")
+end)
+
+list.Set("PlayXHandlers", "TwitchVod", function(width, height, start, volume, uri, handlerArgs)
+    return playxlib.GenerateTwitchEmbed(width, height, start, volume, uri, "twitchvod")
 end)
