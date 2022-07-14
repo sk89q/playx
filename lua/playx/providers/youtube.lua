@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.27 by Dathus on 2021-04-11 8:36 PM (-03:00 GMT)
+-- Version 2.8.29 by Dathus on 2022-07-14 6:19 PM (-03:00 GMT)
 
 local apiKey = "AIzaSyCLKZU-TS5J98Q-w97PLO7oqZytJnxVUHk"
 
@@ -101,7 +101,7 @@ function YouTube.QueryMetadata(uri, callback, failCallback)
         local views = resultsTable.items[1].statistics.viewCount
 
         local likes = resultsTable.items[1].statistics.likeCount
-        local numRaters = likes + resultsTable.items[1].statistics.dislikeCount
+        local numRaters = likes -- + resultsTable.items[1].statistics.dislikeCount
         local rating = likes/numRaters * 5
 
         if length then
