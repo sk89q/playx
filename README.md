@@ -7,6 +7,12 @@ PlayX is a media player for [Garry's Mod][] that can play YouTube videos and mor
 
 Just download this addon by clicking on Download ZIP and extract the addon in ````Steam\SteamApps\common\GarrysMod\garrysmod\addons\```` as usual.
 
+
+### Requirement
+![Requirement](https://ziondevelopers.github.io/playx/img/branch.png)
+
+For now to this addon to work you need to use the x86-64 branch.
+
 ### Workshop Ready!
 
 PlayX is now available via the Steam Workshop! Go to [its Workshop page][workshop] and press `Subscribe`, and it will automatically appear in Garry's Mod.
