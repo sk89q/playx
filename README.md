@@ -13,6 +13,8 @@ Just download this addon by clicking on Download ZIP and extract the addon in ``
 
 For now to this addon to work you need to use the x86-64 branch.
 
+For Twitch Streams, Currently Only Non-Mature streams is possible, and you need [CEF Codec Fix][CEFCodecFix].
+
 ### Workshop Ready!
 
 PlayX is now available via the Steam Workshop! Go to [its Workshop page][workshop] and press `Subscribe`, and it will automatically appear in Garry's Mod.
@@ -39,3 +41,4 @@ To view a copy of this license, visit [Common Creative's Website][License].
 [License]: <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 [YouTubeTerms]: <https://www.youtube.com/t/terms>
 [GooglePrivacyPolicy]: <https://policies.google.com/privacy>
+[CEFCodecFix]: <https://github.com/solsticegamestudios/GModCEFCodecFix>
