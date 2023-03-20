@@ -13,7 +13,7 @@ Just download this addon by clicking on Download ZIP and extract the addon in ``
 
 For now to this addon to work you need to use the x86-64 branch.
 
-For Twitch Streams, Currently Only Non-Mature streams is possible, and you need [CEF Codec Fix][CEFCodecFix].
+For Twitch Streams/VODs, Currently Only Non-Mature streams/VODs is possible, and you need [CEF Codec Fix][CEFCodecFix].
 
 ### Workshop Ready!
 
