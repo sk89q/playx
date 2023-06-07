@@ -1,5 +1,4 @@
-PlayX
-=====
+![Logo](https://raw.githubusercontent.com/ZionDevelopers/playx/master/logo.png)
 
 PlayX is a media player for [Garry's Mod][] that can play YouTube videos and more.
 
