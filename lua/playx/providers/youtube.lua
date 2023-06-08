@@ -20,6 +20,7 @@ function YouTube.Detect(uri)
         "^https?://[A-Za-z0-9%.%-]*%.youtube%.com/v/([A-Za-z0-9_%-]+)",
         "^https?://youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
         "^https?://[A-Za-z0-9%.%-]*%.youtube%-nocookie%.com/watch%?.*v=([A-Za-z0-9_%-]+)",
+        "^https?://[A-Za-z0-9%.%-]*%.youtube%.com/live/([A-Za-z0-9_%-]+)",
     })
 
     if m then
@@ -29,17 +30,17 @@ end
 
 function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-            local url = GetConVarString("playx_youtubehost_url") .. "?v=" .. uri
+        local url = GetConVarString("playx_youtubehost_url") .. "?v=" .. uri
 
-            return {
-                ["Handler"] = "YoutubeNative",
-                ["URI"] = url,
-                ["ResumeSupported"] = true,
-                ["LowFramerate"] = false,
-                ["MetadataFunc"] = function(callback, failCallback)
-                    YouTube.QueryMetadata(uri, callback, failCallback)
-                end
-            }
+        return {
+            ["Handler"] = "YoutubeNative",
+            ["URI"] = url,
+            ["ResumeSupported"] = true,
+            ["LowFramerate"] = false,
+            ["MetadataFunc"] = function(callback, failCallback)
+                YouTube.QueryMetadata(uri, callback, failCallback)
+            end
+        }
     end
 end
 
