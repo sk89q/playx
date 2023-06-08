@@ -23,7 +23,7 @@ PlayX is now available via the Steam Workshop! Go to [its Workshop page][worksho
 Simply clone this repository into your `addons` folder:
 
     cd "%programfiles(x86)%/Steam/SteamApps/common/GarrysMod/garrysmod/addons"
-    git clone https://github.com/ZionDevelopers/PlayX.git PlayX
+    git clone https://github.com/ZionDevelopers/playx.git PlayX
 
 ### Terms of Service and Privacy Policy
 
