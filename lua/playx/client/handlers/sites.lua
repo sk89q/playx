@@ -224,6 +224,7 @@ list.Set("PlayXHandlers", "Livestream", function(width, height, start, volume, u
 end)
 
 -- Initial soundcloud handler by Xerasin, I fixed and make it better for my PlayX version.
+
 list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, uri, handlerArgs)
   if start > 2 then
     start = start + 4 -- Lets account for buffer time...
@@ -242,7 +243,7 @@ list.Set("PlayXHandlers", "SoundCloud", function(width, height, start, volume, u
   end
   
   return playxlib.HandlerResult{
-    url =  playxlib.JSEscape("http://ziondevelopers.github.io/playx/soundcloud.html?url="..uri.."&t="..tostring(start*1000).."&vol="..tostring(volume)),
+    url =  playxlib.JSEscape(GetConVarString("playx_soundcloud_host_url"):Trim() .. "?url="..uri.."&t="..tostring(start*1000).."&vol="..tostring(volume)),
     volumeFunc = volumeFunc,
     playFunc = playFunc,
     pauseFunc = pauseFunc

@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.29 by Dathus on 2022-07-14 6:19 PM (-03:00 GMT)
+-- Version 2.8.32 by Dathus [BR] on 2023-06-09 5:00 PM (-03:00 GMT)
 
 local apiKey = "AIzaSyCLKZU-TS5J98Q-w97PLO7oqZytJnxVUHk"
 
@@ -30,7 +30,7 @@ end
 
 function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-        local url = GetConVarString("playx_youtubehost_url") .. "?v=" .. uri
+        local url = GetConVarString("playx_youtube_host_url") .. "?v=" .. uri
 
         return {
             ["Handler"] = "YoutubeNative",

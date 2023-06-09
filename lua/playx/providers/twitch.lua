@@ -22,7 +22,7 @@ end
 
 function Twitch.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-        local url = "https://ziondevelopers.github.io/playx/twitchhost.html?channel=" .. uri
+        local url = GetConVarString("playx_twitch_host_url"):Trim() .. "?channel=" .. uri
         
         return {
           ["Handler"] = "Twitch",

@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.26 by Dathus on 2021-04-11 05:29 PM (-03:00 GMT)
+-- Version 2.8.32 by Dathus [BR] on 2023-06-09 5:00 PM (-03:00 GMT)
 local TwitchVod = {}
 
 function TwitchVod.Detect(uri)
@@ -22,7 +22,7 @@ end
 
 function TwitchVod.GetPlayer(uri, useJW)
     if uri:find("^[0-9]+$") then
-        local url = "https://ziondevelopers.github.io/playx/twitchhost.html?videoId=" .. uri
+        local url = GetConVarString("playx_twitch_host_url"):Trim() .. "?videoId=" .. uri
         
         return {
           ["Handler"] = "TwitchVod",
@@ -43,5 +43,5 @@ function TwitchVod.QueryMetadata(uri, callback, failCallback)
 end
 
 list.Set("PlayXProviders", "TwitchVod", TwitchVod)
-list.Set("PlayXProvidersList", "TwitchVod", {"TwitchVod"})
+list.Set("PlayXProvidersList", "TwitchVod", {"Twitch Vod"})
  
