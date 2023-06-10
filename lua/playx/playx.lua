@@ -15,6 +15,7 @@ CreateConVar("playx_host_url", "https://ziondevelopers.github.io/playx/host.html
 CreateConVar("playx_youtube_host_url", "https://ziondevelopers.github.io/playx/youtubehost.html",        {FCVAR_GAMEDLL})
 CreateConVar("playx_twitch_host_url", "https://ziondevelopers.github.io/playx/twitchhost.html",        {FCVAR_GAMEDLL})
 CreateConVar("playx_vimeo_host_url", "https://ziondevelopers.github.io/playx/vimeohost.html",        {FCVAR_GAMEDLL})
+CreateClientConVar("playx_navigator_host_url", "https://ziondevelopers.github.io/playx/vimeohost.html",        {FCVAR_GAMEDLL})
 CreateConVar("playx_jw_youtube", "1", {FCVAR_ARCHIVE})
 CreateConVar("playx_admin_timeout", "120", {FCVAR_ARCHIVE})
 CreateConVar("playx_expire", "-1", {FCVAR_ARCHIVE})
