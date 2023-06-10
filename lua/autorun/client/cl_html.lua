@@ -1,14 +1,14 @@
 -- PlayX
 -- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
 -- Copyright (c) 2011 - 2023 DathusBR <https://www.juliocesar.me>
--- 
+--
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
--- 
+--
 -- Credit: Based on Cinema Fixed Edition: <https://raw.githubusercontent.com/FarukGamer/cinema/master/workshop/gamemodes/cinema_modded/gamemode/modules/scoreboard/controls/cl_html.lua>
 
 -- $Id$
--- Version 2.9.1 by Dathus [BR] on 2023-06-10 3:30 PM (-03:00 GMT)
+-- Version 2.9.3 by Dathus [BR] on 2023-06-10 7:46 PM (-03:00 GMT)
 
 local RealTime = RealTime
 
@@ -17,10 +17,15 @@ DEFINE_BASECLASS( "Panel" )
 local PANEL = {}
 
 local JS_CallbackHack = [[(function(){
+
   var funcname = '%s';
+
   window[funcname] = function(){
+
     _gm[funcname].apply(_gm,arguments);
+
   }
+
 })();]]
 
 local ConsoleColors = {
@@ -40,6 +45,8 @@ AccessorFunc( PANEL, "m_bScrollbars",       "Scrollbars",     FORCE_BOOL )
 AccessorFunc( PANEL, "m_bAllowLua",       "AllowLua",     FORCE_BOOL )
 
 --[[---------------------------------------------------------
+
+
 
 -----------------------------------------------------------]]
 function PANEL:Init()
@@ -66,7 +73,7 @@ function PANEL:Init()
 
   self:AddFunction( "window", "open", function()
     -- prevents popups from opening
-  end)
+    end)
 
   self:AddFunction( "gmod", "clickSound", function( click )
     if click then
@@ -84,11 +91,43 @@ function PANEL:Init()
     if not isstring(url) then return end
     gui.OpenURL(url)
   end)
+  
+  --
+  -- Implement a console.log - because awesomium doesn't provide it for us anymore.
+  --
+  self:AddFunction( "gmod", "log", function( param ) self:ConsoleMessage( param ) end )
+  self:AddFunction( "console", "getHTML", function( param ) self:GetHTML( param ) end )
 
+  self:AddFunction( "playx", "processPlayerData", function( query )
+    local playx = PlayX.GetInstance()
+    if query and IsValid(playx) then
+      -- Unavailable on entity removal
+      if playx.ProcessPlayerData then
+        playx:ProcessPlayerData(playxlib.ParseQuery(query))
+      end
+      return true
+    end
+  end )
+
+  self:AddFunction( "gmod", "getUrl", function( href, finished )
+    self.URL = href
+
+    if finished then
+      self:OpeningURL( href ) -- browser controls suck
+      self:FinishedURL( href )
+    else
+      self:OpeningURL( href )
+    end
+  end )
 end
 
 function PANEL:SetupCallbacks()
 
+end
+
+function PANEL:GetHTML( msg )
+  if not isstring( msg ) then msg = "" end
+  PlayX._SourceCodeText:SetText(msg)
 end
 
 function PANEL:Think()
@@ -193,7 +232,9 @@ function PANEL:OnURLChanged( new, old )
 end
 
 --[[---------------------------------------------------------
+
   Window loading events
+
 -----------------------------------------------------------]]
 
 --
