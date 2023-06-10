@@ -639,6 +639,30 @@ function playxlib.GenerateTwitchEmbed(width, height, start, volume, uri, provide
     }
 end
 
+--- Generates the HTML for the Vimeo Embed
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateVimeoEmbed(width, height, start, volume, uri, provider)
+    local volumeFunc = function(volume)
+        return [[videoPlayer.setVolume(]] .. tostring(playxlib.volumeFloat(volume)) .. [[)]]
+    end
+    local playFunc = function()
+        return [[videoPlayer.play()]]
+    end
+    
+    local pauseFunc = function()
+        return [[videoPlayer.pause()]]
+    end
+  
+    return playxlib.HandlerResult{
+        url = uri .. "&start=" .. start,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc
+    }
+end
 
 --- Generates the HTML for the Youtube Native Embed
 -- @param width
