@@ -8,7 +8,7 @@
 -- Credit: Based on Cinema Fixed Edition: <https://raw.githubusercontent.com/FarukGamer/cinema/master/workshop/gamemodes/cinema_modded/gamemode/modules/scoreboard/controls/cl_html.lua>
 
 -- $Id$
--- Version 2.9.3 by Dathus [BR] on 2023-06-10 7:46 PM (-03:00 GMT)
+-- Version 2.9.3 by Dathus [BR] on 2023-06-10 7:54 PM (-03:00 GMT)
 
 local RealTime = RealTime
 
