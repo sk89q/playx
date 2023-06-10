@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 --
 -- $Id$
--- Version 2.7.5 by Nexus [BR] on 07-03-2013 09:02 PM
+-- Version 2.9.0 by Dathus [BR] on 2023-06-10 12:20 (-03:00 GMT)
 
 local Vimeo = {}
 
