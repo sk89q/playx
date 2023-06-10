@@ -6,43 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.28 by Dathus on 2021-04-12 4:51 PM (-03:00 GMT)
-
-list.Set("PlayXHandlers", "Hulu", function(width, height, start, volume, uri, handlerArgs)
-    return playxlib.HandlerResult{
-        url = uri,
-        center = true,
-        css = [[
-* { overflow: hidden !important; }
-]],
-        js = [[
-var m = document.head.innerHTML.match(/\/embed\/([^"]+)"/);
-if (m) {
-	try{
-	    document.body.style.overflow = 'hidden';
-	    var id = m[1];
-	    document.body.innerHTML = '<div id="player-container"></div>'
-	    var swfObject = new SWFObject("/site-player/playerembedwrapper.swf?referrer=none&eid="+id+"&st=&et=&it=&ml=0&siteHost=http://www.hulu.com", "player", "]] .. width .. [[", "]] .. height .. [[", "10.0.22");
-	    swfObject.useExpressInstall("/expressinstall.swf");
-	    swfObject.setAttribute("style", "position:fixed;top:0;left:0;width:1024px;height:512px;z-index:99999;");
-	    swfObject.addParam("allowScriptAccess", "always");
-	    swfObject.addParam("allowFullscreen", "true");
-	    swfObject.addVariable("popout", "true");
-	    swfObject.addVariable("plugins", "1");
-	    swfObject.addVariable("modes", 4);
-	    swfObject.addVariable("initMode", 4);
-	    swfObject.addVariable("sortBy", "");
-	    swfObject.addVariable("continuous_play_on", "false");
-	    swfObject.addVariable("st", ]] .. start .. [[);
-	    swfObject.addVariable("stage_width", "]] .. width .. [[");
-	    swfObject.addVariable("stage_height", "]] .. height .. [[");
-	    swfObject.write("player-container");
-    } catch (e) {}
-} else {
-    document.body.innerHTML = 'Failure to detect ID.'
-}
-]]}
-end)
+-- Version 2.9.2 by Dathus [BR] on 2023-06-10 4:26 PM (-03:00 GMT)
 
 list.Set("PlayXHandlers", "Vimeo", function(width, height, start, volume, uri, handlerArgs)
     return playxlib.GenerateVimeoEmbed(width, height, start, volume, uri, "vimeo")
