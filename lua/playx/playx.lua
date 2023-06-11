@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.32 by Dathus [BR] on 2023-06-09 5:00 PM (-03:00 GMT)
+-- Version 2.9.5 by Dathus [BR] on 2023-06-11 10:02 AM (-03:00 GMT)
 
 
 -- FCVAR_GAMEDLL makes cvar change detection work

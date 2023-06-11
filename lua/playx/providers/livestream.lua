@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 --
 -- $Id$
--- Version 2.7.7 by Nexus [BR] on 09-07-2013 11:46 AM
+-- Version 2.9.5 by Dathus [BR] on 2023-06-11 10:02 AM (-03:00 GMT)
 
 local Livestream = {}
 
