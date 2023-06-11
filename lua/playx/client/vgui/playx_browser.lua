@@ -13,7 +13,7 @@ local PANEL = {}
 function PANEL:Init()
   self.Chrome = vgui.Create("PlayXHTMLControls", self);
   self.Chrome:Dock(TOP)
-  self.Chrome.HomeURL = "https://ziondevelopers.github.io/playx"
+  self.Chrome.HomeURL = GetConVarString("playx_navigator_homepage_url"):Trim()
 end
 
 function PANEL:OpeningVideo(provider, uri)
@@ -25,7 +25,7 @@ function PANEL:Paint()
 
     self.HTML = vgui.Create("PlayXHTML", self)
     self.HTML:Dock(FILL)
-    self.HTML:OpenURL(self.Chrome.HomeURL)
+    self.HTML:OpenURL(GetConVarString("playx_navigator_homepage_url"):Trim())
 
     self.Chrome:SetHTML(self.HTML)
 

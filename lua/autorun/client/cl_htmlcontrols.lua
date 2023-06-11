@@ -95,7 +95,7 @@ function PANEL:Init()
   self.HomeButton:DockMargin( Spacing, Margins, Spacing * 3, Margins )
   self.HomeButton.DoClick = function()
     self.HTML:Stop()
-    self.HTML:OpenURL( self.HomeURL )
+    self.HTML:OpenURL( GetConVarString("playx_navigator_homepage_url"):Trim() )
     self.Cur = 1
   end
 
@@ -119,7 +119,7 @@ function PANEL:Init()
     PlayX.NavigatorCapturedURL = self.HTML.URL;    
     self:Open("", self.HTML.URL);
     self.HTML:Stop()
-    self.HTML:OpenURL(self.HomeURL)
+    self.HTML:OpenURL(GetConVarString("playx_navigator_homepage_url"):Trim())
     PlayX._NavigatorWindow:Close();
   end
 
@@ -133,7 +133,7 @@ function PANEL:Init()
   self:SetButtonColor( Color( 250, 250, 250, 200 ) )
   self.BorderSize = 4
   self.BackgroundColor = Color( 33, 33, 33, 255 )
-  self.HomeURL = "http://www.google.com"
+  self.HomeURL = GetConVarString("playx_navigator_homepage_url"):Trim()
 
 end
 
