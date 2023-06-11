@@ -9,7 +9,7 @@
 -- Credit: Based on Cinema Fixed Edition: <https://raw.githubusercontent.com/FarukGamer/cinema/master/workshop/gamemodes/cinema_modded/gamemode/modules/scoreboard/controls/cl_htmlcontrols.lua>
 
 -- $Id$
--- Version 2.9.1 by Dathus [BR] on 2023-06-10 3:30 PM (-03:00 GMT)
+-- Version 2.9.7 by Dathus [BR] on 2023-06-11 8:37 PM (-03:00 GMT)
 
 local PANEL = {}
 
@@ -119,7 +119,7 @@ function PANEL:Init()
     PlayX.NavigatorCapturedURL = self.HTML.URL;    
     self:Open("", self.HTML.URL);
     self.HTML:Stop()
-    self.HTML:OpenURL(GetConVarString("playx_navigator_homepage_url"):Trim())
+    self.BackButton.DoClick()
     PlayX._NavigatorWindow:Close();
   end
 
