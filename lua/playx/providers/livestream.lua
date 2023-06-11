@@ -12,13 +12,13 @@ local Livestream = {}
 
 function Livestream.Detect(uri, useJW)
   local m = playxlib.FindMatch(uri, {
-    "^https?://livestream%.com/accounts/([0-9]+)/events/([0-9]+)/videos/([0-9]+)",
-    "^https?://livestream%.com/accounts/([0-9]+)/events/([0-9]+)",
-    "^https?://livestream%.com/accounts/([0-9]+)/([A-Za-z0-9%-%_%.]+)"
+    "^https?://livestream%.com/accounts/([0-9]+/events/[0-9]+/videos/[0-9]+)",
+    "^https?://livestream%.com/accounts/([0-9]+/events/[0-9]+)",
+    "^https?://livestream%.com/accounts/([0-9]+/[A-Za-z0-9%-%_%.]+)"
   })
-
+  
   if m then
-    return uri
+    return m[1]
   end
 end
 
@@ -26,7 +26,7 @@ function Livestream.GetPlayer(url, useJW)
   if url:find("^[A-Za-z0-9_%-%/]+$") then
     return {
       ["Handler"] = "Livestream",
-      ["URI"] = GetConVarString("playx_livestream_host_url"):Trim() .. "?path=" .. url,
+      ["URI"] = GetConVarString("playx_livestream_host_url"):Trim() .. "?path=accounts/" .. url,
       ["ResumeSupported"] = false,
       ["LowFramerate"] = false,
       ["MetadataFunc"] = function(callback, failCallback)
