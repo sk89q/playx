@@ -30,7 +30,7 @@ end
 
 function YouTube.GetPlayer(uri, useJW)
     if uri:find("^[A-Za-z0-9_%-]+$") then
-        local url = GetConVarString("playx_youtube_host_url") .. "?v=" .. uri
+        local url = GetConVarString("playx_youtube_host_url") .. "?v=" .. uri .. "&quality=" .. GetConVarString("playx_video_quality"):Trim()
 
         return {
             ["Handler"] = "YoutubeNative",
