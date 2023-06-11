@@ -119,7 +119,7 @@ function PANEL:Init()
     PlayX.NavigatorCapturedURL = self.HTML.URL;    
     self:Open("", self.HTML.URL);
     self.HTML:Stop()
-    self.BackButton.DoClick()
+    self.HTML:OpenURL( GetConVarString("playx_navigator_homepage_url"):Trim() )
     PlayX._NavigatorWindow:Close();
   end
 
