@@ -5,10 +5,9 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 --
--- Soundcloud provider coded by Xerasin
+-- Soundcloud provider coded initially by Xerasin
 
--- Client-side convar
-CreateClientConVar("playx_soundcloud_host_url", "https://ziondevelopers.github.io/playx/soundcloud.html", {FCVAR_GAMEDLL})
+-- Version 2.9.6 by Dathus [BR] on 2023-06-11 4:54 PM (-03:00 GMT)
 
 local SoundCloud = {}
 
@@ -31,7 +30,7 @@ function SoundCloud.GetPlayer(uri, useJW)
   local url = uri
   return {
     ["Handler"] = "SoundCloud",
-    ["URI"] = url,
+    ["URI"] = GetConVarString("playx_soundcloud_host_url") .. '?url=' .. url,
     ["ResumeSupported"] = true,
     ["LowFramerate"] = false,
     ["QueryMetadata"] = function(callback, failCallback)

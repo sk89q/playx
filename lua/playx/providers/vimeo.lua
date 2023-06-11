@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 --
 -- $Id$
--- Version 2.9.0 by Dathus [BR] on 2023-06-10 12:20 (-03:00 GMT)
+-- Version 2.9.6 by Dathus [BR] on 2023-06-11 4:54 PM (-03:00 GMT)
 
 local Vimeo = {}
 
@@ -14,6 +14,7 @@ function Vimeo.Detect(uri, useJW)
   local m = playxlib.FindMatch(uri:gsub("%?.*$", ""), {
     "^https?://[A-Za-z0-9%.%-]*%.vimeo%.com/([0-9]+)",
     "^https?://vimeo%.com/([0-9]+)",
+    "^https?://vimeo.com/channels/[a-zA-Z0-9%-%_%.]+/([0-9]+)"
   })
 
   if m then

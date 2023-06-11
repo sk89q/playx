@@ -6,7 +6,7 @@
 -- To view a copy of this license, visit Common Creative's Website. <https://creativecommons.org/licenses/by-nc-sa/4.0/>
 -- 
 -- $Id$
--- Version 2.8.28 by Dathus on 2021-04-12 4:51 PM (-03:00 GMT)
+-- Version 2.9.6 by Dathus [BR] on 2023-06-11 4:54 PM (-03:00 GMT)
 
 playxlib = {}
 
@@ -633,6 +633,63 @@ function playxlib.GenerateTwitchEmbed(width, height, start, volume, uri, provide
 	
     return playxlib.HandlerResult{
         url = uri .. "&start=" .. start,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc
+    }
+end
+
+--- Generates the HTML for the SoundCloud Embed
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateSoundcloudEmbed(width, height, start, volume, uri, provider)
+  if start > 2 then
+    start = start + 4 -- Lets account for buffer time...
+  end
+  
+  local volumeFunc = function(volume)
+    return "SC.Widget(document.querySelector('iframe')).setVolume("..tostring(volume)..");"
+  end
+  
+  local playFunc = function()
+    return "SC.Widget(document.querySelector('iframe')).play();"
+  end
+  
+  local pauseFunc = function()
+    return "SC.Widget(document.querySelector('iframe')).pause();"
+  end
+  
+    return playxlib.HandlerResult{
+        url = uri .. "&t=" .. start .. "&vol="..volume,
+        volumeFunc = volumeFunc,
+        playFunc = playFunc,
+        pauseFunc = pauseFunc
+    }
+end
+
+--- Generates the HTML for the Livestream Embed
+-- @param width
+-- @param height
+-- @param url
+-- @return HTML
+function playxlib.GenerateLivestreamEmbed(width, height, start, volume, uri, provider)
+
+  local volumeFunc = function(volume)
+    return ""
+  end
+  
+  local playFunc = function()
+    return ""
+  end
+  
+  local pauseFunc = function()
+    return ""
+  end
+  
+    return playxlib.HandlerResult{
+        url = uri,
         volumeFunc = volumeFunc,
         playFunc = playFunc,
         pauseFunc = pauseFunc
